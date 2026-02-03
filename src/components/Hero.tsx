@@ -153,7 +153,7 @@ export default function Hero() {
         {/* Right Column - Text Content */}
         <div className="flex flex-1 flex-col gap-6 items-start max-w-[800px] min-w-[300px]">
           {/* H1 Typography */}
-          <h1 className="flex-1 font-sans text-4xl md:text-5xl lg:text-7xl leading-tight md:leading-[72px] font-semibold text-foreground w-full">
+          <h1 className="flex-1 font-sans text-4xl md:text-5xl lg:text-7xl leading-tight md:leading-[72px] font-medium text-foreground w-full">
             <span className="block">Head of design.</span>
             <span className="block">Still doing the doing.</span>
           </h1>
