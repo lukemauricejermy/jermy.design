@@ -87,6 +87,15 @@
   --sidebar-accent-foreground: #171717;
   --sidebar-border: #e5e5e5;
   --sidebar-ring: #a3a3a3;
+  /* Illustration colors */
+  --illustration-line-work: #171717;
+  --illustration-skin-tone-primary: #fde8c3;
+  --illustration-skin-tone-secondary: #fcd99c;
+  --illustration-clothing-primary: #fafafa;
+  --illustration-clothing-secondary: #f0ede1;
+  --illustration-clothing-tertiary: #ddd6bb;
+  --illustration-laptop: #bbbaba;
+  --illustration-tongue: #fca5a5;
 }
 
 .dark {
@@ -123,6 +132,15 @@
   --sidebar-accent-foreground: #fafafa;
   --sidebar-border: rgba(255, 255, 255, 0.1);
   --sidebar-ring: #525252;
+  /* Illustration colors */
+  --illustration-line-work: #3b3b3b;
+  --illustration-skin-tone-primary: #d5c5a8;
+  --illustration-skin-tone-secondary: #cab691;
+  --illustration-clothing-primary: #0a0a0a;
+  --illustration-clothing-secondary: #726e5c;
+  --illustration-clothing-tertiary: #575447;
+  --illustration-laptop: #2d2d2d;
+  --illustration-tongue: #f87171;
 }
 
 @layer base {
