@@ -2,15 +2,29 @@
 
 import { useTheme } from "next-themes";
 import { Sun, Moon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [localIsDark, setLocalIsDark] = useState(false);
+  const isAnimatingRef = useRef(false);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    if (theme) {
+      // Only sync if we're not currently animating
+      if (!isAnimatingRef.current) {
+        setLocalIsDark(theme === "dark");
+      }
+    }
+    // Fade in after mount, matching header timing
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [theme]);
 
   if (!mounted) {
     return (
@@ -23,13 +37,34 @@ export function ThemeToggle() {
   const isDark = theme === "dark";
 
   const toggleTheme = () => {
-    setTheme(isDark ? "light" : "dark");
+    if (isAnimatingRef.current) return; // Prevent double-clicks during animation
+    
+    const newTheme = isDark ? "light" : "dark";
+    isAnimatingRef.current = true;
+    
+    // Update local state immediately to trigger animation
+    setLocalIsDark(newTheme === "dark");
+    
+    // Use double requestAnimationFrame to ensure browser sees the change
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setTheme(newTheme);
+        // Reset animation flag after transition completes
+        setTimeout(() => {
+          isAnimatingRef.current = false;
+        }, 320);
+      });
+    });
   };
 
   return (
     <button
       onClick={toggleTheme}
       className="bg-muted flex h-9 items-center p-[3px] rounded-lg relative cursor-pointer hover:opacity-90 transition-opacity"
+      style={{
+        opacity: isVisible ? 1 : 0,
+        transition: "opacity 900ms cubic-bezier(0.4, 0, 0.2, 1)",
+      }}
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
     >
       {/* Sliding indicator - matches active button dimensions exactly from Figma */}
@@ -40,10 +75,9 @@ export function ThemeToggle() {
           width: "calc(50% - 3px)",
           height: "calc(100% - 6px)",
           top: "3px",
-          left: isDark ? "50%" : "3px",
-          transitionProperty: "left",
-          transitionDuration: "320ms",
-          transitionTimingFunction: "ease-in-out"
+          left: localIsDark ? "50%" : "3px",
+          transition: "left 320ms cubic-bezier(0.4, 0, 0.2, 1)",
+          willChange: "left"
         }}
       />
       
@@ -51,11 +85,11 @@ export function ThemeToggle() {
       <div className="relative flex items-center w-full h-full z-10">
         {/* Sun button area - matches Figma button structure */}
         <div className="flex-1 flex items-center justify-center p-2 rounded-md h-full">
-          <Sun className={`size-4 transition-colors duration-[320ms] ${!isDark ? "text-foreground" : "text-muted-foreground"}`} />
+          <Sun className={`size-4 ${!isDark ? "text-foreground" : "text-muted-foreground"}`} />
         </div>
         {/* Moon button area - matches Figma button structure */}
         <div className="flex-1 flex items-center justify-center p-2 rounded-md h-full">
-          <Moon className={`size-4 transition-colors duration-[320ms] ${isDark ? "text-foreground" : "text-muted-foreground"}`} />
+          <Moon className={`size-4 ${isDark ? "text-foreground" : "text-muted-foreground"}`} />
         </div>
       </div>
     </button>
