@@ -66,7 +66,7 @@ export function Header() {
     if (!hasLoaded) return "none";
     if (isInitialLoad) {
       // Initial load: animate both transform and opacity
-      return "transform 700ms cubic-bezier(0.4, 0, 0.2, 1), opacity 700ms cubic-bezier(0.4, 0, 0.2, 1)";
+      return "transform 900ms cubic-bezier(0.4, 0, 0.2, 1), opacity 900ms cubic-bezier(0.4, 0, 0.2, 1)";
     }
     // Scroll animations: only transform, no opacity
     return "transform 350ms cubic-bezier(0.4, 0, 0.2, 1)";
@@ -84,7 +84,7 @@ export function Header() {
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 px-6 py-6"
+      className="fixed top-0 left-0 right-0 z-50 px-3 py-3 md:px-6 md:py-6"
       style={{
         transform: isVisible ? "translateY(0)" : "translateY(-100%)",
         transition: getTransitionProperties(),
