@@ -1,9 +1,6 @@
-import { ThemeToggle } from "./theme-toggle";
-
 export default function Hero() {
   return (
-    <section className="flex flex-col items-center justify-center px-6 py-16 md:py-32 w-full min-h-screen relative">
-      <ThemeToggle />
+    <section className="flex flex-col items-center justify-center px-6 pt-32 pb-16 md:pt-40 md:pb-32 w-full min-h-screen">
       <div className="flex flex-1 flex-wrap gap-2 items-center justify-center max-w-[1440px] w-full">
         {/* Left Column - Self Portrait */}
         <div className="flex flex-1 items-center justify-center max-w-[540px] min-w-[240px]">
