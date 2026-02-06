@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle-header";
 
@@ -13,9 +13,84 @@ const navigation = [
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  // Handle initial load animation
+  useEffect(() => {
+    // Start hidden, then animate in after mount
+    setHasLoaded(true);
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Handle scroll-based show/hide
+  useEffect(() => {
+    if (!hasLoaded) return;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const scrollThreshold = 10;
+
+      // Mark that we've scrolled (no longer initial load)
+      if (currentScrollY > 0 && isInitialLoad) {
+        setIsInitialLoad(false);
+      }
+
+      // Only update if scroll change is significant enough to prevent jitter
+      if (Math.abs(currentScrollY - lastScrollY) < scrollThreshold) {
+        return;
+      }
+
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down - hide header
+        setIsVisible(false);
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling up - show header
+        setIsVisible(true);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY, hasLoaded, isInitialLoad]);
+
+  // Determine transition properties based on state
+  const getTransitionProperties = () => {
+    if (!hasLoaded) return "none";
+    if (isInitialLoad) {
+      // Initial load: animate both transform and opacity
+      return "transform 700ms cubic-bezier(0.4, 0, 0.2, 1), opacity 700ms cubic-bezier(0.4, 0, 0.2, 1)";
+    }
+    // Scroll animations: only transform, no opacity
+    return "transform 350ms cubic-bezier(0.4, 0, 0.2, 1)";
+  };
+
+  // Determine opacity based on state
+  const getOpacity = () => {
+    if (!hasLoaded) return "0";
+    if (isInitialLoad) {
+      return isVisible ? "1" : "0";
+    }
+    // After initial load, always fully opaque
+    return "1";
+  };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 px-6 py-6">
+    <header
+      className="fixed top-0 left-0 right-0 z-50 px-6 py-6"
+      style={{
+        transform: isVisible ? "translateY(0)" : "translateY(-100%)",
+        transition: getTransitionProperties(),
+        opacity: getOpacity(),
+      }}
+    >
       <div className="flex items-center justify-between max-w-[1728px] mx-auto">
         {/* Logo */}
         <Link
