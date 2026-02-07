@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle-header";
 
@@ -17,6 +17,7 @@ export function Header() {
   const [hasLoaded, setHasLoaded] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   // Handle initial load animation
   useEffect(() => {
@@ -60,6 +61,27 @@ export function Header() {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY, hasLoaded, isInitialLoad]);
+
+  // Handle click outside to close mobile menu
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        mobileMenuOpen &&
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target as Node) &&
+        !(event.target as HTMLElement).closest('[aria-label="Toggle menu"]')
+      ) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    if (mobileMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }
+  }, [mobileMenuOpen]);
 
   // Determine transition properties based on state
   const getTransitionProperties = () => {
@@ -136,6 +158,9 @@ export function Header() {
         {/* Mobile Navigation */}
         <div className="md:hidden flex items-center">
           <div className="bg-card border border-border flex gap-2 items-center px-3 py-3 rounded-2xl shadow-sm">
+            {/* Theme Toggle - Always visible on mobile */}
+            <ThemeToggle />
+
             {/* Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -149,21 +174,16 @@ export function Header() {
               )}
               <span>Menu</span>
             </button>
-
-            {/* Get in touch button - NOW INSIDE */}
-            <Link
-              href="/contact"
-              className="bg-primary text-primary-foreground h-9 flex items-center justify-center px-4 py-2 rounded-md text-sm leading-5 font-medium hover:opacity-90 transition-opacity"
-            >
-              Get in touch
-            </Link>
           </div>
         </div>
       </div>
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden mt-4 bg-card border border-border rounded-2xl shadow-sm p-3">
+        <div
+          ref={mobileMenuRef}
+          className="md:hidden mt-4 bg-card border border-border rounded-2xl shadow-sm p-3"
+        >
           <nav className="flex flex-col gap-1">
             {navigation.map((item) => (
               <Link
@@ -175,11 +195,14 @@ export function Header() {
                 {item.name}
               </Link>
             ))}
-            <div className="pt-2 border-t border-border mt-1">
-              <div className="px-4 py-2">
-                <ThemeToggle />
-              </div>
-            </div>
+            {/* Get in touch button - Now in the menu */}
+            <Link
+              href="/contact"
+              onClick={() => setMobileMenuOpen(false)}
+              className="bg-primary text-primary-foreground h-9 flex items-center justify-center px-4 py-2 rounded-md text-sm leading-5 font-medium hover:opacity-90 transition-opacity mt-3"
+            >
+              Get in touch
+            </Link>
           </nav>
         </div>
       )}
