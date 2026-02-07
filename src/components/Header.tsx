@@ -62,7 +62,7 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY, hasLoaded, isInitialLoad]);
 
-  // Handle click outside to close mobile menu
+  // Handle click outside and scroll to close mobile menu
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -75,10 +75,18 @@ export function Header() {
       }
     };
 
+    const handleScroll = () => {
+      if (mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    };
+
     if (mobileMenuOpen) {
       document.addEventListener("mousedown", handleClickOutside);
+      window.addEventListener("scroll", handleScroll, { passive: true });
       return () => {
         document.removeEventListener("mousedown", handleClickOutside);
+        window.removeEventListener("scroll", handleScroll);
       };
     }
   }, [mobileMenuOpen]);
