@@ -211,7 +211,7 @@ export default function SocialProof() {
           duration={animationDurations.default}
           distance={15}
           easing={animationEasings.smooth}
-          className="grid grid-cols-[repeat(2,117.523px)] md:flex md:flex-row gap-8 md:gap-14 items-center justify-center px-[86px] py-6 w-full"
+          className="grid grid-cols-[repeat(2,117.523px)] md:flex md:flex-row gap-6 md:gap-14 items-center justify-center px-[86px] py-6 w-full"
         >
           {logos.map((logo) => {
             const LogoComponent = logo.component;
