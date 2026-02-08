@@ -1,3 +1,5 @@
+import { H1, Lead } from "@/components/ui/typography";
+
 export default function Hero() {
   return (
     <section className="flex flex-col items-center justify-center px-6 pt-32 pb-16 md:pt-40 md:pb-32 w-full min-h-screen">
@@ -150,15 +152,15 @@ export default function Hero() {
         {/* Right Column - Text Content */}
         <div className="flex flex-1 flex-col gap-6 items-start max-w-[800px] min-w-[300px]">
           {/* H1 Typography */}
-          <h1 className="flex-1 font-sans text-4xl md:text-5xl lg:text-7xl leading-tight md:leading-[72px] font-medium text-foreground w-full">
+          <H1 className="flex-1 font-sans text-4xl md:text-5xl lg:text-7xl leading-tight md:leading-[72px] font-medium text-foreground w-full">
             <span className="block">Head of design.</span>
             <span className="block">Still doing the doing.</span>
-          </h1>
+          </H1>
 
           {/* Lead Typography */}
-          <p className="flex-1 font-sans text-lg md:text-xl leading-7 md:leading-[28px] font-normal text-muted-foreground w-full">
+          <Lead className="flex-1 font-sans text-lg md:text-xl leading-7 md:leading-[28px] font-normal w-full">
             Leading and crafting digital products across teams and platforms.
-          </p>
+          </Lead>
         </div>
       </div>
     </section>
