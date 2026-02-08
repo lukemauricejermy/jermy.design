@@ -211,7 +211,7 @@ export default function SocialProof() {
           duration={animationDurations.default}
           distance={15}
           easing={animationEasings.smooth}
-          className="grid grid-cols-2 md:flex md:flex-row gap-2 md:gap-14 items-center justify-center py-6 max-w-fit"
+          className="grid grid-cols-2 md:flex md:flex-row gap-4 md:gap-14 items-center justify-center py-6 max-w-fit"
         >
           {logos.map((logo) => {
             const LogoComponent = logo.component;
@@ -221,7 +221,7 @@ export default function SocialProof() {
                 className="relative shrink-0 flex items-center justify-center"
               >
                 <div
-                  className="scale-75 md:scale-100"
+                  className="scale-[0.85] md:scale-100"
                   style={{
                     width: `${logo.width}px`,
                     height: `${logo.height}px`,
