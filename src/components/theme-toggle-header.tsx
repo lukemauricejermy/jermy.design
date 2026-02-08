@@ -5,7 +5,7 @@ import { Sun, Moon } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [localIsDark, setLocalIsDark] = useState(false);
@@ -13,10 +13,11 @@ export function ThemeToggle() {
 
   useEffect(() => {
     setMounted(true);
-    if (theme) {
+    // Use resolvedTheme to get the actual theme being used (resolves "system" to "light" or "dark")
+    if (resolvedTheme) {
       // Only sync if we're not currently animating
       if (!isAnimatingRef.current) {
-        setLocalIsDark(theme === "dark");
+        setLocalIsDark(resolvedTheme === "dark");
       }
     }
     // Fade in after mount, matching header timing
@@ -24,7 +25,7 @@ export function ThemeToggle() {
       setIsVisible(true);
     }, 50);
     return () => clearTimeout(timer);
-  }, [theme]);
+  }, [resolvedTheme]);
 
   if (!mounted) {
     return (
@@ -34,7 +35,8 @@ export function ThemeToggle() {
     );
   }
 
-  const isDark = theme === "dark";
+  // Use resolvedTheme to determine if dark mode is active
+  const isDark = resolvedTheme === "dark";
 
   const toggleTheme = () => {
     if (isAnimatingRef.current) return; // Prevent double-clicks during animation
