@@ -2,11 +2,17 @@
 
 import { useEffect, useRef, useMemo, ReactNode } from "react";
 import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   animationDurations,
   animationEasings,
   animationStaggers,
 } from "@/lib/animation-config";
+
+// Register ScrollTrigger plugin
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 interface TextRevealProps {
   children: string | ReactNode;
@@ -15,6 +21,7 @@ interface TextRevealProps {
   stagger?: number;
   easing?: string;
   className?: string;
+  triggerOnScroll?: boolean;
 }
 
 // Helper function to split text into characters, preserving line breaks
@@ -45,6 +52,7 @@ export function TextReveal({
   stagger = animationStaggers.default,
   easing = animationEasings.robust,
   className = "",
+  triggerOnScroll = false,
 }: TextRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
   
@@ -83,26 +91,51 @@ export function TextReveal({
       });
       console.log("TextReveal: Initial state set");
 
-      // Animate characters up - continuous stagger across all characters
-      gsap.to(charSpans, {
-        y: "0%",
-        duration: duration / 1000, // Convert ms to seconds
-        delay: delay / 1000,
-        stagger: stagger,
-        ease: easing,
-        onStart: () => console.log("TextReveal: Animation started"),
-        onComplete: () => console.log("TextReveal: Animation completed"),
-      });
+      if (triggerOnScroll) {
+        // Scroll-triggered animation
+        const animation = gsap.to(charSpans, {
+          y: "0%",
+          duration: duration / 1000,
+          delay: delay / 1000,
+          stagger: stagger,
+          ease: easing,
+          onStart: () => console.log("TextReveal: Animation started"),
+          onComplete: () => console.log("TextReveal: Animation completed"),
+        });
+
+        ScrollTrigger.create({
+          trigger: element,
+          start: "top 85%",
+          animation: animation,
+          once: true,
+        });
+      } else {
+        // Page load animation
+        gsap.to(charSpans, {
+          y: "0%",
+          duration: duration / 1000,
+          delay: delay / 1000,
+          stagger: stagger,
+          ease: easing,
+          onStart: () => console.log("TextReveal: Animation started"),
+          onComplete: () => console.log("TextReveal: Animation completed"),
+        });
+      }
     }, 10);
 
     return () => {
       clearTimeout(timeoutId);
       if (ref.current) {
         const charSpans = ref.current.querySelectorAll(".char");
+        ScrollTrigger.getAll().forEach((trigger) => {
+          if (trigger.trigger === ref.current) {
+            trigger.kill();
+          }
+        });
         gsap.killTweensOf(charSpans);
       }
     };
-  }, [textData, delay, duration, stagger, easing]);
+  }, [textData, delay, duration, stagger, easing, triggerOnScroll]);
 
   if (typeof children === "string" && textData) {
     const { chars, lineBreakIndices } = textData;
