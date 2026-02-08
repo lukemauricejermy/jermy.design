@@ -1,12 +1,28 @@
+"use client";
+
 import { H1, Lead } from "@/components/ui/typography";
+import { TextReveal } from "@/components/animations/TextReveal";
+import { FadeUp } from "@/components/animations/FadeUp";
+import {
+  animationDurations,
+  animationEasings,
+  animationDelays,
+} from "@/lib/animation-config";
 
 export default function Hero() {
+
   return (
     <section className="flex flex-col items-center justify-center px-6 pt-32 pb-16 md:pt-40 md:pb-32 w-full min-h-screen">
       <div className="flex flex-1 flex-wrap gap-2 items-center justify-center max-w-[1440px] w-full">
         {/* Left Column - Self Portrait */}
         <div className="flex flex-1 items-center justify-center max-w-[540px] min-w-[240px]">
-          <div className="relative shrink-0 size-[240px]">
+          <FadeUp
+            delay={animationDelays.veryLong}
+            duration={animationDurations.slow}
+            distance={15}
+            easing={animationEasings.veryGentle}
+            className="relative shrink-0 size-[240px] overflow-hidden"
+          >
             <svg
               width="240"
               height="240"
@@ -146,21 +162,35 @@ export default function Hero() {
                 strokeWidth="1.79778"
               />
             </svg>
-          </div>
+          </FadeUp>
         </div>
 
         {/* Right Column - Text Content */}
         <div className="flex flex-1 flex-col gap-6 items-start max-w-[800px] min-w-[300px]">
           {/* H1 Typography */}
-          <H1 className="flex-1 font-sans text-4xl md:text-5xl lg:text-7xl leading-tight md:leading-[72px] font-medium text-foreground w-full">
-            <span className="block">Head of design.</span>
-            <span className="block">Still doing the doing.</span>
+          <H1 className="flex-1 font-sans text-4xl md:text-5xl lg:text-7xl leading-tight md:leading-[72px] font-medium text-foreground w-full overflow-hidden">
+            <TextReveal
+              delay={animationDelays.long}
+              duration={animationDurations.verySlow}
+              stagger={0.025}
+              easing={animationEasings.robust}
+            >
+              {`Head of design.\nStill doing the doing.`}
+            </TextReveal>
           </H1>
 
           {/* Lead Typography */}
-          <Lead className="flex-1 font-sans text-lg md:text-xl leading-7 md:leading-[28px] font-normal w-full">
-            Leading and crafting digital products across teams and platforms.
-          </Lead>
+          <FadeUp
+            delay={1350}
+            duration={animationDurations.default + 50}
+            distance={15}
+            easing={animationEasings.smooth}
+            className="flex-1 font-sans text-lg md:text-xl leading-7 md:leading-[28px] font-normal w-full"
+          >
+            <Lead className="w-full">
+              Leading and crafting digital products across teams and platforms.
+            </Lead>
+          </FadeUp>
         </div>
       </div>
     </section>
