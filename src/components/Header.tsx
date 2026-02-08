@@ -4,6 +4,13 @@ import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle-header";
+import { Button } from "@/components/ui/button";
+import {
+  NavigationMenu,
+  NavigationMenuList,
+  NavigationMenuItem,
+  NavigationMenuLink,
+} from "@/components/ui/navigation-menu";
 
 const navigation = [
   { name: "Cases", href: "/work" },
@@ -138,28 +145,28 @@ export function Header() {
         <nav className="hidden md:flex items-center">
           <div className="bg-card border border-border flex gap-5 items-center px-3 py-3 rounded-2xl shadow-sm">
             {/* Navigation Links Container - gap-1 (4px) between links */}
-            <div className="flex gap-1 items-center">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="h-9 flex items-center justify-center px-4 py-2 rounded-md text-sm leading-5 font-medium text-foreground hover:bg-accent transition-colors"
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </div>
+            <NavigationMenu viewport={false}>
+              <NavigationMenuList className="gap-1">
+                {navigation.map((item) => (
+                  <NavigationMenuItem key={item.name}>
+                    <NavigationMenuLink
+                      asChild
+                      className="h-9 flex items-center justify-center px-4 py-2 rounded-md text-sm leading-5 font-medium"
+                    >
+                      <Link href={item.href}>{item.name}</Link>
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                ))}
+              </NavigationMenuList>
+            </NavigationMenu>
 
             {/* Theme Toggle */}
             <ThemeToggle />
 
             {/* Get in touch button - NOW INSIDE */}
-            <Link
-              href="/contact"
-              className="bg-primary text-primary-foreground h-9 flex items-center justify-center px-4 py-2 rounded-md text-sm leading-5 font-medium hover:opacity-90 transition-opacity"
-            >
-              Get in touch
-            </Link>
+            <Button asChild variant="default">
+              <Link href="/contact">Get in touch</Link>
+            </Button>
           </div>
         </nav>
 
@@ -170,9 +177,9 @@ export function Header() {
             <ThemeToggle />
 
             {/* Menu Button */}
-            <button
+            <Button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="bg-secondary text-secondary-foreground h-9 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm leading-5 font-medium hover:bg-accent transition-colors"
+              variant="secondary"
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? (
@@ -181,7 +188,7 @@ export function Header() {
                 <Menu className="size-4" />
               )}
               <span>Menu</span>
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -204,13 +211,11 @@ export function Header() {
               </Link>
             ))}
             {/* Get in touch button - Now in the menu */}
-            <Link
-              href="/contact"
-              onClick={() => setMobileMenuOpen(false)}
-              className="bg-primary text-primary-foreground h-9 flex items-center justify-center px-4 py-2 rounded-md text-sm leading-5 font-medium hover:opacity-90 transition-opacity mt-3"
-            >
-              Get in touch
-            </Link>
+            <Button asChild variant="default" className="mt-3">
+              <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
+                Get in touch
+              </Link>
+            </Button>
           </nav>
         </div>
       )}
