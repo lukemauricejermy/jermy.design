@@ -211,20 +211,23 @@ export default function SocialProof() {
           duration={animationDurations.default}
           distance={15}
           easing={animationEasings.smooth}
-          className="flex flex-wrap gap-14 items-center justify-center px-[86px] py-6 w-full"
+          className="grid grid-cols-[repeat(2,117.523px)] md:flex md:flex-row gap-14 items-center justify-center px-[86px] py-6 w-full"
         >
           {logos.map((logo) => {
             const LogoComponent = logo.component;
             return (
               <div
                 key={logo.name}
-                className="relative shrink-0"
-                style={{
-                  width: `${logo.width}px`,
-                  height: `${logo.height}px`,
-                }}
+                className="relative shrink-0 flex items-center justify-center w-full md:w-auto"
               >
-                <LogoComponent width={logo.width} height={logo.height} />
+                <div
+                  style={{
+                    width: `${logo.width}px`,
+                    height: `${logo.height}px`,
+                  }}
+                >
+                  <LogoComponent width={logo.width} height={logo.height} />
+                </div>
               </div>
             );
           })}
