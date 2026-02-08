@@ -203,7 +203,7 @@ export default function SocialProof() {
         </FadeUp>
       </div>
 
-      <div className="flex flex-col items-start max-w-[1440px] w-full">
+      <div className="flex flex-col items-center max-w-[1440px] w-full">
         <StaggerChildren
           triggerOnScroll={true}
           delayStart={0}
@@ -211,7 +211,7 @@ export default function SocialProof() {
           duration={animationDurations.default}
           distance={15}
           easing={animationEasings.smooth}
-          className="flex flex-row flex-wrap gap-4 md:gap-14 items-center justify-center py-6 w-full"
+          className="grid grid-cols-2 md:flex md:flex-row gap-2 md:gap-14 items-center justify-center py-6 max-w-fit"
         >
           {logos.map((logo) => {
             const LogoComponent = logo.component;
