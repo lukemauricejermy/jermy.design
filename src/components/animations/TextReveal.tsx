@@ -24,25 +24,14 @@ interface TextRevealProps {
   triggerOnScroll?: boolean;
 }
 
-// Helper function to split text into characters, preserving line breaks
-function splitTextIntoChars(text: string): { chars: string[]; lineBreakIndices: number[] } {
+// Split text into lines (by \n) and words (by spaces), preserving structure for proper wrapping
+// Words stay together (no mid-word breaks) and each word has its own overflow for the reveal
+function splitTextIntoWordsAndChars(text: string): { lines: string[][] } {
   const lines = text.split("\n");
-  const chars: string[] = [];
-  const lineBreakIndices: number[] = [];
-  let charCount = 0;
-
-  lines.forEach((line, lineIndex) => {
-    if (lineIndex > 0) {
-      // Mark where the previous line ended (before starting new line)
-      lineBreakIndices.push(charCount);
-    }
-    line.split("").forEach((char) => {
-      chars.push(char === " " ? "\u00A0" : char);
-      charCount++;
-    });
-  });
-
-  return { chars, lineBreakIndices };
+  const result: string[][] = lines.map((line) =>
+    line.split(/\s+/).filter(Boolean)
+  );
+  return { lines: result };
 }
 
 export function TextReveal({
@@ -59,37 +48,27 @@ export function TextReveal({
   // Compute textData immediately during render, not in useEffect
   const textData = useMemo(() => {
     if (typeof children === "string") {
-      const data = splitTextIntoChars(children);
-      console.log("TextReveal: Text data computed", { charCount: data.chars.length, lineBreaks: data.lineBreakIndices });
-      return data;
+      return splitTextIntoWordsAndChars(children);
     }
     return null;
   }, [children]);
 
   useEffect(() => {
-    if (!textData || !ref.current) {
-      console.log("TextReveal: Waiting for textData or ref", { hasTextData: !!textData, hasRef: !!ref.current });
-      return;
-    }
+    if (!textData || !ref.current) return;
 
     const element = ref.current;
     
     // Use a small delay to ensure DOM is ready
     const timeoutId = setTimeout(() => {
       const charSpans = element.querySelectorAll(".char");
-      console.log("TextReveal: Found character spans", charSpans.length);
 
-      if (charSpans.length === 0) {
-        console.warn("TextReveal: No character spans found!");
-        return;
-      }
+      if (charSpans.length === 0) return;
 
       // Set initial state - characters start below, fully opaque
       gsap.set(charSpans, {
         y: "100%",
         opacity: 1,
       });
-      console.log("TextReveal: Initial state set");
 
       if (triggerOnScroll) {
         // Scroll-triggered animation
@@ -99,8 +78,6 @@ export function TextReveal({
           delay: delay / 1000,
           stagger: stagger,
           ease: easing,
-          onStart: () => console.log("TextReveal: Animation started"),
-          onComplete: () => console.log("TextReveal: Animation completed"),
         });
 
         ScrollTrigger.create({
@@ -117,8 +94,6 @@ export function TextReveal({
           delay: delay / 1000,
           stagger: stagger,
           ease: easing,
-          onStart: () => console.log("TextReveal: Animation started"),
-          onComplete: () => console.log("TextReveal: Animation completed"),
         });
       }
     }, 10);
@@ -138,50 +113,36 @@ export function TextReveal({
   }, [textData, delay, duration, stagger, easing, triggerOnScroll]);
 
   if (typeof children === "string" && textData) {
-    const { chars, lineBreakIndices } = textData;
-    const lines: string[][] = [];
-    let currentLineStart = 0;
-
-    lineBreakIndices.forEach((breakIndex) => {
-      // Add line from current start to break index
-      lines.push(chars.slice(currentLineStart, breakIndex));
-      currentLineStart = breakIndex;
-    });
-
-    // Add the last line (from last break to end)
-    if (currentLineStart < chars.length) {
-      lines.push(chars.slice(currentLineStart));
-    }
-
-    // If no line breaks, just one line
-    if (lines.length === 0) {
-      lines.push(chars);
-    }
+    const { lines } = textData;
 
     return (
       <div ref={ref} className={`overflow-hidden ${className}`}>
-        {lines.map((line, lineIndex) => {
-          return (
-            <span 
-              key={lineIndex} 
-              className="block overflow-hidden"
-              style={{ 
-                paddingBottom: "0.5rem" // Extra space for descenders (g, y, p, etc.)
-              }}
-            >
-              {line.map((char, charIndex) => {
-                return (
-                  <span 
-                    key={`${lineIndex}-${charIndex}`} 
-                    className="char inline-block"
-                  >
-                    {char}
-                  </span>
-                );
-              })}
-            </span>
-          );
-        })}
+        {lines.map((lineWords, lineIndex) => (
+          <span
+            key={lineIndex}
+            className="block"
+            style={{ paddingBottom: "0.5rem" }}
+          >
+            {lineWords.map((word, wordIndex) => (
+              <span key={`${lineIndex}-${wordIndex}`}>
+                {wordIndex > 0 && " "}
+                <span
+                  className="inline-block whitespace-nowrap overflow-hidden align-top"
+                  style={{ paddingBottom: "0.5rem" }}
+                >
+                  {word.split("").map((char, charIndex) => (
+                    <span
+                      key={`${lineIndex}-${wordIndex}-${charIndex}`}
+                      className="char inline-block"
+                    >
+                      {char}
+                    </span>
+                  ))}
+                </span>
+              </span>
+            ))}
+          </span>
+        ))}
       </div>
     );
   }

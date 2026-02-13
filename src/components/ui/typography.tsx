@@ -6,7 +6,7 @@ const typographyVariants = cva("", {
   variants: {
     variant: {
       h1: "scroll-m-20",
-      h2: "scroll-m-20 border-b pb-2 first:mt-0",
+      h2: "scroll-m-20 font-medium",
       h3: "scroll-m-20",
       h4: "scroll-m-20",
       lead: "text-muted-foreground",
