@@ -166,7 +166,7 @@ export default function Hero() {
         </div>
 
         {/* Right Column - Text Content */}
-        <div className="flex flex-1 flex-col gap-6 items-start max-w-[800px] min-w-[300px]">
+        <div className="flex flex-1 flex-col gap-3 md:gap-5 items-start max-w-[800px] min-w-[300px]">
           {/* H1 Typography */}
           <H1 className="flex-1 font-sans text-4xl md:text-5xl lg:text-7xl leading-tight md:leading-[72px] font-medium text-foreground w-full overflow-hidden">
             <TextReveal
