@@ -18,11 +18,14 @@ import {
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+/** DatoCMS Structured Text field – matches StructuredText data prop */
+export type StructuredTextData = React.ComponentProps<typeof StructuredText>["data"];
+
 type ValueWithSvg = {
   id: string;
   title: string;
   key: string;
-  description: { value: unknown } | null;
+  description: StructuredTextData;
   svgContent: string;
 };
 
@@ -142,7 +145,7 @@ function ExpandedValueCard({
               {value.title}
             </TextReveal>
           </H3>
-          {value.description?.value && (
+          {value.description && (
             <FadeUp
               triggerOnScroll={false}
               delay={animationDelays.medium}

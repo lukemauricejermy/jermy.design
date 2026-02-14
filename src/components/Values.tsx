@@ -1,7 +1,7 @@
 import { performRequest } from "@/lib/datocms";
 import fs from "fs";
 import path from "path";
-import ValuesClient from "./ValuesClient";
+import ValuesClient, { type StructuredTextData } from "./ValuesClient";
 
 const VALUES_QUERY = `
   query Values {
@@ -21,7 +21,7 @@ type Value = {
   id: string;
   title: string;
   key: string;
-  description: { value: unknown } | null;
+  description: StructuredTextData;
   order: number | null;
 };
 
