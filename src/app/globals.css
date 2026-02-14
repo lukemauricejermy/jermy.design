@@ -57,7 +57,7 @@
   /* Light mode colors - from your Figma tokens (neutral palette) */
   --background: #fafafa;
   --foreground: #0a0a0a;
-  --card: #ffffff;
+  --card: var(--illustration-surface);
   --card-foreground: #0a0a0a;
   --popover: #ffffff;
   --popover-foreground: #0a0a0a;
@@ -91,6 +91,8 @@
   --illustration-line-work: #171717;
   --illustration-skin-tone-primary: #fde8c3;
   --illustration-skin-tone-secondary: #fcd99c;
+  /* Card/illustration surface - #ffffff for cards & value SVGs (distinct from hero) */
+  --illustration-surface: #ffffff;
   --illustration-clothing-primary: #fafafa;
   --illustration-clothing-secondary: #f0ede1;
   --illustration-clothing-tertiary: #ddd6bb;
@@ -102,7 +104,7 @@
   /* Dark mode colors - from your Figma tokens */
   --background: #0a0a0a;
   --foreground: #fafafa;
-  --card: #171717;
+  --card: var(--illustration-surface);
   --card-foreground: #fafafa;
   --popover: #262626;
   --popover-foreground: #fafafa;
@@ -136,6 +138,8 @@
   --illustration-line-work: #3b3b3b;
   --illustration-skin-tone-primary: #d5c5a8;
   --illustration-skin-tone-secondary: #cab691;
+  /* Card/illustration surface - matches card background */
+  --illustration-surface: #171717;
   --illustration-clothing-primary: #0a0a0a;
   --illustration-clothing-secondary: #726e5c;
   --illustration-clothing-tertiary: #575447;

@@ -62,8 +62,9 @@ export function TextReveal({
     if (charSpans.length === 0) return;
 
     // Set initial state before paint - characters start below, fully opaque
+    // Use 110% to add buffer and prevent sub-pixel peeking through overflow
     gsap.set(charSpans, {
-      y: "100%",
+      y: "110%",
       opacity: 1,
     });
 
@@ -108,18 +109,18 @@ export function TextReveal({
     const { lines } = textData;
 
     return (
-      <div ref={ref} className={`overflow-hidden ${className}`}>
+      <div ref={ref} className={`overflow-clip ${className}`}>
         {lines.map((lineWords, lineIndex) => (
           <span
             key={lineIndex}
-            className="block"
+            className="block overflow-clip"
             style={{ paddingBottom: "0.5rem" }}
           >
             {lineWords.map((word, wordIndex) => (
               <span key={`${lineIndex}-${wordIndex}`}>
                 {wordIndex > 0 && " "}
                 <span
-                  className="inline-block whitespace-nowrap overflow-hidden align-top"
+                  className="inline-block whitespace-nowrap overflow-clip align-top leading-none"
                   style={{ paddingBottom: "0.5rem" }}
                 >
                   {word.split("").map((char, charIndex) => (

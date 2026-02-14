@@ -4,6 +4,7 @@ import React, { useState, useCallback, useRef, useEffect, useLayoutEffect } from
 import { createPortal } from "react-dom";
 import { gsap } from "gsap";
 import Link from "next/link";
+import { StructuredText } from "react-datocms";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { H2, H3, Lead } from "@/components/ui/typography";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,7 @@ type ValueWithSvg = {
   id: string;
   title: string;
   key: string;
-  description: string | null;
+  description: { value: unknown } | null;
   svgContent: string;
 };
 
@@ -54,16 +55,16 @@ const ValueCard = React.forwardRef<
         )}
         onClick={onClick}
       >
-        {/* Illustration - 388x388 on TOP — identical styling to modal for seamless swap */}
+        {/* Illustration - scales with card width, max 388×388 — identical styling to modal for seamless swap */}
         <div
           data-illustration
-          className="flex-shrink-0 w-[388px] h-[388px] mx-auto [&_svg]:w-full [&_svg]:h-full [&_svg]:object-contain flex items-center justify-center transition-none"
+          className="flex-shrink-0 w-full max-w-[388px] aspect-square mx-auto [&_svg]:w-full [&_svg]:h-full [&_svg]:object-contain flex items-center justify-center transition-none"
         >
           <ValueIllustration svgContent={value.svgContent} className="w-full h-full" />
         </div>
         {/* Title BELOW illustration — data-collapsed-title for post-unmount animation */}
         <CardHeader className="flex-1 flex items-end pb-0 pt-6 px-0 text-left min-h-0">
-          <H3 data-collapsed-title className="text-4xl leading-normal font-medium">
+          <H3 data-collapsed-title className="text-4xl leading-tight font-medium">
             {value.title}
           </H3>
         </CardHeader>
@@ -72,60 +73,84 @@ const ValueCard = React.forwardRef<
   );
 });
 
-// Expanded modal card: landscape, illustration LEFT, title+description RIGHT
+// Illustration dimensions: desktop 388x388, mobile 320x280
+const ILLUSTRATION_W_DESKTOP = 388;
+const ILLUSTRATION_H_DESKTOP = 388;
+const ILLUSTRATION_W_MOBILE = 320;
+const ILLUSTRATION_H_MOBILE = 280;
+
+// Expanded modal card: desktop = landscape (illustration LEFT, content RIGHT); mobile = stacked (illustration TOP, content BELOW)
 function ExpandedValueCard({
   value,
   illustrationRef,
   collapsedTitleRef,
   expandedContentRef,
   showExpandedContent,
+  isMobile,
 }: {
   value: ValueWithSvg;
   illustrationRef: React.RefObject<HTMLDivElement | null>;
   collapsedTitleRef: React.RefObject<HTMLDivElement | null>;
   expandedContentRef: React.RefObject<HTMLDivElement | null>;
   showExpandedContent: boolean;
+  isMobile: boolean;
 }) {
+  const illustrationW = isMobile ? ILLUSTRATION_W_MOBILE : ILLUSTRATION_W_DESKTOP;
+  const illustrationH = isMobile ? ILLUSTRATION_H_MOBILE : ILLUSTRATION_H_DESKTOP;
+  const isStacked = isMobile;
+
   return (
-    <Card className="overflow-hidden flex flex-row h-full w-full border border-border rounded-3xl shadow-sm p-6 relative">
-      {/* Illustration - absolute, 388x388, position animated by GSAP — identical styling to card for seamless swap */}
+    <Card
+      className={cn(
+        "overflow-hidden h-full w-full border border-border rounded-3xl shadow-sm p-6 relative",
+        isStacked ? "flex flex-col" : "flex flex-row"
+      )}
+    >
+      {/* Illustration - absolute, position animated by GSAP — identical styling to card for seamless swap */}
       <div
         ref={illustrationRef}
         data-illustration
-        className="absolute w-[388px] h-[388px] [&_svg]:w-full [&_svg]:h-full [&_svg]:object-contain flex items-center justify-center transition-none"
+        data-mobile={isMobile}
+        className="absolute [&_svg]:w-full [&_svg]:h-full [&_svg]:object-contain flex items-center justify-center transition-none"
+        style={{ width: illustrationW, height: illustrationH }}
       >
         <ValueIllustration svgContent={value.svgContent} className="w-full h-full" />
       </div>
-      {/* Collapsed title - absolute bottom, fades out during expand. min-h reserves space so animation doesn't cause layout shift. */}
+      {/* Collapsed title - absolute bottom, fades out during expand. Match ValueCard's leading-tight exactly to avoid jump. */}
       <div
         ref={collapsedTitleRef}
         className="absolute bottom-6 left-6 right-6 min-h-[2.5rem] text-left [contain:layout]"
       >
-        <H3 className="text-4xl leading-normal font-medium">{value.title}</H3>
+        <H3 className="text-4xl leading-tight font-medium">{value.title}</H3>
       </div>
-      {/* Expanded content - right side, ref for close animation */}
+      {/* Expanded content - right side on desktop, below illustration on mobile */}
       {showExpandedContent && (
         <div
           ref={expandedContentRef}
-          className="flex-1 flex flex-col justify-center pl-[412px] pr-6 gap-4 min-w-0"
+          className={cn(
+            "flex-1 flex flex-col gap-4 min-w-0 overflow-y-auto",
+            isStacked
+              ? `mt-0 pt-[calc(${ILLUSTRATION_H_MOBILE}px+24px)] px-0`
+              : "justify-center pl-[412px] pr-6"
+          )}
         >
           <H3
             id="value-modal-title"
-            className="text-4xl leading-normal font-medium overflow-hidden"
+            className="text-4xl leading-[1.1] font-medium overflow-hidden"
           >
             <TextReveal triggerOnScroll={false} delay={0}>
               {value.title}
             </TextReveal>
           </H3>
-          {value.description && (
+          {value.description?.value && (
             <FadeUp
               triggerOnScroll={false}
               delay={animationDelays.medium}
               duration={animationDurations.default}
             >
-              <p className="text-base leading-6 text-foreground">
-                {value.description}
-              </p>
+              <div className="text-base leading-6 text-foreground [&_p]:mb-2 [&_p:last-child]:mb-0">
+                <StructuredText data={value.description} />
+              </div>
             </FadeUp>
           )}
         </div>
@@ -134,8 +159,8 @@ function ExpandedValueCard({
   );
 }
 
-// Expanded card dimensions - larger than collapsed for takeover feel
-const EXPANDED_WIDTH = 800;
+// Expanded card dimensions - larger than collapsed for takeover feel (Figma: 920px max-width)
+const EXPANDED_WIDTH = 920;
 const EXPANDED_HEIGHT = 520;
 
 export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
@@ -207,7 +232,10 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
       width: rect.width,
       height: rect.height,
     });
-    // Illustration: start at card's exact position (captured before state change for sub-pixel precision)
+    // Illustration: start at card's exact position and size (captured before state change for sub-pixel precision)
+    // Use card illustration's actual dimensions (can be smaller than 388 when card scales)
+    const startW = cardIllustrationRect?.width ?? (isMobile ? 388 : ILLUSTRATION_W_DESKTOP);
+    const startH = cardIllustrationRect?.height ?? (isMobile ? 388 : ILLUSTRATION_H_DESKTOP);
     if (illustration && cardIllustrationRect && rect) {
       const startLeft = cardIllustrationRect.left - rect.left;
       const startTop = cardIllustrationRect.top - rect.top;
@@ -216,26 +244,33 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
         left: 0,
         x: startLeft,
         y: startTop,
+        width: startW,
+        height: startH,
       });
-    } else if (illustration) {
-      const left = Math.max(0, (rect.width - 48 - 388) / 2);
+    } else if (illustration && rect) {
+      const left = Math.max(0, (rect.width - 48 - startW) / 2);
       gsap.set(illustration, {
         top: 24,
         left,
         x: 0,
         y: 0,
+        width: startW,
+        height: startH,
       });
     }
 
-    // DEBUG: Log positions at start of open animation
-    console.log("Card illustration rect (before open):", cardIllustrationEl?.getBoundingClientRect());
-    console.log("Modal illustration rect (after positioned):", illustration?.getBoundingClientRect());
+    // Freeze collapsed title width to prevent reflow/jump as card expands (titles break onto 2 lines with tight leading)
     if (collapsedTitle) {
-      gsap.set(collapsedTitle, { opacity: 1, y: 0 });
+      const titleWidth = rect.width - 48; // matches left-6 + right-6
+      gsap.set(collapsedTitle, { opacity: 1, y: 0, width: titleWidth, maxWidth: titleWidth });
     }
 
-    const expandW = isMobile ? Math.min(rect.width * 1.5, 400) : EXPANDED_WIDTH;
-    const expandH = isMobile ? Math.max(rect.height * 1.2, 500) : EXPANDED_HEIGHT;
+    const expandW = isMobile
+      ? (typeof window !== "undefined" ? window.innerWidth - 32 : 360)
+      : EXPANDED_WIDTH;
+    const expandH = isMobile
+      ? Math.min(85 * 0.01 * (typeof window !== "undefined" ? window.innerHeight : 700), 800)
+      : EXPANDED_HEIGHT;
 
     const tl = gsap.timeline({
       onComplete: () => {
@@ -248,12 +283,23 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
       },
     });
 
-    tl.to(scrim, {
-      opacity: 1,
-      duration: animationDurations.fast / 1000,
+    // 1. Title fades out instantly when card is selected
+    tl.to(collapsedTitle, {
+      opacity: 0,
+      y: -10,
+      duration: 0.1,
       ease: animationEasings.smooth,
     });
-    // Card expands from portrait to landscape
+    // 2. Scrim + card expand + illustration — run after title is gone
+    tl.to(
+      scrim,
+      {
+        opacity: 1,
+        duration: animationDurations.fast / 1000,
+        ease: animationEasings.smooth,
+      },
+      "+=0"
+    );
     tl.to(
       modalCard,
       {
@@ -268,32 +314,31 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
       },
       "-=0.2"
     );
-    // Illustration moves from top-center to left, vertically centered
     if (illustration) {
       tl.to(
         illustration,
-        {
-          left: 24,
-          x: 0,
-          top: "50%",
-          y: "-50%",
-          duration: animationDurations.default / 1000,
-          ease: animationEasings.smooth,
-        },
+        isMobile
+          ? {
+              left: "50%",
+              x: "-50%",
+              top: 24,
+              y: 0,
+              width: ILLUSTRATION_W_MOBILE,
+              height: ILLUSTRATION_H_MOBILE,
+              duration: animationDurations.default / 1000,
+              ease: animationEasings.smooth,
+            }
+          : {
+              left: 24,
+              x: 0,
+              top: "50%",
+              y: "-50%",
+              duration: animationDurations.default / 1000,
+              ease: animationEasings.smooth,
+            },
         "-=0.6"
       );
     }
-    // Collapsed title fades out with lift
-    tl.to(
-      collapsedTitle,
-      {
-        opacity: 0,
-        y: -10,
-        duration: animationDurations.fast / 1000,
-        ease: animationEasings.smooth,
-      },
-      "-=0.6"
-    );
 
     return () => {
       const els = [modalCard, scrim, collapsedTitle];
@@ -341,21 +386,6 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
             modalIllustration.style.top = `${currentTop - diffTop}px`;
           }
           void modalIllustration.offsetHeight;
-
-          const finalModalRect = modalIllustration.getBoundingClientRect();
-          const finalCardRect = cardIllustration.getBoundingClientRect();
-          console.log("After adjustment - Modal:", {
-            left: finalModalRect.left,
-            top: finalModalRect.top,
-          });
-          console.log("After adjustment - Card:", {
-            left: finalCardRect.left,
-            top: finalCardRect.top,
-          });
-          console.log("Final difference:", {
-            left: finalModalRect.left - finalCardRect.left,
-            top: finalModalRect.top - finalCardRect.top,
-          });
 
           // Prepare grid card title: start hidden so we can animate it in AFTER unmount
           const gridCardTitle = gridCard.querySelector<HTMLElement>("[data-collapsed-title]");
@@ -462,52 +492,38 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
       0.4
     );
 
-    // 4. Illustration moves from left (centered) back to top-center (same time as card resize)
-    // Use card illustration's actual position so modal ends exactly where card sits (avoids 24px jump from padding)
+    // 4. Illustration moves back to top-center of card (same time as card resize)
+    // Use card illustration's actual position AND size so modal ends exactly where card sits (no jump)
     const gridCard = id ? cardRefs.current.get(id) : null;
     const cardIllustrationEl = gridCard?.querySelector("[data-illustration]");
     const cardIllustrationRect = cardIllustrationEl?.getBoundingClientRect();
+    const closeIllVars: gsap.TweenVars = {
+      x: 0,
+      y: 0,
+      duration: 0.4,
+      ease: animationEasings.smooth,
+      clearProps: "transform",
+    };
+    // Always animate to card's actual dimensions (can be scaled on both desktop and mobile)
+    if (cardIllustrationRect) {
+      (closeIllVars as Record<string, unknown>).width = cardIllustrationRect.width;
+      (closeIllVars as Record<string, unknown>).height = cardIllustrationRect.height;
+    }
     if (illustration && rect && cardIllustrationRect) {
       const finalLeft = cardIllustrationRect.left - rect.left;
       const finalTop = cardIllustrationRect.top - rect.top;
-      tl.to(
-        illustration,
-        {
-          left: finalLeft,
-          top: finalTop,
-          x: 0,
-          y: 0,
-          duration: 0.4,
-          ease: animationEasings.smooth,
-          clearProps: "transform",
-        },
-        0.4
-      );
+      tl.to(illustration, { ...closeIllVars, left: finalLeft, top: finalTop }, 0.4);
     } else if (illustration && rect) {
       const finalLeft = 24 + Math.max(0, (rect.width - 48 - 388) / 2);
       tl.to(
         illustration,
-        {
-          left: finalLeft,
-          x: 0,
-          top: 24,
-          y: 0,
-          duration: 0.4,
-          ease: animationEasings.smooth,
-        },
+        { ...closeIllVars, left: finalLeft, top: 24 },
         0.4
       );
     } else if (illustration) {
       tl.to(
         illustration,
-        {
-          left: "50%",
-          x: "-50%",
-          top: 24,
-          y: 0,
-          duration: 0.4,
-          ease: animationEasings.smooth,
-        },
+        { ...closeIllVars, left: "50%", x: "-50%", top: 24 },
         0.4
       );
     }
@@ -566,6 +582,7 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
           collapsedTitleRef={collapsedTitleRef}
           expandedContentRef={expandedContentRef}
           showExpandedContent={expansionComplete}
+          isMobile={isMobile}
         />
         {/* Close button - fades in last, positioned in card top-right */}
         <div
@@ -594,26 +611,48 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
     <section className="py-56 px-6">
       <div className="max-w-[1440px] mx-auto flex flex-col gap-16">
         <div className="flex flex-col gap-6 max-w-2xl">
-          <FadeUp triggerOnScroll delay={0} className="overflow-hidden">
-            <H2 className="text-4xl md:text-5xl lg:text-[60px] font-semibold leading-none tracking-tight border-none pb-0">
-              Let&apos;s talk about values
-            </H2>
-          </FadeUp>
+          <H2 className="text-4xl md:text-5xl lg:text-[60px] leading-none tracking-tight border-none pb-0 overflow-hidden">
+            <TextReveal
+              triggerOnScroll={true}
+              delay={0}
+              duration={animationDurations.verySlow}
+              stagger={0.025}
+              easing={animationEasings.robust}
+            >
+              {`Let's talk about values`}
+            </TextReveal>
+          </H2>
           <FadeUp
             triggerOnScroll={true}
+            delay={animationDelays.short}
             duration={animationDurations.default}
             distance={animationDistances.default}
             easing={animationEasings.smooth}
-            className="flex flex-col gap-6"
           >
             <Lead className="text-xl leading-7">
               There&apos;s a core set of principles that guide how I work — part
               manifesto, part checklist. They&apos;re what I return to when I need
               to sense-check decisions and stay true to myself.
             </Lead>
+          </FadeUp>
+          <FadeUp
+            triggerOnScroll={true}
+            delay={animationDelays.medium}
+            duration={animationDurations.default}
+            distance={animationDistances.default}
+            easing={animationEasings.smooth}
+          >
             <Lead className="text-xl leading-7">
               If you know me, you&apos;ve probably heard these before.
             </Lead>
+          </FadeUp>
+          <FadeUp
+            triggerOnScroll={true}
+            delay={animationDelays.long}
+            duration={animationDurations.default}
+            distance={animationDistances.default}
+            easing={animationEasings.smooth}
+          >
             <Button variant="secondary" size="lg" asChild className="w-fit">
               <Link href="/about">Read more about me</Link>
             </Button>
