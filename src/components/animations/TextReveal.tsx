@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useMemo, ReactNode } from "react";
+import { useLayoutEffect, useRef, useMemo, ReactNode } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
@@ -53,24 +53,22 @@ export function TextReveal({
     return null;
   }, [children]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!textData || !ref.current) return;
 
     const element = ref.current;
-    
-    // Use a small delay to ensure DOM is ready
-    const timeoutId = setTimeout(() => {
-      const charSpans = element.querySelectorAll(".char");
+    const charSpans = element.querySelectorAll(".char");
 
-      if (charSpans.length === 0) return;
+    if (charSpans.length === 0) return;
 
-      // Set initial state - characters start below, fully opaque
-      gsap.set(charSpans, {
-        y: "100%",
-        opacity: 1,
-      });
+    // Set initial state before paint - characters start below, fully opaque
+    gsap.set(charSpans, {
+      y: "100%",
+      opacity: 1,
+    });
 
-      if (triggerOnScroll) {
+    let scrollTriggerInstance: ScrollTrigger | null = null;
+    if (triggerOnScroll) {
         // Scroll-triggered animation
         const animation = gsap.to(charSpans, {
           y: "0%",
@@ -80,34 +78,28 @@ export function TextReveal({
           ease: easing,
         });
 
-        ScrollTrigger.create({
-          trigger: element,
-          start: "top 85%",
-          animation: animation,
-          once: true,
-        });
-      } else {
-        // Page load animation
-        gsap.to(charSpans, {
-          y: "0%",
-          duration: duration / 1000,
-          delay: delay / 1000,
-          stagger: stagger,
-          ease: easing,
-        });
-      }
-    }, 10);
+      scrollTriggerInstance = ScrollTrigger.create({
+        trigger: element,
+        start: "top 85%",
+        animation: animation,
+        once: true,
+      });
+    } else {
+      // Page load animation
+      gsap.to(charSpans, {
+        y: "0%",
+        duration: duration / 1000,
+        delay: delay / 1000,
+        stagger: stagger,
+        ease: easing,
+      });
+    }
 
     return () => {
-      clearTimeout(timeoutId);
+      if (scrollTriggerInstance) scrollTriggerInstance.kill();
       if (ref.current) {
-        const charSpans = ref.current.querySelectorAll(".char");
-        ScrollTrigger.getAll().forEach((trigger) => {
-          if (trigger.trigger === ref.current) {
-            trigger.kill();
-          }
-        });
-        gsap.killTweensOf(charSpans);
+        const spans = ref.current.querySelectorAll(".char");
+        gsap.killTweensOf(spans);
       }
     };
   }, [textData, delay, duration, stagger, easing, triggerOnScroll]);

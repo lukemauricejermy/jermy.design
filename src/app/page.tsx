@@ -2,6 +2,7 @@ import Hero from "@/components/Hero";
 import { Header } from "@/components/Header";
 import SocialProof from "@/components/SocialProof";
 import FeaturedCases from "@/components/FeaturedCases";
+import Values from "@/components/Values";
 
 export default function Home() {
   return (
@@ -10,6 +11,7 @@ export default function Home() {
       <Hero />
       <SocialProof />
       <FeaturedCases />
+      <Values />
     </main>
   );
 }
