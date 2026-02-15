@@ -1,6 +1,7 @@
 import { performRequest } from "@/lib/datocms";
 import Link from "next/link";
 import { FooterWrapper } from "@/components/FooterWrapper";
+import { FooterLinksMobile } from "@/components/FooterLinksMobile";
 import { H1, Lead, P } from "@/components/ui/typography";
 import { Button } from "@/components/ui/button";
 import { FadeUp, StaggerChildren } from "@/components/animations";
@@ -92,10 +93,10 @@ export default async function Footer() {
   }));
 
   return (
-    <FooterWrapper className="fixed bottom-0 left-0 right-0 -z-10 bg-secondary border-t border-border py-24 md:py-40 px-6">
-      <div className="max-w-[1440px] mx-auto flex flex-col gap-24 md:gap-40">
+    <FooterWrapper className="fixed bottom-0 left-0 right-0 -z-10 bg-secondary border-t border-border py-12 md:py-40 px-6">
+      <div className="max-w-[1440px] mx-auto flex flex-col gap-12 md:gap-40">
         {/* Top row: Intro + CTA left, Link columns right */}
-        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-16 lg:gap-24">
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8 md:gap-16 lg:gap-24">
           <div className="flex flex-col gap-6 max-w-xl">
             <FadeUp
               triggerOnScroll
@@ -123,6 +124,11 @@ export default async function Footer() {
             </FadeUp>
           </div>
 
+          <FooterLinksMobile
+            menuLinks={MENU_LINKS}
+            caseStudyLinks={caseStudyLinks}
+            legalLinks={LEGAL_LINKS}
+          />
           <StaggerChildren
             triggerOnScroll
             delayStart={animationDelays.short}
@@ -130,7 +136,7 @@ export default async function Footer() {
             duration={animationDurations.default}
             distance={animationDistances.default}
             easing={animationEasings.smooth}
-            className="flex flex-col sm:flex-row gap-12 sm:gap-16 md:gap-24"
+            className="hidden md:flex flex-col sm:flex-row gap-12 sm:gap-16 md:gap-24"
           >
             <LinkColumn title="Menu" links={MENU_LINKS} />
             <LinkColumn title="Case studies" links={caseStudyLinks} />
