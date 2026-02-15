@@ -114,7 +114,7 @@ function ExpandedValueCard({
         ref={illustrationRef}
         data-illustration
         data-mobile={isMobile}
-        className="absolute [&_svg]:w-full [&_svg]:h-full [&_svg]:object-contain flex items-center justify-center transition-none"
+        className="absolute z-0 [&_svg]:w-full [&_svg]:h-full [&_svg]:object-contain flex items-center justify-center transition-none"
         style={{ width: illustrationW, height: illustrationH }}
       >
         <ValueIllustration svgContent={value.svgContent} className="w-full h-full" />
@@ -131,7 +131,7 @@ function ExpandedValueCard({
         <div
           ref={expandedContentRef}
           className={cn(
-            "flex-1 flex flex-col gap-4 min-w-0 overflow-y-auto",
+            "relative z-10 flex-1 flex flex-col gap-4 min-w-0 overflow-y-auto",
             isStacked
               ? `mt-0 pt-[calc(${ILLUSTRATION_H_MOBILE}px+24px)] px-0`
               : "justify-center pl-[412px] pr-6"
