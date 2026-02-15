@@ -102,10 +102,12 @@ function ExpandedValueCard({
   const illustrationH = isMobile ? ILLUSTRATION_H_MOBILE : ILLUSTRATION_H_DESKTOP;
   const isStacked = isMobile;
 
+  console.log('isStacked:', isStacked, 'isMobile:', isMobile);
+
   return (
     <Card
       className={cn(
-        "overflow-hidden h-full w-full border border-border rounded-3xl shadow-sm p-6 relative",
+        "isolate overflow-hidden h-full w-full border border-border rounded-3xl shadow-sm p-6 relative",
         isStacked ? "flex flex-col" : "flex flex-row"
       )}
     >
@@ -114,8 +116,8 @@ function ExpandedValueCard({
         ref={illustrationRef}
         data-illustration
         data-mobile={isMobile}
-        className="absolute z-0 [&_svg]:w-full [&_svg]:h-full [&_svg]:object-contain flex items-center justify-center transition-none"
-        style={{ width: illustrationW, height: illustrationH }}
+        className="absolute [&_svg]:w-full [&_svg]:h-full [&_svg]:object-contain flex items-center justify-center transition-none"
+        style={{ width: illustrationW, height: illustrationH, zIndex: 0 }}
       >
         <ValueIllustration svgContent={value.svgContent} className="w-full h-full" />
       </div>
@@ -131,11 +133,15 @@ function ExpandedValueCard({
         <div
           ref={expandedContentRef}
           className={cn(
-            "relative z-10 flex-1 flex flex-col gap-4 min-w-0 overflow-y-auto",
-            isStacked
-              ? `mt-0 pt-[calc(${ILLUSTRATION_H_MOBILE}px+24px)] px-0`
-              : "justify-center pl-[412px] pr-6"
+            "relative flex-1 flex flex-col gap-4 min-w-0 overflow-y-auto",
+            isStacked ? "mt-0 px-0" : "justify-center pl-[412px] pr-6"
           )}
+          style={{
+            zIndex: 10,
+            ...(isStacked && {
+              paddingTop: ILLUSTRATION_H_MOBILE + 24,
+            }),
+          }}
         >
           <H3
             id="value-modal-title"
