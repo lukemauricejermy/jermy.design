@@ -67,7 +67,7 @@ const ValueCard = React.forwardRef<
         </div>
         {/* Title BELOW illustration — data-collapsed-title for post-unmount animation */}
         <CardHeader className="flex-1 flex items-end pb-0 pt-6 px-0 text-left min-h-0">
-          <H3 data-collapsed-title className="text-4xl leading-tight font-medium">
+          <H3 data-collapsed-title className="text-3xl md:text-4xl leading-none tracking-tight font-medium">
             {value.title}
           </H3>
         </CardHeader>
@@ -102,8 +102,6 @@ function ExpandedValueCard({
   const illustrationH = isMobile ? ILLUSTRATION_H_MOBILE : ILLUSTRATION_H_DESKTOP;
   const isStacked = isMobile;
 
-  console.log('isStacked:', isStacked, 'isMobile:', isMobile);
-
   return (
     <Card
       className={cn(
@@ -126,7 +124,7 @@ function ExpandedValueCard({
         ref={collapsedTitleRef}
         className="absolute bottom-6 left-6 right-6 min-h-[2.5rem] text-left [contain:layout]"
       >
-        <H3 className="text-4xl leading-tight font-medium">{value.title}</H3>
+        <H3 className="text-3xl md:text-4xl leading-none tracking-tight font-medium">{value.title}</H3>
       </div>
       {/* Expanded content - right side on desktop, below illustration on mobile */}
       {showExpandedContent && (
@@ -145,7 +143,7 @@ function ExpandedValueCard({
         >
           <H3
             id="value-modal-title"
-            className="text-4xl leading-[1.1] font-medium overflow-hidden"
+            className="text-3xl md:text-4xl leading-none tracking-tight font-medium overflow-hidden"
           >
             <TextReveal triggerOnScroll={false} delay={0}>
               {value.title}
@@ -268,7 +266,7 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
       });
     }
 
-    // Freeze collapsed title width to prevent reflow/jump as card expands (titles break onto 2 lines with tight leading)
+    // Freeze collapsed title width to prevent reflow/jump as card expands (titles break onto 2 lines)
     if (collapsedTitle) {
       const titleWidth = rect.width - 48; // matches left-6 + right-6
       gsap.set(collapsedTitle, { opacity: 1, y: 0, width: titleWidth, maxWidth: titleWidth });
