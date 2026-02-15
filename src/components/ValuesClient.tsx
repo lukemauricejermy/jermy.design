@@ -571,7 +571,7 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
     >
       <div
         ref={scrimRef}
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-background/60 backdrop-blur-sm"
         onClick={handleClose}
       />
       <div
@@ -681,7 +681,7 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
               onClick={() => handleOpen(value.id)}
               className={
                 expandedId === value.id
-                  ? "opacity-0 pointer-events-none transition-none"
+                  ? "invisible opacity-0 pointer-events-none transition-none"
                   : undefined
               }
               aria-hidden={expandedId === value.id}
