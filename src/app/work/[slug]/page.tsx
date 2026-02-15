@@ -69,7 +69,7 @@ export default async function CaseStudyPage({
           <img
             src={caseStudy.coverImage.url}
             alt={caseStudy.coverImage.alt || caseStudy.title}
-            className="w-full rounded-lg"
+            className="w-full rounded-3xl"
           />
         )}
       </article>

@@ -72,7 +72,7 @@ export function ThemeToggle() {
       {/* Sliding indicator - matches active button dimensions exactly from Figma */}
       {/* Left button: starts at 3px, Right button: starts at 50% */}
       <div
-        className="absolute bg-card border border-border rounded-md shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_0px_rgba(0,0,0,0.1)]"
+        className="absolute bg-card border border-border rounded-inner-lg-gap-3px shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_0px_rgba(0,0,0,0.1)]"
         style={{ 
           width: "calc(50% - 3px)",
           height: "calc(100% - 6px)",
@@ -86,11 +86,11 @@ export function ThemeToggle() {
       {/* Icons - matches Figma structure exactly with p-2 (8px) padding, h-full */}
       <div className="relative flex items-center w-full h-full z-10">
         {/* Sun button area - matches Figma button structure */}
-        <div className="flex-1 flex items-center justify-center p-2 rounded-md h-full">
+        <div className="flex-1 flex items-center justify-center p-2 rounded-inner-lg-gap-3px h-full">
           <Sun className={`size-4 ${!isDark ? "text-foreground" : "text-muted-foreground"}`} />
         </div>
         {/* Moon button area - matches Figma button structure */}
-        <div className="flex-1 flex items-center justify-center p-2 rounded-md h-full">
+        <div className="flex-1 flex items-center justify-center p-2 rounded-inner-lg-gap-3px h-full">
           <Moon className={`size-4 ${isDark ? "text-foreground" : "text-muted-foreground"}`} />
         </div>
       </div>

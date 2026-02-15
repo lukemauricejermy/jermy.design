@@ -51,7 +51,7 @@ export default async function WorkPage() {
             >
               <article className="space-y-4">
                 {study.coverImage && (
-                  <div className="overflow-hidden rounded-lg">
+                  <div className="overflow-hidden rounded-3xl">
                     <img
                       src={study.coverImage.url}
                       alt={study.coverImage.alt || study.title}

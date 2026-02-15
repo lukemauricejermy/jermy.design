@@ -134,7 +134,7 @@ export function Header() {
           href="/"
           className="bg-card border border-border flex items-center px-3 py-3 rounded-2xl shadow-sm shrink-0 hover:bg-accent transition-colors"
         >
-          <div className="flex h-9 items-center justify-center px-4 py-2 rounded-md shrink-0">
+          <div className="flex h-9 items-center justify-center px-4 py-2 rounded-inner-2xl-gap-3 shrink-0">
             <span className="font-sans text-sm leading-none text-foreground">
               jermy.design
             </span>
@@ -151,7 +151,7 @@ export function Header() {
                   <NavigationMenuItem key={item.name}>
                     <NavigationMenuLink
                       asChild
-                      className="h-9 flex items-center justify-center px-4 py-2 rounded-md text-sm leading-5 font-medium"
+                      className="h-9 flex items-center justify-center px-4 py-2 rounded-inner-2xl-gap-3 text-sm leading-5 font-medium"
                     >
                       <Link href={item.href}>{item.name}</Link>
                     </NavigationMenuLink>
@@ -205,7 +205,7 @@ export function Header() {
                 key={item.name}
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="h-9 flex items-center px-4 py-2 rounded-md text-sm leading-5 font-medium text-foreground hover:bg-accent transition-colors"
+                className="h-9 flex items-center px-4 py-2 rounded-inner-2xl-gap-3 text-sm leading-5 font-medium text-foreground hover:bg-accent transition-colors"
               >
                 {item.name}
               </Link>

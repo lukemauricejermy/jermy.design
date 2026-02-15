@@ -188,7 +188,7 @@ const logos = [
 
 export default function SocialProof() {
   return (
-    <section className="flex flex-col gap-6 items-center justify-center px-6 py-24 w-full">
+    <section className="bg-background flex flex-col gap-6 items-center justify-center px-6 py-24 w-full">
       <div className="flex items-center justify-center max-w-[1440px] w-full">
         <FadeUp
           triggerOnScroll={true}

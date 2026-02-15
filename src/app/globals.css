@@ -49,6 +49,13 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+  /* Concentric nested radius: inner = outer - gap. Use for elements nested inside rounded containers. */
+  --radius-card: var(--radius-3xl);
+  --radius-inner-gap-4: max(0px, calc(var(--radius-card) - 1rem));    /* 16px gap */
+  --radius-inner-gap-6: max(0px, calc(var(--radius-card) - 1.5rem));  /* 24px gap */
+  --radius-inner-gap-8: max(0px, calc(var(--radius-card) - 2rem));    /* 32px gap */
+  --radius-inner-2xl-gap-3: max(0px, calc(var(--radius-2xl) - 0.75rem));  /* rounded-2xl container, 12px gap */
+  --radius-inner-lg-gap-3px: max(0px, calc(var(--radius-lg) - 3px));      /* rounded-lg container, 3px gap */
 }
 
 :root {
@@ -151,33 +158,91 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html, body {
+    overscroll-behavior: none;
+  }
   html {
     transition: background-color 320ms cubic-bezier(0.4, 0, 0.2, 1);
   }
   body {
     @apply bg-background text-foreground font-sans;
-    transition: background-color 320ms cubic-bezier(0.4, 0, 0.2, 1), 
+    transition: background-color 320ms cubic-bezier(0.4, 0, 0.2, 1),
                 color 320ms cubic-bezier(0.4, 0, 0.2, 1);
   }
-  /* Smooth color transitions for theme switching - only on elements using theme colors */
-  /* Use a more specific approach to avoid conflicts with existing animations */
+  /* Theme transitions */
   section, div, button, a, nav, header, footer, main, article, aside {
     transition-property: background-color, border-color;
     transition-duration: 320ms;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
-  /* Exclude text color transitions to prevent flicker */
   h1, h2, h3, h4, h5, h6, p, span, a, button, svg {
     transition-property: background-color, border-color, fill, stroke;
     transition-duration: 320ms;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
-  /* SVG color transitions - only fill and stroke */
   svg, svg path, svg rect, svg circle, svg ellipse, svg line, svg polyline, svg polygon {
     transition-property: fill, stroke;
     transition-duration: 320ms;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
+  /* Hero portrait: slightly faster transition so it keeps pace with page (reduces intermittent lag) */
+  [data-hero-portrait] svg,
+  [data-hero-portrait] svg rect,
+  [data-hero-portrait] svg path,
+  [data-hero-portrait] svg circle,
+  [data-hero-portrait] svg ellipse {
+    transition-duration: 260ms;
+  }
+  /* Values cards: instant transition (Card bg matches illustration-surface, no visible jump) */
+  [data-slot="card"] [data-illustration] svg,
+  [data-slot="card"] [data-illustration] svg rect,
+  [data-slot="card"] [data-illustration] svg path,
+  [data-slot="card"] [data-illustration] svg circle,
+  [data-slot="card"] [data-illustration] svg ellipse,
+  [data-slot="card"] [data-illustration] svg line,
+  [data-slot="card"] [data-illustration] svg polyline,
+  [data-slot="card"] [data-illustration] svg polygon {
+    transition: none;
+  }
   /* Don't transition text colors on headings/paragraphs to prevent flicker */
   /* Text will still change, just without transition animation */
+}
+
+/* Hero portrait reveal - CSS overlay so SVG is never in compositing layer (fixes theme jump on first switch after hard refresh) */
+@keyframes hero-portrait-reveal {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+.hero-portrait-reveal {
+  animation: hero-portrait-reveal 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.8s forwards;
+  pointer-events: none;
+}
+
+/* Concentric border radius utilities: inner radius = outer - gap */
+.rounded-inner-gap-4 {
+  border-radius: var(--radius-inner-gap-4);
+}
+.rounded-inner-gap-6 {
+  border-radius: var(--radius-inner-gap-6);
+  overflow: hidden; /* Ensure images are clipped to rounded corners */
+  isolation: isolate; /* Create stacking context for reliable clipping */
+}
+.rounded-inner-gap-8 {
+  border-radius: var(--radius-inner-gap-8);
+}
+.rounded-inner-2xl-gap-3 {
+  border-radius: var(--radius-inner-2xl-gap-3);
+}
+.rounded-inner-lg-gap-3px {
+  border-radius: var(--radius-inner-lg-gap-3px);
+}
+
+/* Featured cases: card 32px radius, 12px padding → inner = 32 − 12 = 20px (concentric) */
+.featured-cases {
+  --radius-card: 2rem;
+  --radius-inner-gap-3: max(0px, calc(var(--radius-card) - 0.75rem)); /* 12px gap → 20px inner */
 }

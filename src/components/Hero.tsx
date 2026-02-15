@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { H1, Lead } from "@/components/ui/typography";
 import { TextReveal } from "@/components/animations/TextReveal";
 import { FadeUp } from "@/components/animations/FadeUp";
@@ -10,28 +11,27 @@ import {
 } from "@/lib/animation-config";
 
 export default function Hero() {
+  const [revealComplete, setRevealComplete] = useState(false);
 
   return (
-    <section className="flex flex-col items-center justify-center px-6 pt-32 pb-16 md:pt-40 md:pb-32 w-full min-h-screen">
+    <section className="bg-background flex flex-col items-center justify-center px-6 pt-32 pb-16 md:pt-40 md:pb-32 w-full min-h-screen">
       <div className="flex flex-1 flex-wrap gap-2 items-center justify-center max-w-[1440px] w-full">
         {/* Left Column - Self Portrait */}
-        <div className="flex flex-1 items-center justify-center max-w-[540px] min-w-[240px]">
-          <FadeUp
-            delay={animationDelays.veryLong}
-            duration={animationDurations.slow}
-            distance={15}
-            easing={animationEasings.veryGentle}
-            className="relative shrink-0 size-[240px] overflow-hidden"
-          >
-            <svg
+        <div
+          className="flex flex-1 items-center justify-center max-w-[540px] min-w-[240px] [&_svg]:w-full [&_svg]:h-full [&_svg]:object-contain transition-none relative shrink-0 size-[240px] overflow-hidden"
+          data-illustration
+          data-hero-portrait
+        >
+          <svg
               width="240"
               height="240"
               viewBox="0 0 240 240"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               className="size-full"
+              data-illustration
             >
-              <rect width="240" height="240" fill="var(--illustration-clothing-primary)" />
+              <rect width="240" height="240" fill="none" />
               <path
                 d="M144 178.091C145.2 178.491 152.5 178.925 156 179.091C158 184.691 154.167 187.091 152 187.591H139C138.5 187.591 135.5 190.091 135 190.591C134.6 190.991 128.265 190.758 125.147 190.591C124.554 192.006 123.842 193.389 123 194.591C120.2 198.591 119.833 196.258 120 194.591C120.404 194.187 120.995 192.065 121.567 189.591H118.741C118.329 190.954 117.778 192.758 117 195.091C115 201.091 113.5 197.091 113 197.091C112.704 197.091 113.982 193.071 115.179 189.267C112.922 189.008 112.119 188.042 112 187.591C111.6 184.791 114.713 185.091 116.319 185.591C116.647 184.497 116.897 183.604 117 183.091C117.1 182.59 117.482 181.886 118.033 181.091L112 182.091L107 187.091C102.2 192.291 101 190.258 101 188.591C101 188.591 106.52 181.692 110.5 178.481C110.67 178.344 110.836 178.214 111 178.091C112.167 177.591 114.169 176.979 116.319 176.386C117.54 176.05 118.809 175.719 120 175.418C121.936 174.928 123.666 174.518 124.648 174.288C125.101 174.004 125.411 173.913 125.5 174.091C127 174.591 135 178.091 135.5 177.591C136 177.091 142.5 177.591 144 178.091Z"
                 fill="var(--illustration-skin-tone-primary)"
@@ -161,8 +161,15 @@ export default function Hero() {
                 stroke="var(--illustration-line-work)"
                 strokeWidth="1.79778"
               />
-            </svg>
-          </FadeUp>
+          </svg>
+          {/* Overlay fades out to reveal - removed from DOM when done to avoid compositing layer on first theme toggle */}
+          {!revealComplete && (
+            <div
+              className="absolute inset-0 bg-background hero-portrait-reveal"
+              aria-hidden
+              onAnimationEnd={() => setRevealComplete(true)}
+            />
+          )}
         </div>
 
         {/* Right Column - Text Content */}

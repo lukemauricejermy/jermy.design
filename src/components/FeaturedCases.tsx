@@ -50,14 +50,14 @@ type QueryResult = {
 // Placeholder card when fewer than 4 featured case studies
 function PlaceholderCard() {
   return (
-    <Card className="overflow-hidden h-full min-h-[280px] flex flex-col">
-      <CardHeader className="flex-1">
+        <Card className="overflow-hidden h-full min-h-[280px] flex flex-col rounded-2xl md:rounded-[var(--radius-card)] py-3 md:py-6">
+      <CardHeader className="flex-1 px-3 md:px-6">
         <CardTitle className="text-muted-foreground font-normal">
           Coming soon
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-0">
-        <div className="aspect-video bg-muted rounded-lg flex items-center justify-center" />
+      <CardContent className="pt-0 px-3 md:px-6">
+        <div className="aspect-video bg-muted rounded md:rounded-lg overflow-hidden flex items-center justify-center" />
       </CardContent>
     </Card>
   );
@@ -74,8 +74,8 @@ export default async function FeaturedCases() {
     const study = allCaseStudies[i];
     return study ? (
       <Link key={study.id} href={`/work/${study.slug}`} className="block h-full">
-        <Card className="overflow-hidden h-full flex flex-col group transition-shadow hover:shadow-md">
-          <CardHeader className="flex-1 gap-1.5">
+        <Card className="overflow-hidden h-full flex flex-col rounded-2xl md:rounded-[var(--radius-card)] py-3 md:py-6 group transition-shadow hover:shadow-md">
+          <CardHeader className="flex-1 gap-1.5 px-3 md:px-6">
             <CardTitle className="text-2xl font-medium leading-8">
               {study.title}
             </CardTitle>
@@ -85,18 +85,20 @@ export default async function FeaturedCases() {
               </CardDescription>
             )}
           </CardHeader>
-          <CardContent className="pt-0">
-            <div className="overflow-hidden rounded-lg aspect-video bg-muted">
+          <CardContent className="pt-0 px-3 md:px-6">
+            <div className="aspect-video bg-muted relative rounded md:rounded-lg overflow-hidden">
               {study.coverImage ? (
-                <Image
-                  src={study.coverImage.url}
-                  alt={study.coverImage.alt || study.title}
-                  width={600}
-                  height={338}
-                  className="w-full h-full object-cover transition-transform group-hover:scale-[1.02]"
-                />
+                <div className="absolute inset-0">
+                  <Image
+                    src={study.coverImage.url}
+                    alt={study.coverImage.alt || study.title}
+                    width={600}
+                    height={338}
+                    className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-[1.02]"
+                  />
+                </div>
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-muted" />
+                <div className="absolute inset-0 flex items-center justify-center bg-muted" />
               )}
             </div>
           </CardContent>
@@ -108,7 +110,7 @@ export default async function FeaturedCases() {
   });
 
   return (
-    <section className="py-56 px-6">
+    <section className="bg-background py-56 px-6">
       <div className="max-w-[1440px] mx-auto flex flex-col gap-32">
         {/* Row 1: H2 on LEFT, Lead + Button on RIGHT */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-24">
@@ -116,8 +118,8 @@ export default async function FeaturedCases() {
             <TextReveal
               triggerOnScroll={true}
               delay={0}
-              duration={animationDurations.verySlow}
-              stagger={0.025}
+              duration={750}
+              stagger={0.015}
               easing={animationEasings.robust}
             >
               {`Design of every shape and size, from early stage startup to enterprise tech`}
@@ -159,7 +161,7 @@ export default async function FeaturedCases() {
           duration={animationDurations.default}
           distance={animationDistances.default}
           easing={animationEasings.smooth}
-          className="grid grid-cols-1 sm:grid-cols-2 gap-8 w-full"
+          className="featured-cases grid grid-cols-1 sm:grid-cols-2 gap-8 w-full"
         >
           {cards}
         </StaggerChildren>

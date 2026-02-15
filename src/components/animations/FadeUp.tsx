@@ -71,13 +71,17 @@ export function FadeUp({
         gsap.killTweensOf(element);
       };
     } else {
-      // Page load animation
+      // Page load animation - clear transform when done to avoid compositing layer (fixes theme toggle flash on hero)
       gsap.to(element, {
         y: 0,
         opacity: 1,
         duration: duration / 1000,
         delay: delay / 1000,
         ease: easing,
+        onComplete: () => {
+          element.style.transform = "";
+          element.style.opacity = "";
+        },
       });
 
       return () => {

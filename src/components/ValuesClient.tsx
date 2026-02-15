@@ -54,7 +54,7 @@ const ValueCard = React.forwardRef<
     <div ref={ref} className={cn("h-full", className)} aria-hidden={ariaHidden}>
       <Card
         className={cn(
-          "overflow-hidden flex flex-col h-full transition-shadow hover:shadow-md border border-border rounded-3xl shadow-sm p-6 cursor-pointer"
+          "overflow-hidden flex flex-col h-full transition-shadow hover:shadow-md border border-border rounded-3xl shadow-sm p-8 cursor-pointer"
         )}
         onClick={onClick}
       >
@@ -66,8 +66,8 @@ const ValueCard = React.forwardRef<
           <ValueIllustration svgContent={value.svgContent} className="w-full h-full" />
         </div>
         {/* Title BELOW illustration — data-collapsed-title for post-unmount animation */}
-        <CardHeader className="flex-1 flex items-end pb-0 pt-6 px-0 text-left min-h-0">
-          <H3 data-collapsed-title className="text-3xl md:text-4xl leading-none tracking-tight font-medium">
+        <CardHeader className="flex-1 flex items-end pb-0 pt-8 px-0 text-left min-h-0">
+          <H3 data-collapsed-title className="text-2xl md:text-3xl leading-none tracking-tight font-medium">
             {value.title}
           </H3>
         </CardHeader>
@@ -105,7 +105,7 @@ function ExpandedValueCard({
   return (
     <Card
       className={cn(
-        "isolate overflow-hidden h-full w-full border border-border rounded-3xl shadow-sm p-6 relative",
+        "isolate overflow-hidden h-full w-full border border-border rounded-3xl shadow-sm p-8 relative",
         isStacked ? "flex flex-col" : "flex flex-row"
       )}
     >
@@ -122,9 +122,9 @@ function ExpandedValueCard({
       {/* Collapsed title - absolute bottom, fades out during expand. Match ValueCard's leading-tight exactly to avoid jump. */}
       <div
         ref={collapsedTitleRef}
-        className="absolute bottom-6 left-6 right-6 min-h-[2.5rem] text-left [contain:layout]"
+        className="absolute bottom-8 left-8 right-8 min-h-[2.5rem] text-left [contain:layout]"
       >
-        <H3 className="text-3xl md:text-4xl leading-none tracking-tight font-medium">{value.title}</H3>
+        <H3 className="text-2xl md:text-3xl leading-none tracking-tight font-medium">{value.title}</H3>
       </div>
       {/* Expanded content - right side on desktop, below illustration on mobile */}
       {showExpandedContent && (
@@ -132,12 +132,12 @@ function ExpandedValueCard({
           ref={expandedContentRef}
           className={cn(
             "relative flex-1 flex flex-col gap-4 min-w-0 overflow-y-auto",
-            isStacked ? "mt-0 px-0" : "justify-center pl-[412px] pr-6"
+            isStacked ? "mt-0 px-0" : "justify-center pl-[420px] pr-8"
           )}
           style={{
             zIndex: 10,
             ...(isStacked && {
-              paddingTop: ILLUSTRATION_H_MOBILE + 24,
+              paddingTop: ILLUSTRATION_H_MOBILE + 32,
             }),
           }}
         >
@@ -145,7 +145,7 @@ function ExpandedValueCard({
             id="value-modal-title"
             className="text-3xl md:text-4xl leading-none tracking-tight font-medium overflow-hidden"
           >
-            <TextReveal triggerOnScroll={false} delay={0}>
+            <TextReveal triggerOnScroll={false} delay={0} duration={600} stagger={0.015} easing={animationEasings.robust}>
               {value.title}
             </TextReveal>
           </H3>
@@ -255,9 +255,9 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
         height: startH,
       });
     } else if (illustration && rect) {
-      const left = Math.max(0, (rect.width - 48 - startW) / 2);
+      const left = Math.max(0, (rect.width - 64 - startW) / 2);
       gsap.set(illustration, {
-        top: 24,
+        top: 32,
         left,
         x: 0,
         y: 0,
@@ -268,7 +268,7 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
 
     // Freeze collapsed title width to prevent reflow/jump as card expands (titles break onto 2 lines)
     if (collapsedTitle) {
-      const titleWidth = rect.width - 48; // matches left-6 + right-6
+      const titleWidth = rect.width - 64; // matches left-8 + right-8
       gsap.set(collapsedTitle, { opacity: 1, y: 0, width: titleWidth, maxWidth: titleWidth });
     }
 
@@ -328,7 +328,7 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
           ? {
               left: "50%",
               x: "-50%",
-              top: 24,
+              top: 32,
               y: 0,
               width: ILLUSTRATION_W_MOBILE,
               height: ILLUSTRATION_H_MOBILE,
@@ -336,7 +336,7 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
               ease: animationEasings.smooth,
             }
           : {
-              left: 24,
+              left: 32,
               x: 0,
               top: "50%",
               y: "-50%",
@@ -521,16 +521,16 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
       const finalTop = cardIllustrationRect.top - rect.top;
       tl.to(illustration, { ...closeIllVars, left: finalLeft, top: finalTop }, 0.4);
     } else if (illustration && rect) {
-      const finalLeft = 24 + Math.max(0, (rect.width - 48 - 388) / 2);
+      const finalLeft = 32 + Math.max(0, (rect.width - 64 - 388) / 2);
       tl.to(
         illustration,
-        { ...closeIllVars, left: finalLeft, top: 24 },
+        { ...closeIllVars, left: finalLeft, top: 32 },
         0.4
       );
     } else if (illustration) {
       tl.to(
         illustration,
-        { ...closeIllVars, left: "50%", x: "-50%", top: 24 },
+        { ...closeIllVars, left: "50%", x: "-50%", top: 32 },
         0.4
       );
     }
@@ -605,7 +605,7 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
             onClick={handleClose}
             aria-label="Close"
             type="button"
-            className="rounded-lg"
+            className="rounded-inner-gap-4"
           >
             <X className="size-5" />
           </Button>
@@ -615,15 +615,15 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
   );
 
   return (
-    <section className="py-56 px-6">
+    <section className="bg-background py-56 px-6">
       <div className="max-w-[1440px] mx-auto flex flex-col gap-16">
         <div className="flex flex-col gap-6 max-w-2xl">
           <H2 className="text-4xl md:text-5xl lg:text-[60px] leading-none tracking-tight border-none pb-0 overflow-hidden">
             <TextReveal
               triggerOnScroll={true}
               delay={0}
-              duration={animationDurations.verySlow}
-              stagger={0.025}
+              duration={750}
+              stagger={0.015}
               easing={animationEasings.robust}
             >
               {`Let's talk about values`}
