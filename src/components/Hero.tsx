@@ -196,6 +196,8 @@ export default function Hero() {
           >
             <Lead className="w-full">
               Leading and crafting digital products across teams and platforms.
+              <br />
+              On parental leave until September 2026.
             </Lead>
           </FadeUp>
         </div>

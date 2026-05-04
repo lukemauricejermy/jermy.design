@@ -1,8 +1,6 @@
 import { performRequest } from "@/lib/datocms";
-import Link from "next/link";
 import Image from "next/image";
 import { H2, Lead } from "@/components/ui/typography";
-import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -50,15 +48,21 @@ type QueryResult = {
 // Placeholder card when fewer than 4 featured case studies
 function PlaceholderCard() {
   return (
-        <Card className="overflow-hidden h-full min-h-[280px] flex flex-col rounded-2xl md:rounded-[var(--radius-card)] py-3 md:py-6">
-      <CardHeader className="flex-1 px-3 md:px-6">
+    <Card className="overflow-hidden h-full min-h-[280px] flex flex-col rounded-2xl md:rounded-[var(--radius-card)] py-3 md:py-6">
+      <CardContent className="pt-0 px-3 md:px-6">
+        <div className="aspect-video bg-muted rounded md:rounded-lg overflow-hidden relative">
+          <div className="absolute inset-0 rounded md:rounded-lg bg-background/60 backdrop-blur-sm flex items-center justify-center pointer-events-none">
+            <span className="text-sm md:text-base leading-none font-medium text-foreground">
+              Full case coming soon
+            </span>
+          </div>
+        </div>
+      </CardContent>
+      <CardHeader className="px-3 md:px-6">
         <CardTitle className="text-muted-foreground font-normal">
           Coming soon
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-0 px-3 md:px-6">
-        <div className="aspect-video bg-muted rounded md:rounded-lg overflow-hidden flex items-center justify-center" />
-      </CardContent>
     </Card>
   );
 }
@@ -73,18 +77,8 @@ export default async function FeaturedCases() {
   const cards = Array.from({ length: slots }, (_, i) => {
     const study = allCaseStudies[i];
     return study ? (
-      <Link key={study.id} href={`/work/${study.slug}`} className="block h-full">
-        <Card className="overflow-hidden h-full flex flex-col rounded-2xl md:rounded-[var(--radius-card)] py-3 md:py-6 group transition-shadow hover:shadow-md">
-          <CardHeader className="flex-1 gap-1.5 px-3 md:px-6">
-            <CardTitle className="text-2xl font-medium leading-8">
-              {study.title}
-            </CardTitle>
-            {study.excerpt && (
-              <CardDescription className="text-base leading-5 text-foreground">
-                {study.excerpt}
-              </CardDescription>
-            )}
-          </CardHeader>
+      <div key={study.id} className="block h-full select-none">
+        <Card className="overflow-hidden h-full flex flex-col rounded-2xl md:rounded-[var(--radius-card)] py-3 md:py-6">
           <CardContent className="pt-0 px-3 md:px-6">
             <div className="aspect-video bg-muted relative rounded md:rounded-lg overflow-hidden">
               {study.coverImage ? (
@@ -94,16 +88,31 @@ export default async function FeaturedCases() {
                     alt={study.coverImage.alt || study.title}
                     width={600}
                     height={338}
-                    className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-[1.02]"
+                    className="w-full h-full object-cover object-center"
                   />
                 </div>
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center bg-muted" />
               )}
+              <div className="absolute inset-0 rounded md:rounded-lg bg-background/60 backdrop-blur-sm flex items-center justify-center pointer-events-none z-10">
+                <span className="text-sm md:text-base leading-none font-medium text-foreground">
+                  Full case coming soon
+                </span>
+              </div>
             </div>
           </CardContent>
+          <CardHeader className="gap-1.5 px-3 md:px-6">
+            <CardTitle className="text-2xl font-medium leading-8">
+              {study.title}
+            </CardTitle>
+            {study.excerpt && (
+              <CardDescription className="text-base leading-5 text-foreground">
+                {study.excerpt}
+              </CardDescription>
+            )}
+          </CardHeader>
         </Card>
-      </Link>
+      </div>
     ) : (
       <PlaceholderCard key={`placeholder-${i}`} />
     );
@@ -142,14 +151,6 @@ export default async function FeaturedCases() {
               This portfolio is a curated snapshot of that work — a selection of
               the projects I&apos;m most proud of and able to share publicly.
             </Lead>
-            <div>
-              <Link
-                href="/work"
-                className={buttonVariants({ variant: "secondary", size: "lg" })}
-              >
-                See all cases
-              </Link>
-            </div>
           </FadeUp>
         </div>
 

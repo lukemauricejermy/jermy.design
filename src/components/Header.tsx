@@ -12,13 +12,10 @@ import {
   NavigationMenuLink,
 } from "@/components/ui/navigation-menu";
 
-const navigation = [
-  { name: "Cases", href: "/work" },
-  { name: "About me", href: "/about" },
-  { name: "Work history", href: "/work-history" },
-];
+const navigation: Array<{ name: string; href: string }> = [];
 
 export function Header() {
+  const hasNavigationItems = navigation.length > 0;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
@@ -143,29 +140,30 @@ export function Header() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center">
-          <div className="bg-card border border-border flex gap-5 items-center px-3 py-3 rounded-2xl shadow-sm">
-            {/* Navigation Links Container - gap-1 (4px) between links */}
-            <NavigationMenu viewport={false}>
-              <NavigationMenuList className="gap-1">
-                {navigation.map((item) => (
-                  <NavigationMenuItem key={item.name}>
-                    <NavigationMenuLink
-                      asChild
-                      className="h-9 flex items-center justify-center px-4 py-2 rounded-inner-2xl-gap-3 text-sm leading-5 font-medium"
-                    >
-                      <Link href={item.href}>{item.name}</Link>
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
-                ))}
-              </NavigationMenuList>
-            </NavigationMenu>
+          <div className="bg-card border border-border flex items-center gap-2 px-3 py-3 rounded-2xl shadow-sm">
+            {hasNavigationItems && (
+              <NavigationMenu viewport={false}>
+                <NavigationMenuList className="gap-1">
+                  {navigation.map((item) => (
+                    <NavigationMenuItem key={item.name}>
+                      <NavigationMenuLink
+                        asChild
+                        className="h-9 flex items-center justify-center px-4 py-2 rounded-inner-2xl-gap-3 text-sm leading-5 font-medium"
+                      >
+                        <Link href={item.href}>{item.name}</Link>
+                      </NavigationMenuLink>
+                    </NavigationMenuItem>
+                  ))}
+                </NavigationMenuList>
+              </NavigationMenu>
+            )}
 
             {/* Theme Toggle */}
             <ThemeToggle />
 
             {/* Get in touch button - NOW INSIDE */}
             <Button asChild variant="default">
-              <Link href="/contact">Get in touch</Link>
+              <Link href="mailto:luke@jermy.design">Get in touch</Link>
             </Button>
           </div>
         </nav>
@@ -212,7 +210,10 @@ export function Header() {
             ))}
             {/* Get in touch button - Now in the menu */}
             <Button asChild variant="default" className="mt-3">
-              <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
+              <Link
+                href="mailto:luke@jermy.design"
+                onClick={() => setMobileMenuOpen(false)}
+              >
                 Get in touch
               </Link>
             </Button>

@@ -3,7 +3,6 @@
 import React, { useState, useCallback, useRef, useEffect, useLayoutEffect } from "react";
 import { createPortal } from "react-dom";
 import { gsap } from "gsap";
-import Link from "next/link";
 import { StructuredText } from "react-datocms";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { H2, H3, Lead } from "@/components/ui/typography";
@@ -652,17 +651,6 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
             <Lead className="text-xl leading-7">
               If you know me, you&apos;ve probably heard these before.
             </Lead>
-          </FadeUp>
-          <FadeUp
-            triggerOnScroll={true}
-            delay={animationDelays.long}
-            duration={animationDurations.default}
-            distance={animationDistances.default}
-            easing={animationEasings.smooth}
-          >
-            <Button variant="secondary" size="lg" asChild className="w-fit">
-              <Link href="/about">Read more about me</Link>
-            </Button>
           </FadeUp>
         </div>
 
