@@ -32,7 +32,7 @@ function getTimeOfDayGreeting(now: Date) {
     return "👋 Good afternoon friend!";
   if (secondsSinceMidnight >= eveningStart && secondsSinceMidnight <= 20 * 60 * 60)
     return "👋 Good evening friend!";
-  return "🦉 Hello to you, night owl!";
+  return "🦉 Hello there, night owl!";
 }
 
 declare global {
