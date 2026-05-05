@@ -18,6 +18,23 @@ const TEXT_MOVE_DISTANCE = animationDistances.default;
 const SWIPE_DURATION_SECONDS = animationDurations.verySlow / 1000;
 const SWIPE_EXIT_Y_PERCENT = -120;
 
+function getTimeOfDayGreeting(now: Date) {
+  const secondsSinceMidnight =
+    now.getHours() * 60 * 60 + now.getMinutes() * 60 + now.getSeconds();
+  const morningStart = 4 * 60 * 60 + 1; // 04:00:01
+  const afternoonStart = 12 * 60 * 60 + 1; // 12:00:01
+  const eveningStart = 16 * 60 * 60 + 1; // 16:00:01
+  const nightStart = 20 * 60 * 60 + 1; // 20:00:01
+
+  if (secondsSinceMidnight >= morningStart && secondsSinceMidnight <= 12 * 60 * 60)
+    return "👋 Good morning friend!";
+  if (secondsSinceMidnight >= afternoonStart && secondsSinceMidnight <= 16 * 60 * 60)
+    return "👋 Good afternoon friend!";
+  if (secondsSinceMidnight >= eveningStart && secondsSinceMidnight <= 20 * 60 * 60)
+    return "👋 Good evening friend!";
+  return "🦉 Hello to you, night owl!";
+}
+
 declare global {
   interface Window {
     __preloaderDone?: boolean;
@@ -25,6 +42,7 @@ declare global {
 }
 
 export function PreLoader() {
+  const greeting = getTimeOfDayGreeting(new Date());
   const [isVisible, setIsVisible] = useState(true);
   const overlayRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
@@ -123,9 +141,7 @@ export function PreLoader() {
       className="fixed inset-0 z-[100] flex items-center justify-center bg-secondary"
     >
       <div ref={textRef} className="opacity-0">
-        <Lead className="text-foreground text-xl md:text-2xl">
-          👋 Welcome!
-        </Lead>
+        <Lead className="text-foreground text-xl md:text-2xl">{greeting}</Lead>
       </div>
     </div>
   );
