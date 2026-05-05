@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { H1, Lead } from "@/components/ui/typography";
+import { Badge } from "@/components/ui/badge";
 import { TextReveal } from "@/components/animations/TextReveal";
 import { FadeUp } from "@/components/animations/FadeUp";
 import {
@@ -187,11 +188,35 @@ export default function Hero() {
 
         {/* Right Column - Text Content */}
         <div className="flex flex-1 flex-col gap-3 md:gap-5 items-start max-w-[800px] min-w-[300px]">
+          {isPreloaderDone ? (
+            <FadeUp
+              delay={0}
+              duration={animationDurations.default + 50}
+              distance={15}
+              easing={animationEasings.smooth}
+              className="w-fit"
+            >
+              <Badge
+                variant="outline"
+                className="px-4 py-2 text-sm md:text-base leading-none font-medium text-foreground"
+              >
+                On paternity leave until Sept &apos;26
+              </Badge>
+            </FadeUp>
+          ) : (
+            <Badge
+              variant="outline"
+              className="px-4 py-2 text-sm md:text-base leading-none font-medium text-foreground opacity-0"
+            >
+              On paternity leave until Sept &apos;26
+            </Badge>
+          )}
+
           {/* H1 Typography */}
           <H1 className="flex-1 font-sans text-5xl lg:text-7xl leading-none tracking-tight font-medium text-foreground w-full overflow-hidden">
             {isPreloaderDone ? (
               <TextReveal
-                delay={0}
+                delay={120}
                 duration={animationDurations.verySlow}
                 stagger={0.025}
                 easing={animationEasings.robust}
@@ -206,7 +231,7 @@ export default function Hero() {
           {/* Lead Typography */}
           {isPreloaderDone ? (
             <FadeUp
-              delay={0}
+              delay={220}
               duration={animationDurations.default + 50}
               distance={15}
               easing={animationEasings.smooth}
@@ -214,15 +239,11 @@ export default function Hero() {
             >
               <Lead className="w-full">
                 Leading and crafting digital products across teams and platforms.
-                <br />
-                On parental leave until September 2026.
               </Lead>
             </FadeUp>
           ) : (
             <Lead className="w-full opacity-0">
               Leading and crafting digital products across teams and platforms.
-              <br />
-              On parental leave until September 2026.
             </Lead>
           )}
         </div>
