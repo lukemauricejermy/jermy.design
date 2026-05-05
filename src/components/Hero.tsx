@@ -1,24 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { H1, Lead } from "@/components/ui/typography";
 import { TextReveal } from "@/components/animations/TextReveal";
 import { FadeUp } from "@/components/animations/FadeUp";
 import {
   animationDurations,
   animationEasings,
-  animationDelays,
 } from "@/lib/animation-config";
 
 export default function Hero() {
   const [revealComplete, setRevealComplete] = useState(false);
+  const [isPreloaderDone, setIsPreloaderDone] = useState(false);
+
+  useEffect(() => {
+    if (window.__preloaderDone) {
+      setIsPreloaderDone(true);
+      return;
+    }
+
+    const handlePreloaderDone = () => setIsPreloaderDone(true);
+    window.addEventListener("preloader:done", handlePreloaderDone);
+    return () => window.removeEventListener("preloader:done", handlePreloaderDone);
+  }, []);
 
   return (
     <section className="bg-background flex flex-col items-center justify-center px-6 pt-32 pb-16 md:pt-40 md:pb-32 w-full min-h-screen">
       <div className="flex flex-1 flex-wrap gap-2 items-center justify-center max-w-[1440px] w-full">
         {/* Left Column - Self Portrait */}
         <div
-          className="flex flex-1 items-center justify-center max-w-[540px] min-w-[240px] [&_svg]:w-full [&_svg]:h-full [&_svg]:object-contain transition-none relative shrink-0 size-[240px] overflow-hidden"
+          className={`flex flex-1 items-center justify-center max-w-[540px] min-w-[240px] [&_svg]:w-full [&_svg]:h-full [&_svg]:object-contain transition-none relative shrink-0 size-[240px] overflow-hidden ${
+            isPreloaderDone ? "opacity-100" : "opacity-0"
+          }`}
           data-illustration
           data-hero-portrait
         >
@@ -163,7 +176,7 @@ export default function Hero() {
               />
           </svg>
           {/* Overlay fades out to reveal - removed from DOM when done to avoid compositing layer on first theme toggle */}
-          {!revealComplete && (
+          {isPreloaderDone && !revealComplete && (
             <div
               className="absolute inset-0 bg-background hero-portrait-reveal"
               aria-hidden
@@ -176,30 +189,42 @@ export default function Hero() {
         <div className="flex flex-1 flex-col gap-3 md:gap-5 items-start max-w-[800px] min-w-[300px]">
           {/* H1 Typography */}
           <H1 className="flex-1 font-sans text-5xl lg:text-7xl leading-none tracking-tight font-medium text-foreground w-full overflow-hidden">
-            <TextReveal
-              delay={animationDelays.long}
-              duration={animationDurations.verySlow}
-              stagger={0.025}
-              easing={animationEasings.robust}
-            >
-              {`Head of design.\nStill doing the doing.`}
-            </TextReveal>
+            {isPreloaderDone ? (
+              <TextReveal
+                delay={0}
+                duration={animationDurations.verySlow}
+                stagger={0.025}
+                easing={animationEasings.robust}
+              >
+                {`Head of design.\nStill doing the doing.`}
+              </TextReveal>
+            ) : (
+              <span className="opacity-0">{`Head of design.\nStill doing the doing.`}</span>
+            )}
           </H1>
 
           {/* Lead Typography */}
-          <FadeUp
-            delay={1350}
-            duration={animationDurations.default + 50}
-            distance={15}
-            easing={animationEasings.smooth}
-            className="flex-1 font-sans text-lg md:text-xl leading-7 md:leading-[28px] font-normal w-full"
-          >
-            <Lead className="w-full">
+          {isPreloaderDone ? (
+            <FadeUp
+              delay={0}
+              duration={animationDurations.default + 50}
+              distance={15}
+              easing={animationEasings.smooth}
+              className="flex-1 font-sans text-lg md:text-xl leading-7 md:leading-[28px] font-normal w-full"
+            >
+              <Lead className="w-full">
+                Leading and crafting digital products across teams and platforms.
+                <br />
+                On parental leave until September 2026.
+              </Lead>
+            </FadeUp>
+          ) : (
+            <Lead className="w-full opacity-0">
               Leading and crafting digital products across teams and platforms.
               <br />
               On parental leave until September 2026.
             </Lead>
-          </FadeUp>
+          )}
         </div>
       </div>
     </section>

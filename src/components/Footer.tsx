@@ -16,6 +16,8 @@ const SOCIAL_LINKS = [
 ];
 
 export default async function Footer() {
+  const bookingLink = "https://calendar.app.google/zyft1akDpn5qg5M48";
+
   return (
     <FooterWrapper className="fixed bottom-0 left-0 right-0 -z-10 bg-secondary border-t border-border py-12 md:py-40 px-6">
       <div className="max-w-[1440px] mx-auto flex flex-col gap-12 md:gap-40">
@@ -43,7 +45,9 @@ export default async function Footer() {
               easing={animationEasings.smooth}
             >
               <Button asChild size="lg" className="w-fit">
-                <Link href="mailto:luke@jermy.design">Get in touch</Link>
+                <Link href={bookingLink} target="_blank" rel="noopener noreferrer">
+                  Book a chat
+                </Link>
               </Button>
             </FadeUp>
           </div>

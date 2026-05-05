@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
-import { Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
 import { ThemeToggle } from "./theme-toggle-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,24 +13,43 @@ import {
 
 const navigation: Array<{ name: string; href: string }> = [];
 
+declare global {
+  interface Window {
+    __preloaderDone?: boolean;
+  }
+}
+
 export function Header() {
+  const bookingLink = "https://calendar.app.google/zyft1akDpn5qg5M48";
   const hasNavigationItems = navigation.length > 0;
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isPreloaderDone, setIsPreloaderDone] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const mobileMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (window.__preloaderDone) {
+      setIsPreloaderDone(true);
+      return;
+    }
+
+    const handlePreloaderDone = () => setIsPreloaderDone(true);
+    window.addEventListener("preloader:done", handlePreloaderDone);
+    return () => window.removeEventListener("preloader:done", handlePreloaderDone);
+  }, []);
 
   // Handle initial load animation
   useEffect(() => {
+    if (!isPreloaderDone) return;
+
     // Start hidden, then animate in after mount
     setHasLoaded(true);
     const timer = setTimeout(() => {
       setIsVisible(true);
     }, 50);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isPreloaderDone]);
 
   // Handle scroll-based show/hide
   useEffect(() => {
@@ -65,35 +83,6 @@ export function Header() {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY, hasLoaded, isInitialLoad]);
-
-  // Handle click outside and scroll to close mobile menu
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        mobileMenuOpen &&
-        mobileMenuRef.current &&
-        !mobileMenuRef.current.contains(event.target as Node) &&
-        !(event.target as HTMLElement).closest('[aria-label="Toggle menu"]')
-      ) {
-        setMobileMenuOpen(false);
-      }
-    };
-
-    const handleScroll = () => {
-      if (mobileMenuOpen) {
-        setMobileMenuOpen(false);
-      }
-    };
-
-    if (mobileMenuOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      window.addEventListener("scroll", handleScroll, { passive: true });
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-        window.removeEventListener("scroll", handleScroll);
-      };
-    }
-  }, [mobileMenuOpen]);
 
   // Determine transition properties based on state
   const getTransitionProperties = () => {
@@ -161,9 +150,11 @@ export function Header() {
             {/* Theme Toggle */}
             <ThemeToggle />
 
-            {/* Get in touch button - NOW INSIDE */}
+            {/* Book a chat button */}
             <Button asChild variant="default">
-              <Link href="mailto:luke@jermy.design">Get in touch</Link>
+              <Link href={bookingLink} target="_blank" rel="noopener noreferrer">
+                Book a chat
+              </Link>
             </Button>
           </div>
         </nav>
@@ -174,52 +165,15 @@ export function Header() {
             {/* Theme Toggle - Always visible on mobile */}
             <ThemeToggle />
 
-            {/* Menu Button */}
-            <Button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              variant="secondary"
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? (
-                <X className="size-4" />
-              ) : (
-                <Menu className="size-4" />
-              )}
-              <span>Menu</span>
+            {/* Book a chat button */}
+            <Button asChild variant="default">
+              <Link href={bookingLink} target="_blank" rel="noopener noreferrer">
+                Book a chat
+              </Link>
             </Button>
           </div>
         </div>
       </div>
-
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div
-          ref={mobileMenuRef}
-          className="md:hidden mt-4 bg-card border border-border rounded-2xl shadow-sm p-3"
-        >
-          <nav className="flex flex-col gap-1">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="h-9 flex items-center px-4 py-2 rounded-inner-2xl-gap-3 text-sm leading-5 font-medium text-foreground hover:bg-accent transition-colors"
-              >
-                {item.name}
-              </Link>
-            ))}
-            {/* Get in touch button - Now in the menu */}
-            <Button asChild variant="default" className="mt-3">
-              <Link
-                href="mailto:luke@jermy.design"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Get in touch
-              </Link>
-            </Button>
-          </nav>
-        </div>
-      )}
     </header>
   );
 }
