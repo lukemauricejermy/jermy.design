@@ -8,14 +8,17 @@ import Footer from "@/components/Footer";
 export default function Home() {
   return (
     <main>
-      <div className="relative z-10">
-        <Header />
-        <Hero />
-        <SocialProof />
-        <FeaturedCases />
-        <Values />
+      <div className="relative z-10 pointer-events-none">
+        <div className="pointer-events-auto">
+          <Header />
+          <Hero />
+          <SocialProof />
+          <FeaturedCases />
+          <Values />
+        </div>
         {/* Spacer: matches footer height so fixed footer is revealed as content scrolls away */}
         <div
+          className="pointer-events-none"
           style={{ minHeight: "var(--footer-height, 500px)" }}
           aria-hidden
         />

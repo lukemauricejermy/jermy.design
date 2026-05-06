@@ -58,7 +58,7 @@ function PlaceholderCard() {
           </div>
         </div>
       </CardContent>
-      <CardHeader className="px-3 md:px-6">
+      <CardHeader className="px-3 md:px-6 pb-5 md:pb-7">
         <CardTitle className="text-muted-foreground font-normal">
           Coming soon
         </CardTitle>
@@ -101,7 +101,7 @@ export default async function FeaturedCases() {
               </div>
             </div>
           </CardContent>
-          <CardHeader className="gap-1.5 px-3 md:px-6">
+          <CardHeader className="gap-1.5 px-3 md:px-6 pb-5 md:pb-7">
             <CardTitle className="text-2xl font-medium leading-8">
               {study.title}
             </CardTitle>

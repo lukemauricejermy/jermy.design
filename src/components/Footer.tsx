@@ -19,7 +19,7 @@ export default async function Footer() {
   const bookingLink = "https://calendar.app.google/zyft1akDpn5qg5M48";
 
   return (
-    <FooterWrapper className="fixed bottom-0 left-0 right-0 -z-10 bg-secondary border-t border-border py-12 md:py-40 px-6">
+    <FooterWrapper className="fixed bottom-0 left-0 right-0 z-0 bg-secondary border-t border-border py-12 md:py-40 px-6">
       <div className="max-w-[1440px] mx-auto flex flex-col gap-12 md:gap-40">
         {/* Top row: Intro + CTA */}
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8 md:gap-16 lg:gap-24">
