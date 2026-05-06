@@ -215,7 +215,7 @@ export default function SocialProof() {
           duration={animationDurations.default}
           distance={15}
           easing={animationEasings.smooth}
-          className="flex flex-row flex-nowrap gap-6 md:gap-10 lg:gap-14 items-center justify-center py-6 w-full overflow-x-auto [--logo-base-width:72px] md:[--logo-base-width:84px] lg:[--logo-base-width:98px]"
+          className="grid grid-cols-4 gap-2 md:gap-8 lg:gap-14 items-center justify-items-center py-6 w-full max-w-[920px] mx-auto [--logo-base-width:54px] md:[--logo-base-width:76px] lg:[--logo-base-width:98px]"
         >
           {logos.map((logo) => {
             const LogoComponent = logo.component;
