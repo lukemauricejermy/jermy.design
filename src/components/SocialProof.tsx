@@ -165,24 +165,28 @@ const logos = [
     component: GoogleLogo,
     width: 87,
     height: 29.25,
+    opticalScale: 1,
   },
   {
     name: "BBC",
     component: BBCLogo,
     width: 81.75,
     height: 23.25,
+    opticalScale: 0.85,
   },
   {
     name: "Ustwo",
     component: UstwoLogo,
     width: 97.5,
     height: 27.75,
+    opticalScale: 1,
   },
   {
     name: "Samsung",
     component: SamsungLogo,
     width: 117.523,
     height: 18,
+    opticalScale: 1.25,
   },
 ];
 
@@ -211,22 +215,18 @@ export default function SocialProof() {
           duration={animationDurations.default}
           distance={15}
           easing={animationEasings.smooth}
-          className="grid grid-cols-2 md:flex md:flex-row gap-4 md:gap-14 items-center justify-center py-6 max-w-fit"
+          className="flex flex-row flex-nowrap gap-6 md:gap-10 lg:gap-14 items-center justify-center py-6 w-full overflow-x-auto [--logo-base-width:72px] md:[--logo-base-width:84px] lg:[--logo-base-width:98px]"
         >
           {logos.map((logo) => {
             const LogoComponent = logo.component;
+            const scaledWidth = `calc(var(--logo-base-width) * ${logo.opticalScale})`;
+            const scaledHeight = `calc(var(--logo-base-width) * ${logo.opticalScale} * ${logo.height / logo.width})`;
             return (
               <div
                 key={logo.name}
                 className="relative shrink-0 flex items-center justify-center"
               >
-                <div
-                  className="scale-[0.85] md:scale-100"
-                  style={{
-                    width: `${logo.width}px`,
-                    height: `${logo.height}px`,
-                  }}
-                >
+                <div style={{ width: `${scaledWidth}px`, height: `${scaledHeight}px` }}>
                   <LogoComponent width={logo.width} height={logo.height} />
                 </div>
               </div>
