@@ -198,17 +198,25 @@ export default function Hero() {
             >
               <Badge
                 variant="outline"
-                className="px-4 py-2 text-sm md:text-base leading-none font-medium text-foreground"
+                className="gap-3 px-4 py-2 text-sm md:text-base leading-none font-medium text-foreground"
               >
-                On paternity leave until Sept &apos;26
+                <span
+                  aria-hidden="true"
+                  className="size-2 rounded-full bg-green-500 animate-pulse"
+                />
+                On paternity leave until Sept 2026
               </Badge>
             </FadeUp>
           ) : (
             <Badge
               variant="outline"
-              className="px-4 py-2 text-sm md:text-base leading-none font-medium text-foreground opacity-0"
+              className="gap-3 px-4 py-2 text-sm md:text-base leading-none font-medium text-foreground opacity-0"
             >
-              On paternity leave until Sept &apos;26
+              <span
+                aria-hidden="true"
+                className="size-2 rounded-full bg-green-500 animate-pulse"
+              />
+              On paternity leave until Sept 2026
             </Badge>
           )}
 
