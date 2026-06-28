@@ -107,14 +107,14 @@ export function Header() {
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 px-3 py-6 md:px-6"
+      className="fixed top-0 left-0 right-0 z-50 px-6 py-6"
       style={{
         transform: isVisible ? "translateY(0)" : "translateY(-100%)",
         transition: getTransitionProperties(),
         opacity: getOpacity(),
       }}
     >
-      <div className="flex items-center justify-between max-w-[1728px] mx-auto">
+      <div className="flex items-center justify-between mx-auto w-full">
         {/* Logo */}
         <Link
           href="/"

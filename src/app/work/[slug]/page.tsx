@@ -1,41 +1,14 @@
 import { performRequest } from "@/lib/datocms";
 import { notFound } from "next/navigation";
-
-const CASE_STUDY_QUERY = `
-  query CaseStudy($slug: String!) {
-    caseStudy(filter: { slug: { eq: $slug } }) {
-      id
-      title
-      slug
-      excerpt
-      coverImage {
-        url
-        alt
-      }
-      content {
-        value
-      }
-    }
-  }
-`;
-
-type CaseStudy = {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string | null;
-  coverImage: {
-    url: string;
-    alt: string | null;
-  } | null;
-  content: {
-    value: unknown;
-  } | null;
-};
-
-type QueryResult = {
-  caseStudy: CaseStudy | null;
-};
+import { Header } from "@/components/Header";
+import Footer from "@/components/Footer";
+import { CaseStudyHero } from "@/components/case-study/case-study-hero";
+import { CaseStudyOverview } from "@/components/case-study/case-study-overview";
+import { CaseStudyCallouts } from "@/components/case-study/case-study-callouts";
+import {
+  CASE_STUDY_QUERY,
+  type CaseStudyQueryResult,
+} from "@/lib/queries/case-study";
 
 export default async function CaseStudyPage({
   params,
@@ -43,8 +16,8 @@ export default async function CaseStudyPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  
-  const { caseStudy } = await performRequest<QueryResult>({
+
+  const { caseStudy } = await performRequest<CaseStudyQueryResult>({
     query: CASE_STUDY_QUERY,
     variables: { slug },
   });
@@ -54,25 +27,28 @@ export default async function CaseStudyPage({
   }
 
   return (
-    <main className="min-h-screen p-8 md:p-24">
-      <article className="max-w-3xl space-y-8">
-        <header className="space-y-4">
-          <h1 className="text-5xl font-semibold tracking-tight">
-            {caseStudy.title}
-          </h1>
-          {caseStudy.excerpt && (
-            <p className="text-xl text-muted-foreground">{caseStudy.excerpt}</p>
-          )}
-        </header>
-
-        {caseStudy.coverImage && (
-          <img
-            src={caseStudy.coverImage.url}
-            alt={caseStudy.coverImage.alt || caseStudy.title}
-            className="w-full rounded-3xl"
+    <main>
+      <div className="relative z-10 pointer-events-none">
+        <div className="pointer-events-auto bg-background">
+          <Header />
+          <CaseStudyHero
+            title={caseStudy.title}
+            backgroundColour={caseStudy.heroBackgroundColour?.hex ?? null}
+            logo={caseStudy.clientLogo}
+            imagery={caseStudy.heroImagery}
+            imageryMobile={caseStudy.heroImageryMobile}
           />
-        )}
-      </article>
+          <CaseStudyOverview caseStudy={caseStudy} />
+          <CaseStudyCallouts callouts={caseStudy.callouts} />
+        </div>
+        {/* Spacer: matches footer height so fixed footer is revealed as content scrolls away */}
+        <div
+          className="pointer-events-none"
+          style={{ minHeight: "var(--footer-height, 500px)" }}
+          aria-hidden
+        />
+      </div>
+      <Footer />
     </main>
   );
 }
