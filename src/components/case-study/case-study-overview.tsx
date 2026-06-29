@@ -92,23 +92,30 @@ function groupScores(scores: ScoreValue[]): GroupedScores[] {
   return ordered.map(({ group, items }) => ({ group, items }));
 }
 
-function ScoreBar({ value }: { value: number }) {
+function ScoreBar({ value, fill }: { value: number; fill?: string | null }) {
   return (
     <div
       className="flex shrink-0 items-center gap-0.5"
       aria-label={`${value} out of 5`}
     >
-      {Array.from({ length: 5 }).map((_, index) => (
-        <span
-          key={index}
-          className={cn(
-            "h-4 w-8",
-            index < value ? "bg-chart-4" : SURFACE_CLASS,
-            index === 0 && "rounded-l-sm",
-            index === 4 && "rounded-r-sm"
-          )}
-        />
-      ))}
+      {Array.from({ length: 5 }).map((_, index) => {
+        const isActive = index < value;
+        return (
+          <span
+            key={index}
+            // Active segments use the hero background colour so the scores key
+            // off the same palette as the case study's hero. Falls back to the
+            // chart token when no hero colour is set.
+            style={isActive && fill ? { backgroundColor: fill } : undefined}
+            className={cn(
+              "h-4 w-8",
+              isActive ? (fill ? undefined : "bg-chart-4") : SURFACE_CLASS,
+              index === 0 && "rounded-l-sm",
+              index === 4 && "rounded-r-sm"
+            )}
+          />
+        );
+      })}
     </div>
   );
 }
@@ -155,7 +162,7 @@ export function CaseStudyOverview({ caseStudy }: CaseStudyOverviewProps) {
               pinned near the top of the viewport while the (taller) scores
               column scrolls past, until the section bottom is reached. */}
           <div className="flex flex-col gap-6 lg:sticky lg:top-28 lg:self-start">
-            <H2 className="overflow-hidden pb-0 text-5xl font-medium leading-none tracking-tight md:text-6xl">
+            <H2 className="overflow-hidden border-none pb-0 text-4xl font-medium leading-none tracking-tight md:text-5xl lg:text-6xl">
               <TextReveal
                 triggerOnScroll
                 duration={750}
@@ -209,7 +216,10 @@ export function CaseStudyOverview({ caseStudy }: CaseStudyOverviewProps) {
                         <p className="min-w-0 flex-1 truncate text-base leading-6 text-muted-foreground">
                           {item.name}
                         </p>
-                        <ScoreBar value={item.value} />
+                        <ScoreBar
+                          value={item.value}
+                          fill={caseStudy.heroBackgroundColour?.hex ?? null}
+                        />
                       </div>
                     ))}
                   </div>

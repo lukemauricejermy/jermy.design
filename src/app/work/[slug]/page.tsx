@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import { CaseStudyHero } from "@/components/case-study/case-study-hero";
 import { CaseStudyOverview } from "@/components/case-study/case-study-overview";
 import { CaseStudyCallouts } from "@/components/case-study/case-study-callouts";
+import { CaseStudyRelated } from "@/components/case-study/case-study-related";
 import {
   CASE_STUDY_QUERY,
   type CaseStudyQueryResult,
@@ -40,6 +41,9 @@ export default async function CaseStudyPage({
           />
           <CaseStudyOverview caseStudy={caseStudy} />
           <CaseStudyCallouts callouts={caseStudy.callouts} />
+          <CaseStudyRelated
+            related={[caseStudy.relatedCaseStudy1, caseStudy.relatedCaseStudy2]}
+          />
         </div>
         {/* Spacer: matches footer height so fixed footer is revealed as content scrolls away */}
         <div
