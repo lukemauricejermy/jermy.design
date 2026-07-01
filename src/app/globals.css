@@ -62,6 +62,23 @@
 :root {
   --radius: 0.625rem;
 
+  /* Layout — spacing tokens shared between header and case study hero */
+  --spacing-3: 0.75rem;
+  --spacing-6: 1.5rem;
+  --spacing-9: 2.25rem;
+  --spacing-12: 3rem;
+
+  /* Bottom edge of nav pills — header py-6 top + pill height (excludes header bottom padding) */
+  --header-padding-y: var(--spacing-6);
+  --header-bar-height: calc(var(--spacing-3) * 2 + var(--spacing-9)); /* pill py-3 + h-9 + py-3 */
+  --header-content-bottom: calc(var(--header-padding-y) + var(--header-bar-height));
+
+  /* Case study hero */
+  --hero-section-inset: var(--spacing-3);
+  --hero-content-gap: var(--spacing-12);
+  --hero-tablet-height: min(65svh, 31.25rem); /* caps at 500px — matches ~773px viewport before contain gaps appear */
+  --hero-desktop-height: 88svh; /* restored from original lg min-h — full height on wide screens */
+
   /* Recessive surface for info chips / score group titles.
      Light mode only — dark mode keeps the muted/50 fill which already reads well. */
   --chip-surface: #f0f0f0;
@@ -110,6 +127,13 @@
   --illustration-clothing-tertiary: #ddd6bb;
   --illustration-laptop: #bbbaba;
   --illustration-tongue: #fca5a5;
+}
+
+/* Tall/narrow desktop layouts: cap hero height to prevent transparent-PNG gap at top */
+@media (max-aspect-ratio: 3/2) {
+  :root {
+    --hero-desktop-height: min(80svh, 44.25rem);
+  }
 }
 
 .dark {
