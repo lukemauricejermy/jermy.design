@@ -71,7 +71,7 @@ export function CaseStudyHero({
               alt={desktopImagery.alt ?? `${title} app screens`}
               width={desktopImagery.width ?? undefined}
               height={desktopImagery.height ?? undefined}
-              className="h-full w-full object-contain object-right-bottom lg:object-cover lg:object-right-top"
+              className="h-full w-full object-contain object-right-bottom lg:object-cover lg:object-right"
             />
           </FadeUp>
         )}
