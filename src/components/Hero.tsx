@@ -1,14 +1,43 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { H1, Lead } from "@/components/ui/typography";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import { TextReveal } from "@/components/animations/TextReveal";
 import { FadeUp } from "@/components/animations/FadeUp";
 import {
   animationDurations,
   animationEasings,
 } from "@/lib/animation-config";
+
+const VISIT_URL = "https://visit.com/";
+
+/** Rendered twice: once animated, once as an inert placeholder reserving layout space. */
+function StatusBadge({ isPlaceholder = false }: { isPlaceholder?: boolean }) {
+  return (
+    <Badge
+      asChild
+      variant="outline"
+      className={cn(
+        "gap-3 px-4 py-2 text-sm md:text-base leading-none font-medium text-foreground",
+        // Base badge omits background-color, so the outline variant's hover bg would snap
+        "transition-[color,background-color,border-color,box-shadow]",
+        isPlaceholder && "opacity-0",
+      )}
+      inert={isPlaceholder || undefined}
+    >
+      <Link href={VISIT_URL} target="_blank" rel="noopener noreferrer">
+        <span
+          aria-hidden="true"
+          className="size-2 rounded-full bg-green-500 animate-pulse"
+        />
+        Currently: Head of Design @ Visit
+      </Link>
+    </Badge>
+  );
+}
 
 export default function Hero() {
   const [revealComplete, setRevealComplete] = useState(false);
@@ -196,28 +225,10 @@ export default function Hero() {
               easing={animationEasings.smooth}
               className="w-fit"
             >
-              <Badge
-                variant="outline"
-                className="gap-3 px-4 py-2 text-sm md:text-base leading-none font-medium text-foreground"
-              >
-                <span
-                  aria-hidden="true"
-                  className="size-2 rounded-full bg-green-500 animate-pulse"
-                />
-                On paternity leave until Sept 2026
-              </Badge>
+              <StatusBadge />
             </FadeUp>
           ) : (
-            <Badge
-              variant="outline"
-              className="gap-3 px-4 py-2 text-sm md:text-base leading-none font-medium text-foreground opacity-0"
-            >
-              <span
-                aria-hidden="true"
-                className="size-2 rounded-full bg-green-500 animate-pulse"
-              />
-              On paternity leave until Sept 2026
-            </Badge>
+            <StatusBadge isPlaceholder />
           )}
 
           {/* H1 Typography */}
