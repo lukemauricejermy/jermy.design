@@ -63,7 +63,7 @@ export default async function Footer() {
             easing={animationEasings.smooth}
             className="overflow-visible pb-2"
           >
-            <H1 className="font-sans text-5xl lg:text-7xl leading-none tracking-tight font-medium text-foreground">
+            <H1 className="text-foreground">
               Don&apos;t be a
               <br />
               stranger.
@@ -78,7 +78,7 @@ export default async function Footer() {
             easing={animationEasings.smooth}
             className="flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-8"
           >
-            <P className="text-sm text-muted-foreground">
+            <P className="type-small text-muted-foreground">
               © 2026 jermy.design. All rights reserved.
             </P>
             <div className="flex items-center gap-2">

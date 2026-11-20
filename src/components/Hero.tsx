@@ -21,7 +21,7 @@ function StatusBadge({ isPlaceholder = false }: { isPlaceholder?: boolean }) {
       asChild
       variant="outline"
       className={cn(
-        "gap-3 px-4 py-2 text-sm md:text-base leading-none font-medium text-foreground",
+        "gap-3 px-4 py-2 type-label text-foreground",
         // Base badge omits background-color, so the outline variant's hover bg would snap
         "transition-[color,background-color,border-color,box-shadow]",
         isPlaceholder && "opacity-0",
@@ -232,7 +232,7 @@ export default function Hero() {
           )}
 
           {/* H1 Typography */}
-          <H1 className="flex-1 font-sans text-5xl lg:text-7xl leading-none tracking-tight font-medium text-foreground w-full overflow-hidden">
+          <H1 className="flex-1 text-foreground w-full overflow-hidden">
             {isPreloaderDone ? (
               <TextReveal
                 delay={120}
@@ -254,7 +254,7 @@ export default function Hero() {
               duration={animationDurations.default + 50}
               distance={15}
               easing={animationEasings.smooth}
-              className="flex-1 font-sans text-lg md:text-xl leading-7 md:leading-[28px] font-normal w-full"
+              className="flex-1 type-lead w-full"
             >
               <Lead className="w-full">
                 Leading and crafting digital products across teams and platforms.

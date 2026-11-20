@@ -170,7 +170,7 @@ function CaseStudyCardContent({ study }: { study: CaseStudy }) {
         <CaseStudyCoverImage study={study} />
       </CardContent>
       <CardHeader className="gap-1.5 px-3 md:px-6 pb-5 md:pb-7">
-        <CardTitle className="text-2xl font-medium leading-8">
+        <CardTitle className="type-title-sm">
           {study.title}
         </CardTitle>
         {study.excerpt && (
@@ -203,14 +203,14 @@ function DraftCaseStudyCard({ study }: { study: CaseStudy }) {
               <div className="absolute inset-0 flex items-center justify-center bg-muted" />
             )}
             <div className="absolute inset-0 rounded md:rounded-lg bg-background/60 backdrop-blur-sm flex items-center justify-center pointer-events-none z-10">
-              <span className="text-sm md:text-base leading-none font-medium text-foreground">
+              <span className="type-label text-foreground">
                 Full case coming soon
               </span>
             </div>
           </div>
         </CardContent>
         <CardHeader className="gap-1.5 px-3 md:px-6 pb-5 md:pb-7">
-          <CardTitle className="text-2xl font-medium leading-8">
+          <CardTitle className="type-title-sm">
             {study.title}
           </CardTitle>
           {study.excerpt && (
@@ -244,7 +244,7 @@ function PlaceholderCard() {
       <CardContent className="pt-0 px-3 md:px-6">
         <div className="aspect-video bg-muted rounded md:rounded-lg overflow-hidden relative">
           <div className="absolute inset-0 rounded md:rounded-lg bg-background/60 backdrop-blur-sm flex items-center justify-center pointer-events-none">
-            <span className="text-sm md:text-base leading-none font-medium text-foreground">
+            <span className="type-label text-foreground">
               Full case coming soon
             </span>
           </div>
@@ -282,7 +282,7 @@ export default async function FeaturedCases() {
       <div className="max-w-[1440px] mx-auto flex flex-col gap-32">
         {/* Row 1: H2 on LEFT, Lead + Button on RIGHT */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-24">
-          <H2 className="text-4xl md:text-5xl lg:text-6xl font-medium leading-none tracking-tight border-none pb-0 overflow-hidden">
+          <H2 className="overflow-hidden">
             <TextReveal
               triggerOnScroll={true}
               delay={0}
@@ -300,13 +300,13 @@ export default async function FeaturedCases() {
             easing={animationEasings.smooth}
             className="flex flex-col gap-8"
           >
-            <Lead className="text-lg md:text-xl leading-7 md:leading-[28px]">
+            <Lead>
               I&apos;ve spent the last 20 years creating digital products —
               in-house, as a consultant, and as the founder of my own design
               studio. I&apos;ve worked across industries and alongside some
               exceptional teams and people.
             </Lead>
-            <Lead className="text-lg md:text-xl leading-7 md:leading-[28px]">
+            <Lead>
               This portfolio is a curated snapshot of that work — a selection of
               the projects I&apos;m most proud of and able to share publicly.
             </Lead>

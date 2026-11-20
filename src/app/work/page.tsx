@@ -59,7 +59,7 @@ export default async function WorkPage() {
                     />
                   </div>
                 )}
-                <h2 className="text-2xl font-medium group-hover:underline">
+                <h2 className="type-title-sm group-hover:underline">
                   {study.title}
                 </h2>
                 {study.excerpt && (

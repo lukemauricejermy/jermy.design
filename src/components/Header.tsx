@@ -137,7 +137,7 @@ export function Header() {
                     <NavigationMenuItem key={item.name}>
                       <NavigationMenuLink
                         asChild
-                        className="h-9 flex items-center justify-center px-4 py-2 rounded-inner-2xl-gap-3 text-sm leading-5 font-medium"
+                        className="h-9 flex items-center justify-center px-4 py-2 rounded-inner-2xl-gap-3 type-small font-medium"
                       >
                         <Link href={item.href}>{item.name}</Link>
                       </NavigationMenuLink>

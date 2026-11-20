@@ -1,129 +1,117 @@
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "@/lib/utils"
 
+import { cn, type TypeStyle } from "@/lib/utils"
+
+/**
+ * Typography — the site's type scale as a component.
+ *
+ * Each variant maps to a `type-*` utility in globals.css (size, line height,
+ * tracking, weight, responsive steps). Pick the variant for the role the text
+ * plays, and set the HTML element separately with `as`, so visual size and
+ * document outline stay independent:
+ *
+ *   <Typography variant="headline" as="h2">Selected work</Typography>
+ *
+ * The H1–H4 / Lead / P shortcuts pair the usual element with its default
+ * style. Colour, spacing, layout and the leading/tracking/weight modifiers are
+ * fine to add via className. For a different size, change the variant rather
+ * than adding `text-*`.
+ */
 const typographyVariants = cva("", {
   variants: {
     variant: {
-      h1: "scroll-m-20",
-      h2: "scroll-m-20 font-medium",
-      h3: "scroll-m-20 font-medium",
-      h4: "scroll-m-20",
-      lead: "text-muted-foreground",
-      p: "leading-7 [&:not(:first-child)]:mt-6",
-      large: "text-lg font-semibold",
-      small: "text-sm font-medium leading-none",
-      muted: "text-sm text-muted-foreground",
-    },
+      display: "type-display",
+      headline: "type-headline",
+      "title-lg": "type-title-lg",
+      title: "type-title",
+      "title-sm": "type-title-sm",
+      lead: "type-lead text-muted-foreground",
+      body: "type-body",
+      "body-long": "type-body-long",
+      label: "type-label",
+      small: "type-small",
+      caption: "type-caption text-muted-foreground",
+      overline: "type-overline text-muted-foreground",
+    } satisfies Record<TypeStyle, string>,
   },
   defaultVariants: {
-    variant: "p",
+    variant: "body",
   },
 })
 
-export interface TypographyProps
-  extends React.HTMLAttributes<HTMLElement>,
-    VariantProps<typeof typographyVariants> {
-  as?: React.ElementType
+type Variant = NonNullable<VariantProps<typeof typographyVariants>["variant"]>
+
+/** Element used when `as` isn't given. */
+const defaultElement: Record<Variant, React.ElementType> = {
+  display: "h1",
+  headline: "h2",
+  "title-lg": "h3",
+  title: "h3",
+  "title-sm": "h4",
+  lead: "p",
+  body: "p",
+  "body-long": "p",
+  label: "span",
+  small: "p",
+  caption: "p",
+  overline: "p",
 }
 
-const Typography = React.forwardRef<HTMLElement, TypographyProps>(
-  ({ className, variant, as, ...props }, ref) => {
-    const Comp = as || (variant === "h1" ? "h1" : variant === "h2" ? "h2" : variant === "h3" ? "h3" : variant === "h4" ? "h4" : "p")
-    return (
-      <Comp
-        ref={ref}
-        className={cn(typographyVariants({ variant }), className)}
-        {...props}
-      />
-    )
+type TypographyProps = React.HTMLAttributes<HTMLElement> &
+  VariantProps<typeof typographyVariants> & {
+    as?: React.ElementType
+    ref?: React.Ref<HTMLElement>
   }
-)
-Typography.displayName = "Typography"
 
-// Convenience components
-const H1 = React.forwardRef<
-  HTMLHeadingElement,
-  React.HTMLAttributes<HTMLHeadingElement>
->(({ className, ...props }, ref) => (
-  <Typography
-    ref={ref}
-    variant="h1"
-    as="h1"
-    className={className}
-    {...props}
-  />
-))
-H1.displayName = "H1"
+function Typography({ className, variant, as, ...props }: TypographyProps) {
+  const Comp = as ?? defaultElement[variant ?? "body"]
+  return (
+    <Comp
+      data-slot="typography"
+      data-variant={variant ?? "body"}
+      className={cn(typographyVariants({ variant }), className)}
+      {...props}
+    />
+  )
+}
 
-const H2 = React.forwardRef<
-  HTMLHeadingElement,
-  React.HTMLAttributes<HTMLHeadingElement>
->(({ className, ...props }, ref) => (
-  <Typography
-    ref={ref}
-    variant="h2"
-    as="h2"
-    className={className}
-    {...props}
-  />
-))
-H2.displayName = "H2"
+type ShortcutProps<E extends HTMLElement> = React.HTMLAttributes<E> & {
+  ref?: React.Ref<E>
+}
 
-const H3 = React.forwardRef<
-  HTMLHeadingElement,
-  React.HTMLAttributes<HTMLHeadingElement>
->(({ className, ...props }, ref) => (
-  <Typography
-    ref={ref}
-    variant="h3"
-    as="h3"
-    className={className}
-    {...props}
-  />
-))
-H3.displayName = "H3"
+// Shortcuts: common element + default style.
+function H1(props: ShortcutProps<HTMLHeadingElement>) {
+  return <Typography variant="display" as="h1" {...props} />
+}
 
-const H4 = React.forwardRef<
-  HTMLHeadingElement,
-  React.HTMLAttributes<HTMLHeadingElement>
->(({ className, ...props }, ref) => (
-  <Typography
-    ref={ref}
-    variant="h4"
-    as="h4"
-    className={className}
-    {...props}
-  />
-))
-H4.displayName = "H4"
+function H2(props: ShortcutProps<HTMLHeadingElement>) {
+  return <Typography variant="headline" as="h2" {...props} />
+}
 
-const Lead = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
->(({ className, ...props }, ref) => (
-  <Typography
-    ref={ref}
-    variant="lead"
-    as="p"
-    className={className}
-    {...props}
-  />
-))
-Lead.displayName = "Lead"
+function H3(props: ShortcutProps<HTMLHeadingElement>) {
+  return <Typography variant="title" as="h3" {...props} />
+}
 
-const P = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
->(({ className, ...props }, ref) => (
-  <Typography
-    ref={ref}
-    variant="p"
-    as="p"
-    className={className}
-    {...props}
-  />
-))
-P.displayName = "P"
+function H4(props: ShortcutProps<HTMLHeadingElement>) {
+  return <Typography variant="title-sm" as="h4" {...props} />
+}
+
+function Lead(props: ShortcutProps<HTMLParagraphElement>) {
+  return <Typography variant="lead" as="p" {...props} />
+}
+
+/** Long-form paragraph; consecutive paragraphs get 24px between them. */
+function P({ className, ...props }: ShortcutProps<HTMLParagraphElement>) {
+  return (
+    <Typography
+      variant="body-long"
+      as="p"
+      className={cn("[&:not(:first-child)]:mt-6", className)}
+      {...props}
+    />
+  )
+}
 
 export { Typography, H1, H2, H3, H4, Lead, P, typographyVariants }
+export type { TypographyProps }

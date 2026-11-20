@@ -72,7 +72,20 @@ src/
 ### Components & styling
 
 - Server components by default; add `"use client"` only where needed (animation, theme toggles, interactivity). Pattern: server wrapper fetches data → client component animates (e.g. `Values` → `ValuesClient`).
-- Use `cn()` from `@/lib/utils` to merge classes.
+- Use `cn()` from `@/lib/utils` to merge classes. It's shadcn's `cn` extended to understand the type scale. UI components must import it from `@/lib/utils`, not from `"cn"`; after `shadcn add`, repoint the new file's import.
+
+### Typography
+
+- The type scale lives in `globals.css` as `type-*` utilities: `display`, `headline`, `title-lg`, `title`, `title-sm`, `lead`, `body`, `body-long`, `label`, `small`, `caption`, `overline`. Each sets size, line height, tracking and weight, with responsive steps built in.
+- Use `<Typography variant="…" as="…">` (or the `H1`–`H4` / `Lead` / `P` shortcuts) or the `type-*` class directly. Choose the variant by role and set the element separately.
+- **Don't add `text-xl`, `leading-none`, `tracking-tight` etc. to set type.** Pick a type style. Leading, tracking and weight modifiers still compose if genuinely needed. A new size means a new token in `globals.css` + `TYPE_STYLES` in `lib/utils.ts`.
+- Known off-scale one-offs (left as-is deliberately): values intro `Lead` (20/28 at all widths), footer `Lead`, preloader greeting, card descriptions (16/20).
+- Fonts: Matter (400/500/600) from `public/fonts`, and DM Mono via `next/font` (`preload: false`) for `type-overline`, `font-mono` and code.
+
+### Design system page
+
+- `/design-system` (noindex) documents colour, type, radius, motion and components, rendered live from the real tokens and components. Its readouts (hex values, type steps, radii) are computed in the browser from the CSS, so they don't need updating by hand.
+- When adding a component or token, add it to the page too (`src/app/design-system/`).
 - Use design tokens (`bg-background`, `text-muted-foreground`, `bg-chip-surface`, etc.), not raw colours. New tokens go in `globals.css` under both `:root` and `.dark`, then get mapped in `@theme inline`.
 - Every change must look right in **both light and dark mode** and across mobile / tablet / desktop.
 - Nested rounded elements use the concentric radius tokens (`--radius-inner-gap-*`) so inner radius = outer radius − gap.

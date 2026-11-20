@@ -201,7 +201,7 @@ export default function SocialProof() {
           easing={animationEasings.smooth}
           className="w-full"
         >
-          <Lead className="text-center text-lg md:text-xl leading-7 md:leading-[28px] font-normal">
+          <Lead className="text-center">
             Worked as part of some of the world's best digital and design teams:
           </Lead>
         </FadeUp>

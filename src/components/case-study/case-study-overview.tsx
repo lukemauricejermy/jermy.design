@@ -162,7 +162,7 @@ export function CaseStudyOverview({ caseStudy }: CaseStudyOverviewProps) {
               pinned near the top of the viewport while the (taller) scores
               column scrolls past, until the section bottom is reached. */}
           <div className="flex flex-col gap-6 lg:sticky lg:top-28 lg:self-start">
-            <H2 className="overflow-hidden border-none pb-0 text-4xl font-medium leading-none tracking-tight md:text-5xl lg:text-6xl">
+            <H2 className="overflow-hidden">
               <TextReveal
                 triggerOnScroll
                 duration={750}
@@ -213,7 +213,7 @@ export function CaseStudyOverview({ caseStudy }: CaseStudyOverviewProps) {
                         key={item.id}
                         className="flex items-center gap-2 px-4"
                       >
-                        <p className="min-w-0 flex-1 truncate text-base leading-6 text-muted-foreground">
+                        <p className="min-w-0 flex-1 truncate type-body text-muted-foreground">
                           {item.name}
                         </p>
                         <ScoreBar

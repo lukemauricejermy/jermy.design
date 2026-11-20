@@ -66,7 +66,7 @@ const ValueCard = React.forwardRef<
         </div>
         {/* Title BELOW illustration — data-collapsed-title for post-unmount animation */}
         <CardHeader className="flex-1 flex items-end pb-0 pt-8 px-0 text-left min-h-0">
-          <H3 data-collapsed-title className="text-2xl md:text-3xl leading-none tracking-tight font-medium">
+          <H3 data-collapsed-title>
             {value.title}
           </H3>
         </CardHeader>
@@ -123,7 +123,7 @@ function ExpandedValueCard({
         ref={collapsedTitleRef}
         className="absolute bottom-8 left-8 right-8 min-h-[2.5rem] text-left [contain:layout]"
       >
-        <H3 className="text-2xl md:text-3xl leading-none tracking-tight font-medium">{value.title}</H3>
+        <H3>{value.title}</H3>
       </div>
       {/* Expanded content - right side on desktop, below illustration on mobile */}
       {showExpandedContent && (
@@ -142,7 +142,7 @@ function ExpandedValueCard({
         >
           <H3
             id="value-modal-title"
-            className="text-3xl md:text-4xl leading-none tracking-tight font-medium overflow-hidden"
+            className="type-title-lg overflow-hidden"
           >
             <TextReveal triggerOnScroll={false} delay={0} duration={600} stagger={0.015} easing={animationEasings.robust}>
               {value.title}
@@ -154,7 +154,7 @@ function ExpandedValueCard({
               delay={animationDelays.medium}
               duration={animationDurations.default}
             >
-              <div className="text-base leading-6 text-foreground [&_p]:mb-2 [&_p:last-child]:mb-0">
+              <div className="type-body text-foreground [&_p]:mb-2 [&_p:last-child]:mb-0">
                 <StructuredText data={value.description} />
               </div>
             </FadeUp>
@@ -617,7 +617,7 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
     <section className="bg-background py-56 px-6">
       <div className="max-w-[1440px] mx-auto flex flex-col gap-16">
         <div className="flex flex-col gap-6 max-w-2xl">
-          <H2 className="text-4xl md:text-5xl lg:text-[60px] leading-none tracking-tight border-none pb-0 overflow-hidden">
+          <H2 className="overflow-hidden">
             <TextReveal
               triggerOnScroll={true}
               delay={0}

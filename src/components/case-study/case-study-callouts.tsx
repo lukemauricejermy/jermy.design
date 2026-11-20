@@ -44,7 +44,7 @@ function CalloutImage({
           className="absolute right-4 bottom-4 max-w-[calc(100%-2rem)] overflow-hidden rounded-xl bg-background/70 backdrop-blur-md"
         >
           <ItemContent>
-            <p className="truncate text-sm leading-5 text-foreground">
+            <p className="truncate type-small text-foreground">
               {caption}
             </p>
           </ItemContent>
@@ -109,7 +109,7 @@ export function CaseStudyCallouts({ callouts }: CaseStudyCalloutsProps) {
             className="flex w-full flex-col items-start gap-8 py-20"
           >
             {callout.title && (
-              <H2 className="overflow-hidden border-none pb-0 text-4xl font-medium leading-none tracking-tight md:text-5xl lg:text-6xl">
+              <H2 className="overflow-hidden">
                 <TextReveal
                   triggerOnScroll
                   duration={750}

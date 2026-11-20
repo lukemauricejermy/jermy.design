@@ -8,7 +8,7 @@
   /* Fonts */
   --font-sans: 'Matter', ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-sans);
-  --font-mono: 'DM Mono', ui-monospace, monospace;
+  --font-mono: var(--font-dm-mono), ui-monospace, monospace;
 
   /* Colors mapped to CSS variables */
   --color-background: var(--background);
@@ -285,4 +285,138 @@
 .featured-cases {
   --radius-card: 2rem;
   --radius-inner-gap-3: max(0px, calc(var(--radius-card) - 0.75rem)); /* 12px gap → 20px inner */
+}
+/* ==========================================================================
+   Type scale
+   --------------------------------------------------------------------------
+   One class per text style: `type-<name>`. Each sets size, line height,
+   tracking and weight, and steps up at the md (48rem) / lg (64rem)
+   breakpoints where noted. Values mirror the sizes the site already used.
+
+   Line height, tracking and weight read Tailwind's own variables first, so
+   modifiers still compose: `type-title leading-8` or `type-lead font-medium`
+   work as expected. To change the size, pick another type style rather than
+   adding a `text-*` size. `cn()` drops the type class if a `text-*` size
+   follows it.
+
+   The /design-system page documents these and reads the live values.
+   ========================================================================== */
+
+/* Display: 48 → 72 (lg). Hero and footer sign-off. */
+@utility type-display {
+  font-size: 3rem;
+  line-height: var(--tw-leading, 1);
+  letter-spacing: var(--tw-tracking, -0.025em);
+  font-weight: var(--tw-font-weight, 500);
+  @media (width >= theme(--breakpoint-lg)) {
+    font-size: 4.5rem;
+  }
+}
+
+/* Headline: 36 → 48 (md) → 60 (lg). Section headings. */
+@utility type-headline {
+  font-size: 2.25rem;
+  line-height: var(--tw-leading, 1);
+  letter-spacing: var(--tw-tracking, -0.025em);
+  font-weight: var(--tw-font-weight, 500);
+  @media (width >= theme(--breakpoint-md)) {
+    font-size: 3rem;
+  }
+  @media (width >= theme(--breakpoint-lg)) {
+    font-size: 3.75rem;
+  }
+}
+
+/* Title large: 30 → 36 (md). Expanded value titles. */
+@utility type-title-lg {
+  font-size: 1.875rem;
+  line-height: var(--tw-leading, 1);
+  letter-spacing: var(--tw-tracking, -0.025em);
+  font-weight: var(--tw-font-weight, 500);
+  @media (width >= theme(--breakpoint-md)) {
+    font-size: 2.25rem;
+  }
+}
+
+/* Title: 24 → 30 (md). Value card titles, sub-section headings. */
+@utility type-title {
+  font-size: 1.5rem;
+  line-height: var(--tw-leading, 1);
+  letter-spacing: var(--tw-tracking, -0.025em);
+  font-weight: var(--tw-font-weight, 500);
+  @media (width >= theme(--breakpoint-md)) {
+    font-size: 1.875rem;
+  }
+}
+
+/* Title small: 24 / 32. Card titles (case study touts). */
+@utility type-title-sm {
+  font-size: 1.5rem;
+  line-height: var(--tw-leading, 2rem);
+  letter-spacing: var(--tw-tracking, normal);
+  font-weight: var(--tw-font-weight, 500);
+}
+
+/* Lead: 18 → 20 (md), 28 line height. Intro paragraphs. */
+@utility type-lead {
+  font-size: 1.125rem;
+  line-height: var(--tw-leading, 1.75rem);
+  letter-spacing: var(--tw-tracking, normal);
+  font-weight: var(--tw-font-weight, 400);
+  @media (width >= theme(--breakpoint-md)) {
+    font-size: 1.25rem;
+  }
+}
+
+/* Body: 16 / 24. Default UI and short copy. */
+@utility type-body {
+  font-size: 1rem;
+  line-height: var(--tw-leading, 1.5rem);
+  letter-spacing: var(--tw-tracking, normal);
+  font-weight: var(--tw-font-weight, 400);
+}
+
+/* Body long: 16 / 28. Long-form reading (case study rich text). */
+@utility type-body-long {
+  font-size: 1rem;
+  line-height: var(--tw-leading, 1.75rem);
+  letter-spacing: var(--tw-tracking, normal);
+  font-weight: var(--tw-font-weight, 400);
+}
+
+/* Label: 14 → 16 (md), tight, medium. Buttons, pills, nav, tags. */
+@utility type-label {
+  font-size: 0.875rem;
+  line-height: var(--tw-leading, 1);
+  letter-spacing: var(--tw-tracking, normal);
+  font-weight: var(--tw-font-weight, 500);
+  @media (width >= theme(--breakpoint-md)) {
+    font-size: 1rem;
+  }
+}
+
+/* Small: 14 / 20. Captions, meta, secondary detail. */
+@utility type-small {
+  font-size: 0.875rem;
+  line-height: var(--tw-leading, 1.25rem);
+  letter-spacing: var(--tw-tracking, normal);
+  font-weight: var(--tw-font-weight, 400);
+}
+
+/* Caption: 12 / 16. Fine print, legal, image credits. */
+@utility type-caption {
+  font-size: 0.75rem;
+  line-height: var(--tw-leading, 1rem);
+  letter-spacing: var(--tw-tracking, normal);
+  font-weight: var(--tw-font-weight, 400);
+}
+
+/* Overline: DM Mono 12 / 16, uppercase, spaced. Eyebrows and labels. */
+@utility type-overline {
+  font-family: theme(--font-mono);
+  font-size: 0.75rem;
+  line-height: var(--tw-leading, 1rem);
+  letter-spacing: var(--tw-tracking, 0.08em);
+  font-weight: var(--tw-font-weight, 400);
+  text-transform: uppercase;
 }
