@@ -1,7 +1,10 @@
 import { performRequest } from "@/lib/datocms";
 import fs from "fs";
 import path from "path";
-import ValuesClient, { type StructuredTextData } from "./ValuesClient";
+import ValuesClient, {
+  type StructuredTextData,
+  type ValueIllustrationData,
+} from "./ValuesClient";
 
 const VALUES_QUERY = `
   query Values {
@@ -29,20 +32,28 @@ type QueryResult = {
   allValues: Value[];
 };
 
-function loadSvgContent(key: string): string | null {
-  try {
-    const normalizedKey = key.replace(/_/g, "-").toLowerCase();
-    const svgPath = path.join(
-      process.cwd(),
-      "public",
-      "images",
-      "values",
-      `${normalizedKey}.svg`
-    );
-    return fs.readFileSync(svgPath, "utf-8");
-  } catch {
-    return null;
-  }
+/**
+ * Value illustration: public/images/values/<VERSION>/<key>.png (3D render,
+ * background removed, full square frame so the character is the same size on
+ * every card) and <key>-dark.png, the night version for dark mode. Size comes
+ * from the PNG header. Bump VERSION when replacing images (Next's image
+ * optimiser caches by URL).
+ */
+const ILLUSTRATION_VERSION = "v7";
+
+function loadIllustration(key: string): ValueIllustrationData | null {
+  const slug = key.replace(/_/g, "-").toLowerCase();
+  const dir = path.join(process.cwd(), "public", "images", "values", ILLUSTRATION_VERSION);
+  const file = path.join(dir, `${slug}.png`);
+  if (!fs.existsSync(file)) return null;
+  const header = fs.readFileSync(file).subarray(16, 24);
+  const dark = fs.existsSync(path.join(dir, `${slug}-dark.png`));
+  return {
+    src: `/images/values/${ILLUSTRATION_VERSION}/${slug}.png`,
+    darkSrc: dark ? `/images/values/${ILLUSTRATION_VERSION}/${slug}-dark.png` : undefined,
+    width: header.readUInt32BE(0),
+    height: header.readUInt32BE(4),
+  };
 }
 
 export default async function Values() {
@@ -61,10 +72,10 @@ export default async function Values() {
 
   const values = response?.allValues ?? [];
 
-  const valuesWithSvgs = values.map((v) => ({
+  const valuesWithIllustrations = values.map((v) => ({
     ...v,
-    svgContent: loadSvgContent(v.key) ?? "",
+    illustration: loadIllustration(v.key),
   }));
 
-  return <ValuesClient values={valuesWithSvgs} />;
+  return <ValuesClient values={valuesWithIllustrations} />;
 }

@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useRef, useEffect, useLayoutEffect } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import { gsap } from "gsap";
 import { StructuredText } from "react-datocms";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -20,27 +21,62 @@ import { cn } from "@/lib/utils";
 /** DatoCMS Structured Text field – matches StructuredText data prop */
 export type StructuredTextData = React.ComponentProps<typeof StructuredText>["data"];
 
+export type ValueIllustrationData = {
+  src: string;
+  /** Night version for pictures with a screen in them (lit by the screen). */
+  darkSrc?: string;
+  width: number;
+  height: number;
+};
+
 type ValueWithSvg = {
   id: string;
   title: string;
   key: string;
   description: StructuredTextData;
-  svgContent: string;
+  illustration: ValueIllustrationData | null;
 };
 
 function ValueIllustration({
-  svgContent,
+  illustration,
   className,
 }: {
-  svgContent: string;
+  illustration: ValueIllustrationData | null;
   className?: string;
 }) {
-  if (!svgContent) return null;
+  if (!illustration) return null;
+  const { src, darkSrc, width, height } = illustration;
+  const sizes = "(min-width: 1024px) 560px, (min-width: 768px) 50vw, 90vw";
+  const img =
+    "absolute inset-0 size-full object-contain object-top transition-opacity duration-[320ms]";
   return (
     <div
-      className={cn("flex items-center justify-center overflow-hidden", className)}
-      dangerouslySetInnerHTML={{ __html: svgContent }}
-    />
+      className={cn(
+        "relative",
+        // Soft fade at the bottom so waist crops (and the arcade cabinet) dissolve.
+        "[mask-image:linear-gradient(to_bottom,black_82%,transparent_98%)]",
+        className
+      )}
+    >
+      <Image
+        src={src}
+        alt=""
+        width={width}
+        height={height}
+        sizes={sizes}
+        className={cn(img, darkSrc && "dark:opacity-0")}
+      />
+      {darkSrc && (
+        <Image
+          src={darkSrc}
+          alt=""
+          width={width}
+          height={height}
+          sizes={sizes}
+          className={cn(img, "opacity-0 dark:opacity-100")}
+        />
+      )}
+    </div>
   );
 }
 
@@ -60,9 +96,9 @@ const ValueCard = React.forwardRef<
         {/* Illustration - scales with card width, max 388×388 — identical styling to modal for seamless swap */}
         <div
           data-illustration
-          className="flex-shrink-0 w-full max-w-[388px] aspect-square mx-auto [&_svg]:w-full [&_svg]:h-full [&_svg]:object-contain flex items-center justify-center transition-none"
+          className="flex-shrink-0 w-full max-w-[300px] aspect-square mx-auto flex items-center justify-center transition-none"
         >
-          <ValueIllustration svgContent={value.svgContent} className="w-full h-full" />
+          <ValueIllustration illustration={value.illustration} className="w-full h-full" />
         </div>
         {/* Title BELOW illustration — data-collapsed-title for post-unmount animation */}
         <CardHeader className="flex-1 flex items-end pb-0 pt-8 px-0 text-left min-h-0">
@@ -116,7 +152,7 @@ function ExpandedValueCard({
         className="absolute [&_svg]:w-full [&_svg]:h-full [&_svg]:object-contain flex items-center justify-center transition-none"
         style={{ width: illustrationW, height: illustrationH, zIndex: 0 }}
       >
-        <ValueIllustration svgContent={value.svgContent} className="w-full h-full" />
+        <ValueIllustration illustration={value.illustration} className="w-full h-full" />
       </div>
       {/* Collapsed title - absolute bottom, fades out during expand. Match ValueCard's leading-tight exactly to avoid jump. */}
       <div

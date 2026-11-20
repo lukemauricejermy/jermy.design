@@ -11,6 +11,11 @@ const STYLE_INFO: Record<
   TypeStyle,
   { usage: string; element: string; sample: string }
 > = {
+  hero: {
+    usage: "Homepage hero only. On the homepage it's fitted by script to fill the screen (balanced wrapping picks the line count); the CSS value shown here is the fallback.",
+    element: "h1",
+    sample: "Still doing the doing.",
+  },
   display: {
     usage: "Page-defining statements. Hero and footer sign-off. One per page.",
     element: "h1",
@@ -91,6 +96,16 @@ const BREAKPOINT_NAMES: Record<number, string> = { 0: "base", 768: "md", 1024: "
 function fallback(value: string) {
   const m = value.match(/^var\([^,]+,\s*(.+)\)$/)
   return (m ? m[1] : value).trim()
+}
+
+/** `clamp(3.5rem, min(22.4cqi, 19svh), 30rem)` → "56–480" */
+function fluidRange(value?: string): string | null {
+  // First and last clamp() arguments; the middle may contain min()/max().
+  const m = value?.match(/^clamp\(\s*([^,]+?)\s*,.*,\s*([^,]+?)\s*\)$/)
+  if (!m) return null
+  const lo = toPx(m[1].trim())
+  const hi = toPx(m[2].trim())
+  return lo && hi ? `${lo}–${hi}` : null
 }
 
 function toPx(value: string, fontSizePx?: number): number | null {
@@ -205,7 +220,7 @@ function TypeRow({
       id={`type-${name}`}
       className="grid scroll-mt-32 gap-6 border-t border-border py-10 first:border-t-0 first:pt-0 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-12"
     >
-      <div className="flex min-w-0 flex-col gap-4">
+      <div className="@container flex min-w-0 flex-col gap-4">
         <Typography variant={name} as="div" className="break-words text-foreground">
           {info.sample}
         </Typography>
@@ -236,6 +251,8 @@ function TypeRow({
               const sizePx = spec.fontSize ? toPx(spec.fontSize) : basePx
               const lhSource = spec.lineHeight ?? base?.lineHeight
               const lhPx = lhSource ? toPx(lhSource, sizePx ?? undefined) : null
+              const fluid = fluidRange(spec.fontSize)
+              const lhRatio = lhSource ? fallback(lhSource) : null
               return (
                 <span
                   key={minWidth}
@@ -247,8 +264,13 @@ function TypeRow({
                   )}
                   title={minWidth ? `≥ ${minWidth}px` : "All widths"}
                 >
-                  {BREAKPOINT_NAMES[minWidth] ?? `${minWidth}px`} {sizePx ?? "?"}
-                  {lhPx ? `/${+lhPx.toFixed(1)}` : ""}
+                  {BREAKPOINT_NAMES[minWidth] ?? `${minWidth}px`}{" "}
+                  {fluid ? `fluid ${fluid} / ${lhRatio}` : (
+                    <>
+                      {sizePx ?? "?"}
+                      {lhPx ? `/${+lhPx.toFixed(1)}` : ""}
+                    </>
+                  )}
                   {" · "}
                   {formatTracking(spec.letterSpacing ?? base?.letterSpacing)}
                 </span>

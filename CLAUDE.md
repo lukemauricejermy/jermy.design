@@ -22,7 +22,7 @@ npm run lint    # eslint
 
 There is no test suite.
 
-If edits to `globals.css` stop showing up in dev (Turbopack's persistent cache can keep serving old CSS, even across restarts), stop the dev server, delete `.next/dev`, and start it again.
+Dev CSS quirk: Turbopack serves `globals.css` one save behind, and a `touch` doesn't count (it hashes content). After editing it, make a second throwaway content change (add, then remove, a comment) and the latest version lands. Edit `globals.css` on its own, not in the same instant as other files. The persistent dev cache is off in `next.config.ts`; if CSS still looks stale after a restart, delete `.next/dev`.
 
 ## Deployment
 
@@ -87,6 +87,16 @@ src/
 - `TextReveal` inherits line height from its parent. Each word's mask extends 0.25em below the line, with a matching negative margin, for descenders. Wrap it in `overflow-x-clip`, never `overflow-hidden`, or the last line's descenders get cut.
 - Known off-scale one-offs (left as-is deliberately): values intro `Lead` (20/28 at all widths), footer `Lead`, preloader greeting.
 - Fonts: Matter (400/500/600) from `public/fonts`, and DM Mono via `next/font` (`preload: false`) for `type-overline`, `font-mono` and code.
+
+### Artwork
+
+- Style: Pixar-style 3D in the Plocka visual language (soft rounded forms, clean matte materials, light from the upper left), but character portraits are front three-quarter, not isometric.
+- Generate with `node scripts/generate-art.mjs` (Gemini `gemini-3-pro-image`; style refs in `art/reference/style/`, character ref in `art/reference/character/`). Use `--from` a picked image for consistent variations and `--size 2K` for anything shown large. Output goes to `art/generated/` (gitignored); review before using.
+- Cut out with `swift scripts/cutout.swift in.png out.png [--keep-frame]`. It removes the background locally, keys the soft edge band on the flat background colour and decontaminates edge pixels (no grey halo). For light/dark pairs, use `--keep-frame` and crop both to the same box so they line up.
+- **Use `--bg green` for anything with props**, and for night versions too: generate the picture, then ask Gemini to "change only the background colour" with `--bg green`. The cutout keys on green excess, despills and chokes the edge, giving clean edges with nothing dropped. On grey or near-black, Vision loses floating props and dark-on-dark shading.
+- Value illustrations live in `public/images/values/<version>/<key>.png` plus `<key>-dark.png`, cut with `--keep-frame` (full 2048 square) so the character is the same size on every card. Every value needs a night version; pictures with a screen (arcade, laptop) light the face with it. Bump `ILLUSTRATION_VERSION` in `Values.tsx` when replacing images. The old hand-drawn SVGs are in `art/reference/values-hand-drawn/`.
+- Gemini won't reliably mirror a pose: flip the image yourself (`sips -f horizontal`), then ask it to re-light only.
+- When replacing an image in `public/`, use a new filename. Next's image optimiser caches by URL.
 
 ### Design system page
 

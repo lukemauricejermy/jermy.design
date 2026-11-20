@@ -186,7 +186,7 @@ export default function DesignSystemPage() {
               title="Typography"
               description={
                 <>
-                  Twelve styles, each a single <Code>type-*</Code> class that
+                  Thirteen styles, each a single <Code>type-*</Code> class that
                   sets size, line height, tracking and weight, stepping up at
                   breakpoints. Highlighted steps show what applies at your
                   current width.

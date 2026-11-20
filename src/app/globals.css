@@ -338,6 +338,24 @@
   }
 }
 
+/* Hero: massive. On the homepage Hero.tsx fits the size to fill the screen
+   (largest size where no word overflows and the block fits the height); this
+   rule is the fallback before that runs / without JS. Sized to its
+   container (cqi) — put it inside an `@container`. SemiBold, 0.9 / −4%, as Displaay sets Matter at 150px+.
+   Below md the copy wraps to four short lines ("Head of / design. / Still
+   doing / the doing.", longest ~4.4em) and fills the width; from md it sits
+   on two lines with "Still doing the doing." (~8.4em) edge to edge. The svh
+   cap keeps the block within ~70% of the screen height. */
+@utility type-hero {
+  font-size: clamp(3.5rem, min(23.5cqi, 19svh), 30rem);
+  line-height: var(--tw-leading, 0.9);
+  letter-spacing: var(--tw-tracking, -0.04em);
+  font-weight: var(--tw-font-weight, 600);
+  @media (width >= theme(--breakpoint-md)) {
+    font-size: clamp(3.5rem, min(11.85cqi, 38svh), 30rem);
+  }
+}
+
 /* Headline: 36 → 48 (md) → 60 (lg). Section headings. */
 @utility type-headline {
   font-size: 2.25rem;

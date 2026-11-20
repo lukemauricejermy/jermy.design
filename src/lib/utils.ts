@@ -2,6 +2,7 @@ import { createCn } from "cn/config"
 
 /** Type scale styles defined as `type-*` utilities in globals.css. */
 export const TYPE_STYLES = [
+  "hero",
   "display",
   "headline",
   "title-lg",

@@ -29,7 +29,9 @@ interface TextRevealProps {
 function splitTextIntoWordsAndChars(text: string): { lines: string[][] } {
   const lines = text.split("\n");
   const result: string[][] = lines.map((line) =>
-    line.split(/\s+/).filter(Boolean)
+    // Split on ordinary spaces only: a non-breaking space (\u00a0) keeps a
+    // phrase together as one unbreakable unit.
+    line.split(/[ \t\r\f\v]+/).filter(Boolean)
   );
   return { lines: result };
 }
@@ -121,6 +123,7 @@ export function TextReveal({
               <span key={`${lineIndex}-${wordIndex}`}>
                 {wordIndex > 0 && " "}
                 <span
+                  data-word
                   className="inline-block whitespace-nowrap overflow-hidden align-top"
                   style={{ paddingBottom: "0.25em", marginBottom: "-0.25em" }}
                 >

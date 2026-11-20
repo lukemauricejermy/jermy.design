@@ -21,6 +21,7 @@ import { cn, type TypeStyle } from "@/lib/utils"
 const typographyVariants = cva("", {
   variants: {
     variant: {
+      hero: "type-hero",
       display: "type-display",
       headline: "type-headline",
       "title-lg": "type-title-lg",
@@ -44,6 +45,7 @@ type Variant = NonNullable<VariantProps<typeof typographyVariants>["variant"]>
 
 /** Element used when `as` isn't given. */
 const defaultElement: Record<Variant, React.ElementType> = {
+  hero: "h1",
   display: "h1",
   headline: "h2",
   "title-lg": "h3",
