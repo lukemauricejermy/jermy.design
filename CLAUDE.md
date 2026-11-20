@@ -22,6 +22,8 @@ npm run lint    # eslint
 
 There is no test suite.
 
+If edits to `globals.css` stop showing up in dev (Turbopack's persistent cache can keep serving old CSS, even across restarts), stop the dev server, delete `.next/dev`, and start it again.
+
 ## Deployment
 
 - GitHub: `lukemauricejermy/jermy.design`, default branch `main`
@@ -79,7 +81,11 @@ src/
 - The type scale lives in `globals.css` as `type-*` utilities: `display`, `headline`, `title-lg`, `title`, `title-sm`, `lead`, `body`, `body-long`, `label`, `small`, `caption`, `overline`. Each sets size, line height, tracking and weight, with responsive steps built in.
 - Use `<Typography variant="…" as="…">` (or the `H1`–`H4` / `Lead` / `P` shortcuts) or the `type-*` class directly. Choose the variant by role and set the element separately.
 - **Don't add `text-xl`, `leading-none`, `tracking-tight` etc. to set type.** Pick a type style. Leading, tracking and weight modifiers still compose if genuinely needed. A new size means a new token in `globals.css` + `TYPE_STYLES` in `lib/utils.ts`.
-- Known off-scale one-offs (left as-is deliberately): values intro `Lead` (20/28 at all widths), footer `Lead`, preloader greeting, card descriptions (16/20).
+- **Spacing is tuned for Matter, not inherited from shadcn/Inter.** Following Displaay's own Matter specimen: tracking tightens as size grows and opens as it shrinks (about −2% at 60px, 0 around 30px, +1.5% at 16px, +2.5% at 12px). Line height tightens as size grows. Raw Tailwind `text-*` sizes carry the same tracking via `--text-*--letter-spacing` in `@theme`. Retune against displaay.net/typeface/matter, not generic defaults.
+- **Display** is SemiBold, 0.97 line height and −4% tracking, matched to Displaay's type tester (measured from cap height). Don't loosen it back.
+- Matter metrics: cap 0.70em, x-height 0.504em, ink ~0.9em, ascent/descent box 0.95/0.24. Weights shipped: 400/500/600 (`font-synthesis: none`).
+- `TextReveal` inherits line height from its parent. Each word's mask extends 0.25em below the line, with a matching negative margin, for descenders. Wrap it in `overflow-x-clip`, never `overflow-hidden`, or the last line's descenders get cut.
+- Known off-scale one-offs (left as-is deliberately): values intro `Lead` (20/28 at all widths), footer `Lead`, preloader greeting.
 - Fonts: Matter (400/500/600) from `public/fonts`, and DM Mono via `next/font` (`preload: false`) for `type-overline`, `font-mono` and code.
 
 ### Design system page

@@ -174,7 +174,7 @@ function CaseStudyCardContent({ study }: { study: CaseStudy }) {
           {study.title}
         </CardTitle>
         {study.excerpt && (
-          <CardDescription className="text-base leading-5 text-foreground">
+          <CardDescription className="type-body text-foreground">
             {study.excerpt}
           </CardDescription>
         )}
@@ -214,7 +214,7 @@ function DraftCaseStudyCard({ study }: { study: CaseStudy }) {
             {study.title}
           </CardTitle>
           {study.excerpt && (
-            <CardDescription className="text-base leading-5 text-foreground">
+            <CardDescription className="type-body text-foreground">
               {study.excerpt}
             </CardDescription>
           )}
@@ -282,7 +282,7 @@ export default async function FeaturedCases() {
       <div className="max-w-[1440px] mx-auto flex flex-col gap-32">
         {/* Row 1: H2 on LEFT, Lead + Button on RIGHT */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-24">
-          <H2 className="overflow-hidden">
+          <H2 className="overflow-x-clip">
             <TextReveal
               triggerOnScroll={true}
               delay={0}

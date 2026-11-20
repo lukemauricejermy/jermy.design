@@ -142,7 +142,7 @@ function ExpandedValueCard({
         >
           <H3
             id="value-modal-title"
-            className="type-title-lg overflow-hidden"
+            className="type-title-lg overflow-x-clip"
           >
             <TextReveal triggerOnScroll={false} delay={0} duration={600} stagger={0.015} easing={animationEasings.robust}>
               {value.title}
@@ -617,7 +617,7 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
     <section className="bg-background py-56 px-6">
       <div className="max-w-[1440px] mx-auto flex flex-col gap-16">
         <div className="flex flex-col gap-6 max-w-2xl">
-          <H2 className="overflow-hidden">
+          <H2 className="overflow-x-clip">
             <TextReveal
               triggerOnScroll={true}
               delay={0}

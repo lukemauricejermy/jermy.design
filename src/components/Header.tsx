@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { ThemeToggle } from "./theme-toggle-header";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   NavigationMenu,
   NavigationMenuList,
@@ -12,6 +13,13 @@ import {
 } from "@/components/ui/navigation-menu";
 
 const navigation: Array<{ name: string; href: string }> = [];
+
+// Floating pill bar, same surface as Card (shadow + hairline ring, no border).
+// 12px padding around 36px controls keeps the bar 60px tall, which
+// --header-bar-height in globals.css depends on. Pills inside a pill with
+// equal padding all round are concentric automatically.
+const BAR_CLASS =
+  "flex items-center rounded-full bg-card p-3 shadow-md ring-1 ring-foreground/5 dark:ring-foreground/10";
 
 declare global {
   interface Window {
@@ -116,20 +124,15 @@ export function Header() {
     >
       <div className="flex items-center justify-between mx-auto w-full">
         {/* Logo */}
-        <Link
-          href="/"
-          className="bg-card border border-border flex items-center px-3 py-3 rounded-2xl shadow-sm shrink-0 hover:bg-accent transition-colors"
-        >
-          <div className="flex h-9 items-center justify-center px-4 py-2 rounded-inner-2xl-gap-3 shrink-0">
-            <span className="font-sans text-sm leading-none text-foreground">
-              jermy.design
-            </span>
-          </div>
-        </Link>
+        <div className={cn(BAR_CLASS, "shrink-0")}>
+          <Button asChild variant="ghost" className="px-4 font-normal">
+            <Link href="/">jermy.design</Link>
+          </Button>
+        </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center">
-          <div className="bg-card border border-border flex items-center gap-2 px-3 py-3 rounded-2xl shadow-sm">
+          <div className={cn(BAR_CLASS, "gap-2")}>
             {hasNavigationItems && (
               <NavigationMenu viewport={false}>
                 <NavigationMenuList className="gap-1">
@@ -137,7 +140,7 @@ export function Header() {
                     <NavigationMenuItem key={item.name}>
                       <NavigationMenuLink
                         asChild
-                        className="h-9 flex items-center justify-center px-4 py-2 rounded-inner-2xl-gap-3 type-small font-medium"
+                        className="h-9 flex items-center justify-center rounded-full px-4 type-small font-medium"
                       >
                         <Link href={item.href}>{item.name}</Link>
                       </NavigationMenuLink>
@@ -161,7 +164,7 @@ export function Header() {
 
         {/* Mobile Navigation */}
         <div className="md:hidden flex items-center">
-          <div className="bg-card border border-border flex gap-2 items-center px-3 py-3 rounded-2xl shadow-sm">
+          <div className={cn(BAR_CLASS, "gap-2")}>
             {/* Theme Toggle - Always visible on mobile */}
             <ThemeToggle />
 

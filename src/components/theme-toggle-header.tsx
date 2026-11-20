@@ -1,11 +1,18 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { Sun, Moon } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Moon02Icon, Sun03Icon } from "@hugeicons/core-free-icons";
 import { useEffect, useState, useRef } from "react";
 
-export function ThemeToggle() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+import { cn } from "@/lib/utils";
+
+/**
+ * Light/dark switch styled as the preset's segmented control (Tabs list):
+ * muted pill track, background-coloured active segment that slides across.
+ */
+export function ThemeToggle({ className }: { className?: string }) {
+  const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [localIsDark, setLocalIsDark] = useState(false);
@@ -13,45 +20,40 @@ export function ThemeToggle() {
 
   useEffect(() => {
     setMounted(true);
-    // Use resolvedTheme to get the actual theme being used (resolves "system" to "light" or "dark")
-    if (resolvedTheme) {
-      // Only sync if we're not currently animating
-      if (!isAnimatingRef.current) {
-        setLocalIsDark(resolvedTheme === "dark");
-      }
+    // resolvedTheme resolves "system" to "light" or "dark"
+    if (resolvedTheme && !isAnimatingRef.current) {
+      setLocalIsDark(resolvedTheme === "dark");
     }
     // Fade in after mount, matching header timing
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-    }, 50);
+    const timer = setTimeout(() => setIsVisible(true), 50);
     return () => clearTimeout(timer);
   }, [resolvedTheme]);
 
+  const track = cn(
+    // Below sm the switch collapses to one segment showing the current mode,
+    // so the header fits a 375px screen; tapping still toggles.
+    "relative inline-flex h-9 w-9 shrink-0 items-center rounded-full bg-muted p-1 sm:w-[4.5rem]",
+    className
+  );
+
   if (!mounted) {
-    return (
-      <div className="bg-muted flex h-9 items-center p-[3px] rounded-lg">
-        <div className="size-4" />
-      </div>
-    );
+    return <div className={track} aria-hidden />;
   }
 
-  // Use resolvedTheme to determine if dark mode is active
   const isDark = resolvedTheme === "dark";
 
   const toggleTheme = () => {
     if (isAnimatingRef.current) return; // Prevent double-clicks during animation
-    
+
     const newTheme = isDark ? "light" : "dark";
     isAnimatingRef.current = true;
-    
-    // Update local state immediately to trigger animation
+
+    // Move the indicator first, then switch theme on the next frames so the
+    // slide and the colour transition start together.
     setLocalIsDark(newTheme === "dark");
-    
-    // Use double requestAnimationFrame to ensure browser sees the change
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         setTheme(newTheme);
-        // Reset animation flag after transition completes
         setTimeout(() => {
           isAnimatingRef.current = false;
         }, 320);
@@ -59,41 +61,51 @@ export function ThemeToggle() {
     });
   };
 
+  const icon = (active: boolean) =>
+    cn(
+      "size-4 transition-colors",
+      active ? "text-foreground" : "text-foreground/60 dark:text-muted-foreground"
+    );
+
   return (
     <button
+      type="button"
       onClick={toggleTheme}
-      className="bg-muted flex h-9 items-center p-[3px] rounded-lg relative cursor-pointer hover:opacity-90 transition-opacity"
+      className={cn(
+        track,
+        "group cursor-pointer outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
+      )}
       style={{
         opacity: isVisible ? 1 : 0,
         transition: "opacity 900ms cubic-bezier(0.4, 0, 0.2, 1)",
       }}
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
     >
-      {/* Sliding indicator - matches active button dimensions exactly from Figma */}
-      {/* Left button: starts at 3px, Right button: starts at 50% */}
-      <div
-        className="absolute bg-card border border-border rounded-inner-lg-gap-3px shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_0px_rgba(0,0,0,0.1)]"
-        style={{ 
-          width: "calc(50% - 3px)",
-          height: "calc(100% - 6px)",
-          top: "3px",
-          left: localIsDark ? "50%" : "3px",
-          transition: "left 320ms cubic-bezier(0.4, 0, 0.2, 1)",
-          willChange: "left"
-        }}
+      {/* Sliding active segment */}
+      <span
+        aria-hidden
+        data-dark={localIsDark}
+        className="absolute inset-y-1 left-1 w-[calc(100%-0.5rem)] rounded-full border border-transparent bg-background transition-transform duration-[320ms] ease-[cubic-bezier(0.4,0,0.2,1)] sm:w-[calc(50%-0.25rem)] sm:data-[dark=true]:translate-x-full dark:border-input dark:bg-input/30"
       />
-      
-      {/* Icons - matches Figma structure exactly with p-2 (8px) padding, h-full */}
-      <div className="relative flex items-center w-full h-full z-10">
-        {/* Sun button area - matches Figma button structure */}
-        <div className="flex-1 flex items-center justify-center p-2 rounded-inner-lg-gap-3px h-full">
-          <Sun className={`size-4 ${!isDark ? "text-foreground" : "text-muted-foreground"}`} />
-        </div>
-        {/* Moon button area - matches Figma button structure */}
-        <div className="flex-1 flex items-center justify-center p-2 rounded-inner-lg-gap-3px h-full">
-          <Moon className={`size-4 ${isDark ? "text-foreground" : "text-muted-foreground"}`} />
-        </div>
-      </div>
+
+      <span className="relative z-10 flex h-full w-full items-center">
+        <span
+          className={cn(
+            "h-full flex-1 items-center justify-center sm:flex",
+            localIsDark ? "hidden" : "flex"
+          )}
+        >
+          <HugeiconsIcon icon={Sun03Icon} className={icon(!localIsDark)} />
+        </span>
+        <span
+          className={cn(
+            "h-full flex-1 items-center justify-center sm:flex",
+            localIsDark ? "flex" : "hidden"
+          )}
+        >
+          <HugeiconsIcon icon={Moon02Icon} className={icon(localIsDark)} />
+        </span>
+      </span>
     </button>
   );
 }

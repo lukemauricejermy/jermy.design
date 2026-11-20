@@ -109,7 +109,7 @@ export function CaseStudyCallouts({ callouts }: CaseStudyCalloutsProps) {
             className="flex w-full flex-col items-start gap-8 py-20"
           >
             {callout.title && (
-              <H2 className="overflow-hidden">
+              <H2 className="overflow-x-clip">
                 <TextReveal
                   triggerOnScroll
                   duration={750}

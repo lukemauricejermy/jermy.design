@@ -59,6 +59,7 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu"
 import { Separator } from "@/components/ui/separator"
+import { ThemeToggle } from "@/components/theme-toggle-header"
 import { Code, Specimen, SubSection } from "./layout"
 
 const BUTTON_VARIANTS = ["default", "secondary", "outline", "ghost", "destructive", "link"] as const
@@ -355,6 +356,22 @@ export function SeparatorGallery() {
           <Separator orientation="vertical" />
           <span className="type-small">Contact</span>
         </div>
+      </Specimen>
+    </SubSection>
+  )
+}
+
+export function ThemeToggleGallery() {
+  return (
+    <SubSection
+      title="Theme toggle"
+      description="Header light/dark switch, built as the preset's segmented control. Below 640px it collapses to a single segment showing the current mode."
+    >
+      <Specimen className="flex items-center gap-6">
+        <ThemeToggle />
+        <span className="type-small text-muted-foreground">
+          Click to switch the whole site.
+        </span>
       </Specimen>
     </SubSection>
   )

@@ -222,17 +222,14 @@ function TypeRow({
           </code>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <SpecCell
-            label="Weight"
-            value={base?.fontWeight ? fallback(base.fontWeight) : "—"}
-          />
-          <SpecCell label="Tracking" value={formatTracking(base?.letterSpacing)} />
-        </div>
+        <SpecCell
+          label="Weight"
+          value={base?.fontWeight ? fallback(base.fontWeight) : "—"}
+        />
 
         <div className="flex flex-col gap-1.5">
           <span className="type-caption text-muted-foreground">
-            Size / line height
+            Size / line height · tracking
           </span>
           <div className="flex flex-wrap gap-2">
             {steps?.map(({ minWidth, spec }) => {
@@ -252,6 +249,8 @@ function TypeRow({
                 >
                   {BREAKPOINT_NAMES[minWidth] ?? `${minWidth}px`} {sizePx ?? "?"}
                   {lhPx ? `/${+lhPx.toFixed(1)}` : ""}
+                  {" · "}
+                  {formatTracking(spec.letterSpacing ?? base?.letterSpacing)}
                 </span>
               )
             }) ?? (

@@ -9,6 +9,7 @@ import {
   ItemGallery,
   MenuGallery,
   SeparatorGallery,
+  ThemeToggleGallery,
 } from "./_components/component-gallery"
 import { DsNav, type NavGroup } from "./_components/ds-nav"
 import { Code, Section, Specimen, SubSection } from "./_components/layout"
@@ -315,6 +316,7 @@ export default function DesignSystemPage() {
               <ItemGallery />
               <MenuGallery />
               <SeparatorGallery />
+              <ThemeToggleGallery />
             </Section>
           </div>
         </div>

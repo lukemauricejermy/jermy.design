@@ -47,7 +47,7 @@ function RelatedCard({ study }: { study: RelatedCaseStudy }) {
             {study.title}
           </CardTitle>
           {study.excerpt && (
-            <CardDescription className="text-base leading-5 text-foreground">
+            <CardDescription className="type-body text-foreground">
               {study.excerpt}
             </CardDescription>
           )}
@@ -68,7 +68,7 @@ export function CaseStudyRelated({ related }: CaseStudyRelatedProps) {
     <section className="bg-background px-6 py-56">
       <div className="mx-auto flex w-full max-w-[1440px] flex-col items-center gap-16">
         {/* Full-width section title */}
-        <H2 className="w-full overflow-hidden">
+        <H2 className="w-full overflow-x-clip">
           <TextReveal
             triggerOnScroll
             duration={750}

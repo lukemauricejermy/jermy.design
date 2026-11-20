@@ -232,7 +232,7 @@ export default function Hero() {
           )}
 
           {/* H1 Typography */}
-          <H1 className="flex-1 text-foreground w-full overflow-hidden">
+          <H1 className="flex-1 text-foreground w-full overflow-x-clip">
             {isPreloaderDone ? (
               <TextReveal
                 delay={120}

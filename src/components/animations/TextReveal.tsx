@@ -108,20 +108,21 @@ export function TextReveal({
   if (typeof children === "string" && textData) {
     const { lines } = textData;
 
+    // Line height comes from the parent's type style. Each word masks its own
+    // characters; the mask extends below the line box for descenders
+    // (padding) without pushing the next line down (equal negative margin).
+    // Parents should use overflow-x-clip, not overflow-hidden, so the last
+    // line's descenders aren't cut off.
     return (
-      <div ref={ref} className={`overflow-hidden ${className}`}>
+      <div ref={ref} className={className}>
         {lines.map((lineWords, lineIndex) => (
-          <span
-            key={lineIndex}
-            className="block overflow-hidden leading-none"
-            style={{ paddingBottom: "0.5rem" }}
-          >
+          <span key={lineIndex} className="block">
             {lineWords.map((word, wordIndex) => (
               <span key={`${lineIndex}-${wordIndex}`}>
                 {wordIndex > 0 && " "}
                 <span
-                  className="inline-block whitespace-nowrap overflow-hidden align-top leading-none"
-                  style={{ paddingBottom: "0.5rem" }}
+                  className="inline-block whitespace-nowrap overflow-hidden align-top"
+                  style={{ paddingBottom: "0.25em", marginBottom: "-0.25em" }}
                 >
                   {word.split("").map((char, charIndex) => (
                     <span

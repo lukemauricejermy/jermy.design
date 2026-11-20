@@ -10,6 +10,20 @@
   --font-heading: var(--font-sans);
   --font-mono: var(--font-dm-mono), ui-monospace, monospace;
 
+  /* Matter tracking on raw text-* sizes, same curve as the type scale, so
+     shadcn components and one-offs are set for Matter too. */
+  --text-xs--letter-spacing: 0.025em;
+  --text-sm--letter-spacing: 0.02em;
+  --text-base--letter-spacing: 0.015em;
+  --text-lg--letter-spacing: 0.01em;
+  --text-xl--letter-spacing: 0.01em;
+  --text-2xl--letter-spacing: 0.005em;
+  --text-3xl--letter-spacing: 0em;
+  --text-4xl--letter-spacing: -0.005em;
+  --text-5xl--letter-spacing: -0.015em;
+  --text-6xl--letter-spacing: -0.02em;
+  --text-7xl--letter-spacing: -0.025em;
+
   /* Colors mapped to CSS variables */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -201,6 +215,9 @@
     }
   }
   html {
+    /* Only use the weights we ship (400/500/600); never fake bold/italic. */
+    font-synthesis: none;
+    font-kerning: normal;
     transition: background-color 320ms cubic-bezier(0.4, 0, 0.2, 1);
     @apply font-sans;
   }
@@ -287,27 +304,35 @@
   --radius-inner-gap-3: max(0px, calc(var(--radius-card) - 0.75rem)); /* 12px gap → 20px inner */
 }
 /* ==========================================================================
-   Type scale
+   Type scale, tuned for Matter
    --------------------------------------------------------------------------
    One class per text style: `type-<name>`. Each sets size, line height,
-   tracking and weight, and steps up at the md (48rem) / lg (64rem)
-   breakpoints where noted. Values mirror the sizes the site already used.
+   tracking and weight, stepping at md (48rem) / lg (64rem) where noted.
 
-   Line height, tracking and weight read Tailwind's own variables first, so
-   modifiers still compose: `type-title leading-8` or `type-lead font-medium`
-   work as expected. To change the size, pick another type style rather than
-   adding a `text-*` size. `cn()` drops the type class if a `text-*` size
+   Spacing follows how Displaay set Matter on its own specimen
+   (displaay.net/typeface/matter): Matter is spaced tight for display, so
+   tracking tightens as type grows (−2…−4% above 60px) and opens as it
+   shrinks (+1…+2% at text sizes). Line height tightens as type grows.
+   Metrics behind the limits: cap 0.70em, x-height 0.504em (large, so small
+   sizes want air), ink spans ~0.9em. TextReveal masks extend 0.25em below
+   the line box, so line heights under 1.0 don't clip descenders.
+
+   Line height, tracking and weight read Tailwind's variables first, so
+   `leading-*`, `tracking-*` and `font-*` modifiers still compose. To change
+   size, pick another style; `cn()` drops a type class if a `text-*` size
    follows it.
 
-   The /design-system page documents these and reads the live values.
+   The /design-system page reads these rules live; keep values literal.
    ========================================================================== */
 
-/* Display: 48 → 72 (lg). Hero and footer sign-off. */
+/* Display: 48 → 72 (lg), SemiBold, 0.97 / −4%. Matched to Displaay's type
+   tester (Matter SemiBold "Head of design. Still doing the doing."), measured
+   from the cap height: −3.9…−4.1% tracking, 0.97 line height. */
 @utility type-display {
   font-size: 3rem;
-  line-height: var(--tw-leading, 1);
-  letter-spacing: var(--tw-tracking, -0.025em);
-  font-weight: var(--tw-font-weight, 500);
+  line-height: var(--tw-leading, 0.97);
+  letter-spacing: var(--tw-tracking, -0.04em);
+  font-weight: var(--tw-font-weight, 600);
   @media (width >= theme(--breakpoint-lg)) {
     font-size: 4.5rem;
   }
@@ -316,71 +341,79 @@
 /* Headline: 36 → 48 (md) → 60 (lg). Section headings. */
 @utility type-headline {
   font-size: 2.25rem;
-  line-height: var(--tw-leading, 1);
-  letter-spacing: var(--tw-tracking, -0.025em);
+  line-height: var(--tw-leading, 1.05);
+  letter-spacing: var(--tw-tracking, -0.005em);
   font-weight: var(--tw-font-weight, 500);
   @media (width >= theme(--breakpoint-md)) {
     font-size: 3rem;
+    line-height: var(--tw-leading, 1);
+    letter-spacing: var(--tw-tracking, -0.015em);
   }
   @media (width >= theme(--breakpoint-lg)) {
     font-size: 3.75rem;
+    letter-spacing: var(--tw-tracking, -0.02em);
   }
 }
 
 /* Title large: 30 → 36 (md). Expanded value titles. */
 @utility type-title-lg {
   font-size: 1.875rem;
-  line-height: var(--tw-leading, 1);
-  letter-spacing: var(--tw-tracking, -0.025em);
+  line-height: var(--tw-leading, 1.1);
+  letter-spacing: var(--tw-tracking, 0em);
   font-weight: var(--tw-font-weight, 500);
   @media (width >= theme(--breakpoint-md)) {
     font-size: 2.25rem;
+    line-height: var(--tw-leading, 1.05);
+    letter-spacing: var(--tw-tracking, -0.005em);
   }
 }
 
 /* Title: 24 → 30 (md). Value card titles, sub-section headings. */
 @utility type-title {
   font-size: 1.5rem;
-  line-height: var(--tw-leading, 1);
-  letter-spacing: var(--tw-tracking, -0.025em);
+  line-height: var(--tw-leading, 1.15);
+  letter-spacing: var(--tw-tracking, 0.005em);
   font-weight: var(--tw-font-weight, 500);
   @media (width >= theme(--breakpoint-md)) {
     font-size: 1.875rem;
+    line-height: var(--tw-leading, 1.1);
+    letter-spacing: var(--tw-tracking, 0em);
   }
 }
 
-/* Title small: 24 / 32. Card titles (case study touts). */
+/* Title small: 24 / 30. Card titles (case study touts). */
 @utility type-title-sm {
   font-size: 1.5rem;
-  line-height: var(--tw-leading, 2rem);
-  letter-spacing: var(--tw-tracking, normal);
+  line-height: var(--tw-leading, 1.25);
+  letter-spacing: var(--tw-tracking, 0.005em);
   font-weight: var(--tw-font-weight, 500);
 }
 
-/* Lead: 18 → 20 (md), 28 line height. Intro paragraphs. */
+/* Lead: 18 → 20 (md), 26 → 28 line height. Intro paragraphs. */
 @utility type-lead {
   font-size: 1.125rem;
-  line-height: var(--tw-leading, 1.75rem);
-  letter-spacing: var(--tw-tracking, normal);
+  line-height: var(--tw-leading, 1.625rem);
+  letter-spacing: var(--tw-tracking, 0.01em);
   font-weight: var(--tw-font-weight, 400);
   @media (width >= theme(--breakpoint-md)) {
     font-size: 1.25rem;
+    line-height: var(--tw-leading, 1.75rem);
   }
 }
 
-/* Body: 16 / 24. Default UI and short copy. */
+/* Body: 16 / 24. Default UI copy and short paragraphs. */
 @utility type-body {
   font-size: 1rem;
   line-height: var(--tw-leading, 1.5rem);
-  letter-spacing: var(--tw-tracking, normal);
+  letter-spacing: var(--tw-tracking, 0.015em);
   font-weight: var(--tw-font-weight, 400);
 }
 
-/* Body long: 16 / 28. Long-form reading (case study rich text). */
+/* Body long: 16 / 26. Long-form reading (case study rich text). */
 @utility type-body-long {
   font-size: 1rem;
-  line-height: var(--tw-leading, 1.75rem);
-  letter-spacing: var(--tw-tracking, normal);
+  line-height: var(--tw-leading, 1.625rem);
+  letter-spacing: var(--tw-tracking, 0.015em);
   font-weight: var(--tw-font-weight, 400);
 }
 
@@ -388,18 +421,19 @@
 @utility type-label {
   font-size: 0.875rem;
   line-height: var(--tw-leading, 1);
-  letter-spacing: var(--tw-tracking, normal);
+  letter-spacing: var(--tw-tracking, 0.015em);
   font-weight: var(--tw-font-weight, 500);
   @media (width >= theme(--breakpoint-md)) {
     font-size: 1rem;
+    letter-spacing: var(--tw-tracking, 0.01em);
   }
 }
 
-/* Small: 14 / 20. Captions, meta, secondary detail. */
+/* Small: 14 / 20. Secondary detail, meta. */
 @utility type-small {
   font-size: 0.875rem;
   line-height: var(--tw-leading, 1.25rem);
-  letter-spacing: var(--tw-tracking, normal);
+  letter-spacing: var(--tw-tracking, 0.02em);
   font-weight: var(--tw-font-weight, 400);
 }
 
@@ -407,7 +441,7 @@
 @utility type-caption {
   font-size: 0.75rem;
   line-height: var(--tw-leading, 1rem);
-  letter-spacing: var(--tw-tracking, normal);
+  letter-spacing: var(--tw-tracking, 0.025em);
   font-weight: var(--tw-font-weight, 400);
 }
 
