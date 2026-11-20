@@ -10,8 +10,11 @@
   },
   "dependencies": {
     "@datocms/cda-client": "^0.2.10",
+    "@hugeicons/core-free-icons": "^4.4.0",
+    "@hugeicons/react": "^1.1.10",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cn": "^0.5.2",
     "gsap": "^3.14.2",
     "lucide-react": "^0.563.0",
     "next": "16.1.6",
@@ -20,6 +23,7 @@
     "react": "19.2.3",
     "react-datocms": "^7.2.14",
     "react-dom": "19.2.3",
+    "shadcn": "^4.23.0",
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
