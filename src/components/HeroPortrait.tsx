@@ -24,8 +24,8 @@ import { cn } from "@/lib/utils";
 export const HERO_PORTRAIT = { width: 694, height: 602 };
 
 const MODES = {
-  light: { video: "/videos/hero-loop-v8-light", poster: "/images/hero/hero-loop-v8-light-poster.png" },
-  dark: { video: "/videos/hero-loop-v8-dark", poster: "/images/hero/hero-loop-v8-dark-poster.png" },
+  light: { video: "/videos/hero-loop-v10-light", poster: "/images/hero/hero-loop-v10-light-poster.png" },
+  dark: { video: "/videos/hero-loop-v10-dark", poster: "/images/hero/hero-loop-v10-dark-poster.png" },
 } as const;
 
 function prefersSafariHevc() {
