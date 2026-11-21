@@ -21,11 +21,11 @@ import { cn } from "@/lib/utils";
  * Firefox, Edge) and HEVC with alpha (Safari, which can't do VP9 alpha).
  * Process: scripts/generate-video.mjs, then ffmpeg (see CLAUDE.md).
  */
-export const HERO_PORTRAIT = { width: 810, height: 604 };
+export const HERO_PORTRAIT = { width: 694, height: 602 };
 
 const MODES = {
-  light: { video: "/videos/hero-loop-v4-light", poster: "/images/hero/hero-loop-v4-light-poster.png" },
-  dark: { video: "/videos/hero-loop-v4-dark", poster: "/images/hero/hero-loop-v4-dark-poster.png" },
+  light: { video: "/videos/hero-loop-v8-light", poster: "/images/hero/hero-loop-v8-light-poster.png" },
+  dark: { video: "/videos/hero-loop-v8-dark", poster: "/images/hero/hero-loop-v8-dark-poster.png" },
 } as const;
 
 function prefersSafariHevc() {

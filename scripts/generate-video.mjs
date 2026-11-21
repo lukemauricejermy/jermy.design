@@ -99,6 +99,9 @@ async function main() {
       from: { type: "string" },
       prompt: { type: "string" },
       loop: { type: "boolean", default: false },
+      // Last frame (first/last-frame interpolation, 3–10 s): pin the end of
+      // the clip to a checked still, e.g. the wave, so a key moment can't drift.
+      to: { type: "string" },
       duration: { type: "string", default: "8" },
       resolution: { type: "string", default: "720p" },
       aspect: { type: "string", default: "16:9" },
@@ -126,7 +129,8 @@ async function main() {
       ]
     : (() => {
         const start = imageItem(values.from)
-        return [start, ...(values.loop ? [start] : []), { type: "text", text: values.prompt }]
+        const end = values.to ? [imageItem(values.to)] : values.loop ? [start] : []
+        return [start, ...end, { type: "text", text: values.prompt }]
       })()
   const body = {
     model: MODEL,

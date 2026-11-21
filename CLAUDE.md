@@ -100,10 +100,11 @@ src/
 
 ### Hero video
 
-- Day loop: `node scripts/generate-video.mjs --loop --from <green still>` (Gemini Omni Flash via the Interactions API; Veo is retired). The still is passed as both first and last frame so it loops. Each take saves its interaction ID next to the .mp4.
-- Night loop: relight the chosen take with `--previous <take>.interaction.txt` and a "change only the lighting" prompt. That's a follow-up turn on the stored interaction, so the motion matches frame for frame. Uploading a video to edit is blocked in the UK/EEA; editing the model's own output is not. Never fake the night version with masks.
-- Key and encode both together with `python3 scripts/key-video.py --name hero-loop-vN take.mp4:light night.mp4:dark`. It uses one shared crop (union of all frames plus padding), green-excess key + despill + choke, VP9-alpha WebM (Chrome/Firefox) + HEVC-alpha MOV (Safari), and posters. Version the names.
-- `HeroPortrait` picks the encode on the client, shows each mode's poster until its video plays, keeps posters for reduced motion, and syncs the incoming loop on theme change. About $0.07/s of video at 720p.
+- The loop is built from two anchored halves so the face-on moment can't drift off-model: typing still → wave still (`generate-video.mjs --from A --to W --duration 4`) and wave → typing (`--from W --to A`). The wave still is made with `generate-art.mjs` and checked by eye first. Prompts lock the eyes ("small, solid dark eyes, no whites, never widened"); without anchoring, the model swaps in round eyes with whites whenever he faces the camera.
+- Join: re-encode each half to constant 24fps, `xfade` 0.25s at the join, then crossfade the last 0.5s into the first 0.5s for the loop point. Check with a frame-difference scan (`tblend` + `signalstats`) that no frame jumps more than normal motion.
+- Night: relight each half with `--previous <half>.interaction.txt` (a follow-up turn on the stored interaction, which is allowed in the UK, unlike uploading video) and assemble it with the identical joins, so it matches frame for frame. Never fake it with masks.
+- Key both with `python3 scripts/key-video.py --name hero-loop-vN day.mp4:light night.mp4:dark:light` (the night video is cut with the day matte). The key is green dominance relative to brightness, with edge colour recovery, despill and a 2px choke. One shared crop, VP9-alpha WebM + HEVC-alpha MOV, posters. Version the names.
+- `HeroPortrait` picks the encode on the client, shows posters until the video plays, keeps them for reduced motion, and syncs the incoming loop on theme change. About $0.07/s of video at 720p.
 
 ### Design system page
 

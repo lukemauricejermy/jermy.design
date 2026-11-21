@@ -7,6 +7,11 @@
 All inputs share one crop box (the union of every frame's subject, plus
 padding), so a day take and its relit night take stay perfectly aligned.
 
+A third field takes the matte from another input: `night.mp4:dark:light`
+cuts the night video with the light take's alpha, frame by frame. Use it
+when a relit take follows the original exactly but its background is no
+longer clean green (relighting tends to dim the backdrop too).
+
 Per input it writes <name>-<label>.webm (VP9 + alpha: Chrome, Firefox,
 Edge), <name>-<label>.mov (HEVC + alpha: Safari) and
 <name>-<label>-poster.png (first frame) into --poster-dir.
@@ -48,20 +53,35 @@ def sample_green(path):
 
 
 def key_expr(bg):
-    excess = bg[1] - max(bg[0], bg[2])
-    low = min(40.0, excess * 0.25)
-    high = min(190.0, excess * 0.8)
-    e = "(g(X,Y)-max(r(X,Y),b(X,Y)))"
-    return f"clip(255*(1-({e}-{low:.1f})/{high - low:.1f}),0,255)"
+    """Alpha from green dominance relative to brightness:
+    (g − max(r, b)) / g. Bright and shadowed green both score high, while
+    skin, white and blue-lit cloth score at or below zero. Thresholds are
+    scaled to the sampled background's own score."""
+    score = (bg[1] - max(bg[0], bg[2])) / max(bg[1], 1)
+    low, high = score * 0.18, score * 0.62
+    e = "((g(X,Y)-max(r(X,Y),b(X,Y)))/max(g(X,Y),1))"
+    return f"clip(255*(1-({e}-{low:.3f})/{high - low:.3f}),0,255)"
 
 
-def key_filter(alpha):
+def key_filter(alpha, bg):
+    """Key + edge recovery, as in cutout.swift: for partly transparent pixels
+    remove the background's share (seen + (seen - bg) * boost, boost capped),
+    then despill and choke 2px, so edges carry no green or olive fringe."""
+    boost = f"min((255-({alpha}))/max({alpha},1),4)"
+
+    def chan(c, b):
+        return (
+            f"if(lt({alpha},8),128,if(gt({alpha},247),{c}(X,Y),"
+            f"clip({c}(X,Y)+({c}(X,Y)-{b:.0f})*{boost},0,255)))"
+        )
+
+    r, g, b = chan("r", bg[0]), chan("g", bg[1]), chan("b", bg[2])
     return (
         "format=gbrap,"
-        f"geq=r='if(lt({alpha},8),128,r(X,Y))'"
-        f":g='if(lt({alpha},8),128,min(g(X,Y),max(r(X,Y),b(X,Y))))'"
-        f":b='if(lt({alpha},8),128,b(X,Y))':a='{alpha}',"
-        "split[c][m];[m]alphaextract,erosion[a];[c][a]alphamerge"
+        f"geq=r='{r}':g='{g}':b='{b}':a='{alpha}',"
+        # despill on the recovered colours
+        "geq=r='r(X,Y)':g='min(g(X,Y),max(r(X,Y),b(X,Y)))':b='b(X,Y)':a='alpha(X,Y)',"
+        "split[c][m];[m]alphaextract,erosion,erosion[a];[c][a]alphamerge"
     )
 
 
@@ -92,12 +112,21 @@ def main():
     p.add_argument("--poster-dir", default="public/images/hero")
     args = p.parse_args()
 
-    takes = [(s.rsplit(":", 1)[0], s.rsplit(":", 1)[1]) for s in args.inputs]
+    takes, matte_from = [], {}
+    for spec in args.inputs:
+        parts = spec.split(":")
+        takes.append((parts[0], parts[1]))
+        if len(parts) > 2:
+            matte_from[parts[1]] = parts[2]
+    paths = dict((label, path) for path, label in takes)
     w, h = probe_size(takes[0][0])
 
-    alphas, box = {}, [w, h, -1, -1]
+    alphas, greens, box = {}, {}, [w, h, -1, -1]
     for path, label in takes:
-        alphas[label] = key_expr(sample_green(path))
+        greens[label] = sample_green(path)
+        alphas[label] = key_expr(greens[label])
+        if label in matte_from:
+            continue
         b = subject_box(path, alphas[label], w, h)
         print(f"{label}: subject box {b}", file=sys.stderr)
         box = [min(box[0], b[0]), min(box[1], b[1]), max(box[2], b[2]), max(box[3], b[3])]
@@ -110,15 +139,27 @@ def main():
     print(f"shared crop {cw}x{ch} at {x0},{y0}", file=sys.stderr)
 
     for path, label in takes:
-        f = f"{key_filter(alphas[label])},{crop}"
+        src = matte_from.get(label)
+        if src:
+            # Colour from this take (green despilled), alpha from the source take.
+            a = alphas[src]
+            f = (
+                f"[0:v]format=gbrap,geq=r='r(X,Y)':g='min(g(X,Y),max(r(X,Y),b(X,Y)))':b='b(X,Y)':a='255'[c];"
+                f"[1:v]format=gbrap,geq=r='0':g='0':b='0':a='{a}',alphaextract,erosion,erosion[m];"
+                f"[c][m]alphamerge,{crop}"
+            )
+            inputs = ["-i", path, "-i", paths[src]]
+        else:
+            f = f"{key_filter(alphas[label], greens[label])},{crop}"
+            inputs = ["-i", path]
         base = f"{args.out}/{args.name}-{label}"
-        run(["ffmpeg", "-v", "error", "-y", "-i", path, "-filter_complex", f,
+        run(["ffmpeg", "-v", "error", "-y", *inputs, "-filter_complex", f,
              "-c:v", "libvpx-vp9", "-pix_fmt", "yuva420p", "-crf", "33", "-b:v", "0",
              "-row-mt", "1", "-deadline", "good", "-cpu-used", "2", "-an", f"{base}.webm"])
-        run(["ffmpeg", "-v", "error", "-y", "-i", path, "-filter_complex", f"{f},format=bgra",
+        run(["ffmpeg", "-v", "error", "-y", *inputs, "-filter_complex", f"{f},format=bgra",
              "-c:v", "hevc_videotoolbox", "-alpha_quality", "0.85", "-allow_sw", "1",
              "-b:v", "2500k", "-tag:v", "hvc1", "-an", f"{base}.mov"])
-        run(["ffmpeg", "-v", "error", "-y", "-i", path, "-filter_complex", f,
+        run(["ffmpeg", "-v", "error", "-y", *inputs, "-filter_complex", f,
              "-frames:v", "1", f"{args.poster_dir}/{args.name}-{label}-poster.png"])
         print(f"{label}: wrote {base}.webm / .mov", file=sys.stderr)
 
