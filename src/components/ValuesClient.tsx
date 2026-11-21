@@ -7,7 +7,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { StructuredText } from "react-datocms";
 import { Card } from "@/components/ui/card";
 import { H2, H3, Lead } from "@/components/ui/typography";
-import { Button } from "@/components/ui/button";
 import { FadeUp, TextReveal } from "@/components/animations";
 import {
   animationDurations,
@@ -15,8 +14,6 @@ import {
   animationDistances,
   animationDelays,
 } from "@/lib/animation-config";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowTurnBackwardIcon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -107,7 +104,6 @@ const face = "absolute inset-0 [backface-visibility:hidden] [-webkit-backface-vi
 function ValueCard({
   value,
   index,
-  total,
   flipped,
   dealt,
   onSelect,
@@ -117,7 +113,6 @@ function ValueCard({
 }: {
   value: ValueWithSvg;
   index: number;
-  total: number;
   flipped: boolean;
   dealt: boolean;
   onSelect: () => void;
@@ -125,7 +120,6 @@ function ValueCard({
   cardRef: (el: HTMLDivElement | null) => void;
   flipperRef: (el: HTMLDivElement | null) => void;
 }) {
-  const number = `${String(index + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}`;
   return (
     <div
       ref={cardRef}
@@ -167,30 +161,24 @@ function ValueCard({
           </H3>
         </Card>
 
-        {/* Back */}
+        {/* Back: title and body sized to the card (container units, with a
+            floor for small phones). Tap, Esc or click outside turns it back. */}
         <Card
           aria-hidden={!flipped}
-          className={cn(face, "flex flex-col gap-0 p-6 md:p-7 shadow-lg [transform:rotateY(180deg)]")}
+          className={cn(face, "flex flex-col gap-0 p-[8cqw] shadow-lg [transform:rotateY(180deg)]")}
         >
-          <span className="type-overline text-muted-foreground">{number}</span>
-          <H3 className="type-title-lg pt-4 text-left">{value.title}</H3>
-          <div className="type-body mt-4 min-h-0 flex-1 overflow-y-auto pb-6 text-foreground [mask-image:linear-gradient(to_bottom,black_calc(100%-2rem),transparent)] [&_p]:mb-3 [&_p:last-child]:mb-0">
+          <H3
+            className="type-headline text-balance text-left"
+            style={{ fontSize: "clamp(1.375rem, 8cqw, 2.75rem)" }}
+          >
+            {value.title}
+          </H3>
+          <div
+            data-card-back-body
+            className="mt-[5cqw] min-h-0 flex-1 overflow-y-auto overscroll-contain text-foreground [&_p]:mb-[0.75em] [&_p:last-child]:mb-0"
+            style={{ fontSize: "clamp(0.875rem, 3.7cqw, 1.25rem)", lineHeight: 1.45 }}
+          >
             <StructuredText data={value.description} />
-          </div>
-          <div className="flex justify-end pt-4">
-            <Button
-              variant="secondary"
-              size="icon-lg"
-              type="button"
-              tabIndex={flipped ? 0 : -1}
-              aria-label="Turn the card back over"
-              onClick={(e) => {
-                e.stopPropagation();
-                onTurnBack();
-              }}
-            >
-              <HugeiconsIcon icon={ArrowTurnBackwardIcon} />
-            </Button>
           </div>
         </Card>
       </div>
@@ -427,14 +415,21 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
             return dir > 0 ? next() : prev();
           };
 
+          /** A flipped card owns its own scrolling: input on it doesn't deal. */
+          const onFlippedCard = (e: Event) =>
+            selectedRef.current !== null &&
+            e.target instanceof Element &&
+            Boolean(e.target.closest("[data-value-card]"));
+
           const onWheel = (e: WheelEvent) => {
-            if (e.ctrlKey || e.deltaY === 0) return;
+            if (e.ctrlKey || e.deltaY === 0 || onFlippedCard(e)) return;
             if (input(e.deltaY > 0 ? 1 : -1, Math.abs(e.deltaY))) e.preventDefault();
           };
           const onTouchStart = (e: TouchEvent) => {
             touchY = e.touches[0]?.clientY ?? null;
           };
           const onTouchMove = (e: TouchEvent) => {
+            if (onFlippedCard(e)) return;
             const y = e.touches[0]?.clientY;
             if (touchY === null || y === undefined) return;
             const delta = touchY - y; // finger moving up = scrolling down
@@ -640,7 +635,6 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
                 key={value.id}
                 value={value}
                 index={i}
-                total={total}
                 flipped={selected === i}
                 dealt={i < dealt}
                 onSelect={() => select(i)}
