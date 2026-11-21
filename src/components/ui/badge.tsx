@@ -21,10 +21,10 @@ const badgeVariants = cva(
       },
       size: {
         default:
-          "h-5 px-2 py-0.5 text-xs has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&>svg]:size-3!",
+          "h-auto px-2 py-1.5 text-xs leading-none has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&>svg]:size-3!",
         // Sits beside big titles: body-size text (fluid, 16 → 18px), medium
         // weight, single line height, and a step more padding.
-        lg: "h-auto px-3 py-1.5 type-body font-medium leading-none has-data-[icon=inline-end]:pr-2.5 has-data-[icon=inline-start]:pl-2.5 [&>svg]:size-4!",
+        lg: "h-auto px-3 py-2 type-body font-medium leading-none has-data-[icon=inline-end]:pr-2.5 has-data-[icon=inline-start]:pl-2.5 [&>svg]:size-4!",
       },
     },
     defaultVariants: {
