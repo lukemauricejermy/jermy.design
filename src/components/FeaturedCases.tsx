@@ -243,48 +243,29 @@ function VemiArt() {
 }
 
 function FoundgoodArt() {
+  // Foundgood is a web platform, so its tile is a browser window rather than
+  // a phone: simple browser chrome set into the top-left of the tile and
+  // running off the right and bottom edges, showing the whole funder
+  // dashboard at a readable size.
   const dir = "/images/cases/foundgood-v1";
-  // The dashboard is a wide desktop screen, so the tile shows a tall crop of
-  // its left side (sidebar, headline KPI, start of the donut): the image is
-  // drawn wider than its window and anchored top-left.
-  const cropWidth = 440; // source px of the 937px-wide screenshot: ends before the 2nd KPI
-  const widgets = [
-    // src, intrinsic size, left, top (cqw); width 44cqw
-    { src: "kpi", w: 594, h: 254, left: 49, top: 15, delay: 0 },
-    { src: "map", w: 2184, h: 1150, left: 53, top: 36.8, delay: 80 },
-  ];
   return (
-    <>
-      <div className="absolute top-[8.25cqw] left-[7cqw] h-[80cqw] w-[38cqw] overflow-hidden rounded-[1.6cqw] transition-transform duration-700 ease-out group-hover:-translate-y-[1cqw]">
-        <Image
-          src={`${dir}/dashboard.png`}
-          alt="Foundgood funder dashboard: initiatives funded, SDGs and countries supported, and initiatives by category"
-          width={937}
-          height={1600}
-          sizes="(min-width: 640px) 40vw, 80vw"
-          className="max-w-none"
-          style={{ width: `${(38 * 937) / cropWidth}cqw`, height: "auto" }}
-        />
+    <div className="absolute top-[9cqw] left-[8cqw] w-[100cqw] overflow-hidden rounded-tl-[1.6cqw] bg-[#F3F4F7] transition-transform duration-700 ease-out group-hover:-translate-x-[1cqw] group-hover:-translate-y-[1cqw]">
+      {/* Browser chrome: traffic lights and an address bar. */}
+      <div className="flex h-[4.5cqw] items-center gap-[0.9cqw] border-b border-black/5 px-[1.8cqw]">
+        <span className="size-[1.1cqw] rounded-full bg-[#FF5F57]" />
+        <span className="size-[1.1cqw] rounded-full bg-[#FEBC2E]" />
+        <span className="size-[1.1cqw] rounded-full bg-[#28C840]" />
+        <span className="ml-[4cqw] h-[2.2cqw] w-[34cqw] rounded-full bg-white" />
       </div>
-      {widgets.map((wg) => (
-        <div
-          key={wg.src}
-          className="absolute w-[44cqw] transition-transform duration-700 ease-out group-hover:-translate-y-[1.2cqw]"
-          style={{ left: `${wg.left}cqw`, top: `${wg.top}cqw`, transitionDelay: `${wg.delay}ms` }}
-        >
-          <Image
-            src={`${dir}/${wg.src}.png`}
-            alt=""
-            width={wg.w}
-            height={wg.h}
-            sizes="(min-width: 640px) 25vw, 50vw"
-            className="h-auto w-full"
-            // The exports carry the canvas grey in their corners.
-            style={{ clipPath: "inset(0.3% round 1cqw)" }}
-          />
-        </div>
-      ))}
-    </>
+      <Image
+        src={`${dir}/dashboard.png`}
+        alt="Foundgood funder dashboard: initiatives funded, SDGs and countries supported, initiatives by category and by SDG"
+        width={937}
+        height={1600}
+        sizes="(min-width: 640px) 50vw, 100vw"
+        className="h-auto w-full"
+      />
+    </div>
   );
 }
 
