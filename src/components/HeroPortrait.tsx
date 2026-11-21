@@ -24,7 +24,7 @@ export const HERO_PORTRAIT = { width: 830, height: 602 };
 
 const MODES = {
   light: { video: "/videos/hero-loop-v3", poster: "/images/hero/hero-loop-v3-poster.png" },
-  dark: { video: "/videos/hero-loop-dark-v2", poster: "/images/hero/hero-loop-dark-v2-poster.png" },
+  dark: { video: "/videos/hero-loop-dark-v3", poster: "/images/hero/hero-loop-dark-v3-poster.png" },
 } as const;
 
 function prefersSafariHevc() {
