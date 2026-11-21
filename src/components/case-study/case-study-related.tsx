@@ -68,7 +68,7 @@ export function CaseStudyRelated({ related }: CaseStudyRelatedProps) {
     <section className="bg-background px-6 py-56">
       <div className="mx-auto flex w-full max-w-[1440px] flex-col items-center gap-16">
         {/* Full-width section title */}
-        <H2 className="w-full overflow-x-clip">
+        <H2 className="w-full">
           <TextReveal
             triggerOnScroll
             duration={750}

@@ -82,9 +82,9 @@ src/
 - Use `<Typography variant="…" as="…">` (or the `H1`–`H4` / `Lead` / `P` shortcuts) or the `type-*` class directly. Choose the variant by role and set the element separately.
 - **Don't add `text-xl`, `leading-none`, `tracking-tight` etc. to set type.** Pick a type style. Leading, tracking and weight modifiers still compose if genuinely needed. A new size means a new token in `globals.css` + `TYPE_STYLES` in `lib/utils.ts`.
 - **Spacing is tuned for Matter, not inherited from shadcn/Inter.** Following Displaay's own Matter specimen: tracking tightens as size grows and opens as it shrinks (about −2% at 60px, 0 around 30px, +1.5% at 16px, +2.5% at 12px). Line height tightens as size grows. Raw Tailwind `text-*` sizes carry the same tracking via `--text-*--letter-spacing` in `@theme`. Retune against displaay.net/typeface/matter, not generic defaults.
-- **Display** is SemiBold, 0.97 line height and −4% tracking, matched to Displaay's type tester (measured from cap height). Don't loosen it back.
+- **Display and all title styles** (`hero`, `display`, `headline`, `title-lg`, `title`, `title-sm`) are SemiBold with tight line height (0.97–1.1) and negative tracking. Display is 0.97 / −4%, matched to Displaay's type tester; the others taper to about −2% at 24px. All values are em or ratios, so they scale with font size. Don't loosen them back. A `type-*` class overrides any earlier weight, leading or tracking class (e.g. CardTitle's base `font-medium`).
 - Matter metrics: cap 0.70em, x-height 0.504em, ink ~0.9em, ascent/descent box 0.95/0.24. Weights shipped: 400/500/600 (`font-synthesis: none`).
-- `TextReveal` inherits line height from its parent. Each word's mask extends 0.25em below the line, with a matching negative margin, for descenders. Wrap it in `overflow-x-clip`, never `overflow-hidden`, or the last line's descenders get cut.
+- `TextReveal` inherits line height from its parent. Each word's mask extends 0.25em below the line (descenders) and 0.12em to each side (glyphs overhang under tight tracking), with matching negative margins, so parents need no clipping. Never put `overflow-hidden` on a reveal heading.
 - Known off-scale one-offs (left as-is deliberately): values intro `Lead` (20/28 at all widths), footer `Lead`, preloader greeting.
 - Fonts: Matter (400/500/600) from `public/fonts`, and DM Mono via `next/font` (`preload: false`) for `type-overline`, `font-mono` and code.
 
@@ -97,6 +97,12 @@ src/
 - Value illustrations live in `public/images/values/<version>/<key>.png` plus `<key>-dark.png`, cut with `--keep-frame` (full 2048 square) so the character is the same size on every card. Every value needs a night version; pictures with a screen (arcade, laptop) light the face with it. Bump `ILLUSTRATION_VERSION` in `Values.tsx` when replacing images. The old hand-drawn SVGs are in `art/reference/values-hand-drawn/`.
 - Gemini won't reliably mirror a pose: flip the image yourself (`sips -f horizontal`), then ask it to re-light only.
 - When replacing an image in `public/`, use a new filename. Next's image optimiser caches by URL.
+
+### Hero video
+
+- 8-second seamless loop made with `node scripts/generate-video.mjs --loop` (Gemini Omni Flash via the Interactions API; Veo is retired). The start frame is the approved still on chroma green (`--bg green`) and is passed as both first and last frame. About $0.07/s at 720p.
+- Keyed and encoded with ffmpeg, mirroring `cutout.swift` (ffmpeg's `colorkey` leaves a dark halo): a `geq` key on green excess (alpha from `g − max(r, b)`, thresholds scaled to the sampled green), despill (`g = min(g, max(r, b))`), fully transparent pixels set to neutral grey (stops chroma-subsampling bleed), a 1px `erosion` choke on the alpha, then a crop to the union box of all frames measured per pixel (not `cropdetect`, which rounds inwards and clips) plus ~8px. Encode VP9 WebM with alpha (`-pix_fmt yuva420p`, Chrome/Firefox) and HEVC with alpha (`hevc_videotoolbox -alpha_quality`, `-tag:v hvc1`, Safari); audio stripped; poster = first keyed frame. Version the filenames (`hero-loop-vN`).
+- `HeroPortrait` picks the encode on the client, shows the poster until the video plays, and keeps the poster for reduced motion. Dark mode plays a night loop (laptop-lit), scaled 0.865 and shifted so its outline matches the day loop exactly, then cropped to the same box; the incoming loop is synced on theme change.
 
 ### Design system page
 

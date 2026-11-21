@@ -39,7 +39,7 @@ type QueryResult = {
  * from the PNG header. Bump VERSION when replacing images (Next's image
  * optimiser caches by URL).
  */
-const ILLUSTRATION_VERSION = "v7";
+const ILLUSTRATION_VERSION = "v8";
 
 function loadIllustration(key: string): ValueIllustrationData | null {
   const slug = key.replace(/_/g, "-").toLowerCase();

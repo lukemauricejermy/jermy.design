@@ -282,7 +282,7 @@ export default async function FeaturedCases() {
       <div className="max-w-[1440px] mx-auto flex flex-col gap-32">
         {/* Row 1: H2 on LEFT, Lead + Button on RIGHT */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-24">
-          <H2 className="overflow-x-clip">
+          <H2>
             <TextReveal
               triggerOnScroll={true}
               delay={0}

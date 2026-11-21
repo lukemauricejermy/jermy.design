@@ -111,10 +111,11 @@ export function TextReveal({
     const { lines } = textData;
 
     // Line height comes from the parent's type style. Each word masks its own
-    // characters; the mask extends below the line box for descenders
-    // (padding) without pushing the next line down (equal negative margin).
-    // Parents should use overflow-x-clip, not overflow-hidden, so the last
-    // line's descenders aren't cut off.
+    // characters for the slide-up. The mask extends below the line box for
+    // descenders and to both sides for glyphs that overhang their advance
+    // (tight tracking pushes the last glyph past the word box), with equal
+    // negative margins so spacing and line height are unchanged. Parents
+    // don't need to clip.
     return (
       <div ref={ref} className={className}>
         {lines.map((lineWords, lineIndex) => (
@@ -125,7 +126,10 @@ export function TextReveal({
                 <span
                   data-word
                   className="inline-block whitespace-nowrap overflow-hidden align-top"
-                  style={{ paddingBottom: "0.25em", marginBottom: "-0.25em" }}
+                  style={{
+                    padding: "0 0.12em 0.25em",
+                    margin: "0 -0.12em -0.25em",
+                  }}
                 >
                   {word.split("").map((char, charIndex) => (
                     <span

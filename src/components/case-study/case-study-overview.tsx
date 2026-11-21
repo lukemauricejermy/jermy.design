@@ -162,7 +162,7 @@ export function CaseStudyOverview({ caseStudy }: CaseStudyOverviewProps) {
               pinned near the top of the viewport while the (taller) scores
               column scrolls past, until the section bottom is reached. */}
           <div className="flex flex-col gap-6 lg:sticky lg:top-28 lg:self-start">
-            <H2 className="overflow-x-clip">
+            <H2>
               <TextReveal
                 triggerOnScroll
                 duration={750}

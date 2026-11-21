@@ -22,7 +22,7 @@ const PORTRAIT_OVERLAP_EM = 0.4;
 const PORTRAIT_SCREEN_SHARE = 0.4;
 // …but never wider than this share of the screen width (tall windows).
 const PORTRAIT_MAX_WIDTH_SHARE = 0.4;
-const PORTRAIT_ASPECT = 1456 / 1253;
+const PORTRAIT_ASPECT = 830 / 602;
 const PORTRAIT_SCALE_STACKED = 2.2;
 
 type WordBox = { text: string; top: number; right: number; bottom: number };
@@ -49,7 +49,14 @@ function fitHeadline(
     const left = heading.getBoundingClientRect().left;
     const rows: WordBox[] = [...words].map((w) => {
       const r = w.getBoundingClientRect();
-      return { text: w.textContent ?? "", top: Math.round(r.top), right: r.right, bottom: r.bottom };
+      // Word masks carry 0.12em side padding for overhanging glyphs (see
+      // TextReveal); measure the text, not the padding.
+      return {
+        text: w.textContent ?? "",
+        top: Math.round(r.top),
+        right: r.right - 0.12 * fontSize,
+        bottom: r.bottom,
+      };
     });
     for (const [i, w] of rows.entries()) {
       if (w.right - left > maxWidth + 0.5) return false;
@@ -80,7 +87,6 @@ function fitHeadline(
  * phones the two stack.
  */
 export default function Hero() {
-  const [revealComplete, setRevealComplete] = useState(false);
   const [isPreloaderDone, setIsPreloaderDone] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -183,18 +189,11 @@ export default function Hero() {
         aria-hidden
         data-illustration
         data-hero-portrait
-        className={`pointer-events-none relative z-10 mt-6 block aspect-[1456/1253] h-[min(24svh,60vw)] self-end md:absolute md:right-[7.5vw] md:bottom-[7.5svh] md:mt-0 md:h-[min(26svh,20vw)] ${
-          isPreloaderDone ? "opacity-100" : "opacity-0"
-        }`}
+        // Already in place when the preloader swipes away; the headline
+        // animates in around it.
+        className="pointer-events-none relative z-10 mt-6 block aspect-[830/602] h-[min(24svh,60vw)] self-end md:absolute md:right-[7.5vw] md:bottom-[7.5svh] md:mt-0 md:h-[min(26svh,20vw)]"
       >
         <HeroPortrait />
-        {/* Fades out to reveal; removed when done so it doesn't keep a compositing layer */}
-        {isPreloaderDone && !revealComplete && (
-          <span
-            className="absolute inset-0 bg-background hero-portrait-reveal"
-            onAnimationEnd={() => setRevealComplete(true)}
-          />
-        )}
       </span>
     </section>
   );

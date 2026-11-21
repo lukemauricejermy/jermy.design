@@ -18,11 +18,11 @@
   --text-lg--letter-spacing: 0.01em;
   --text-xl--letter-spacing: 0.01em;
   --text-2xl--letter-spacing: 0.005em;
-  --text-3xl--letter-spacing: 0em;
-  --text-4xl--letter-spacing: -0.005em;
-  --text-5xl--letter-spacing: -0.015em;
-  --text-6xl--letter-spacing: -0.02em;
-  --text-7xl--letter-spacing: -0.025em;
+  --text-3xl--letter-spacing: -0.025em;
+  --text-4xl--letter-spacing: -0.03em;
+  --text-5xl--letter-spacing: -0.035em;
+  --text-6xl--letter-spacing: -0.04em;
+  --text-7xl--letter-spacing: -0.04em;
 
   /* Colors mapped to CSS variables */
   --color-background: var(--background);
@@ -242,14 +242,6 @@
     transition-duration: 320ms;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
-  /* Hero portrait: slightly faster transition so it keeps pace with page (reduces intermittent lag) */
-  [data-hero-portrait] svg,
-  [data-hero-portrait] svg rect,
-  [data-hero-portrait] svg path,
-  [data-hero-portrait] svg circle,
-  [data-hero-portrait] svg ellipse {
-    transition-duration: 260ms;
-  }
   /* Values cards: instant transition (Card bg matches illustration-surface, no visible jump) */
   [data-slot="card"] [data-illustration] svg,
   [data-slot="card"] [data-illustration] svg rect,
@@ -263,20 +255,6 @@
   }
   /* Don't transition text colors on headings/paragraphs to prevent flicker */
   /* Text will still change, just without transition animation */
-}
-
-/* Hero portrait reveal - CSS overlay so SVG is never in compositing layer (fixes theme jump on first switch after hard refresh) */
-@keyframes hero-portrait-reveal {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-.hero-portrait-reveal {
-  animation: hero-portrait-reveal 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.8s forwards;
-  pointer-events: none;
 }
 
 /* Concentric border radius utilities: inner radius = outer - gap */
@@ -356,55 +334,61 @@
   }
 }
 
-/* Headline: 36 → 48 (md) → 60 (lg). Section headings. */
+/* Title styles share the display treatment: SemiBold, tight line height,
+   negative tracking. Tracking tapers from display's −4% as size drops
+   (Matter SemiBold starts to touch below ~−3% at 24px); line height opens
+   a little on the smaller styles, which wrap more often. */
+
+/* Headline: 36 → 48 (md) → 60 (lg), SemiBold. Section headings. */
 @utility type-headline {
   font-size: 2.25rem;
-  line-height: var(--tw-leading, 1.05);
-  letter-spacing: var(--tw-tracking, -0.005em);
-  font-weight: var(--tw-font-weight, 500);
+  line-height: var(--tw-leading, 1);
+  letter-spacing: var(--tw-tracking, -0.03em);
+  font-weight: var(--tw-font-weight, 600);
   @media (width >= theme(--breakpoint-md)) {
     font-size: 3rem;
-    line-height: var(--tw-leading, 1);
-    letter-spacing: var(--tw-tracking, -0.015em);
+    line-height: var(--tw-leading, 0.98);
+    letter-spacing: var(--tw-tracking, -0.035em);
   }
   @media (width >= theme(--breakpoint-lg)) {
     font-size: 3.75rem;
-    letter-spacing: var(--tw-tracking, -0.02em);
+    line-height: var(--tw-leading, 0.97);
+    letter-spacing: var(--tw-tracking, -0.04em);
   }
 }
 
-/* Title large: 30 → 36 (md). Expanded value titles. */
+/* Title large: 30 → 36 (md), SemiBold. Expanded value titles. */
 @utility type-title-lg {
   font-size: 1.875rem;
-  line-height: var(--tw-leading, 1.1);
-  letter-spacing: var(--tw-tracking, 0em);
-  font-weight: var(--tw-font-weight, 500);
+  line-height: var(--tw-leading, 1.02);
+  letter-spacing: var(--tw-tracking, -0.025em);
+  font-weight: var(--tw-font-weight, 600);
   @media (width >= theme(--breakpoint-md)) {
     font-size: 2.25rem;
-    line-height: var(--tw-leading, 1.05);
-    letter-spacing: var(--tw-tracking, -0.005em);
+    line-height: var(--tw-leading, 1);
+    letter-spacing: var(--tw-tracking, -0.03em);
   }
 }
 
-/* Title: 24 → 30 (md). Value card titles, sub-section headings. */
+/* Title: 24 → 30 (md), SemiBold. Value card titles, sub-section headings. */
 @utility type-title {
   font-size: 1.5rem;
-  line-height: var(--tw-leading, 1.15);
-  letter-spacing: var(--tw-tracking, 0.005em);
-  font-weight: var(--tw-font-weight, 500);
+  line-height: var(--tw-leading, 1.08);
+  letter-spacing: var(--tw-tracking, -0.02em);
+  font-weight: var(--tw-font-weight, 600);
   @media (width >= theme(--breakpoint-md)) {
     font-size: 1.875rem;
-    line-height: var(--tw-leading, 1.1);
-    letter-spacing: var(--tw-tracking, 0em);
+    line-height: var(--tw-leading, 1.02);
+    letter-spacing: var(--tw-tracking, -0.025em);
   }
 }
 
-/* Title small: 24 / 30. Card titles (case study touts). */
+/* Title small: 24, SemiBold. Card titles (case study touts). */
 @utility type-title-sm {
   font-size: 1.5rem;
-  line-height: var(--tw-leading, 1.25);
-  letter-spacing: var(--tw-tracking, 0.005em);
-  font-weight: var(--tw-font-weight, 500);
+  line-height: var(--tw-leading, 1.1);
+  letter-spacing: var(--tw-tracking, -0.02em);
+  font-weight: var(--tw-font-weight, 600);
 }
 
 /* Lead: 18 → 20 (md), 26 → 28 line height. Intro paragraphs. */
