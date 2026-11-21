@@ -178,21 +178,21 @@ async function fetchFeaturedCaseStudies(): Promise<CaseStudy[]> {
 }
 
 /**
- * The tile is the whole visual: no card around it. A square field of the
+ * The tile is the whole visual: no card around it. A 4:3 field of the
  * project's brand colour with the client logo centred on it. Temporary: the
- * cover images crop badly in a square, so logos stand in until there are
- * square covers; a case without a logo falls back to its cover, fitted.
+ * cover images crop badly in these tiles, so logos stand in until there are
+ * better covers; a case without a logo falls back to its cover, fitted.
  * Without a brand colour the field is the muted surface.
  */
 function BrandTile({ study, overlay }: { study: CaseStudy; overlay?: string }) {
   const brand = study.heroBackgroundColour?.hex;
   return (
     <div
-      className="relative aspect-square overflow-hidden rounded-[var(--radius-card)] bg-muted"
+      className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-card)] bg-muted"
       style={brand ? { backgroundColor: brand } : undefined}
     >
       {study.clientLogo ? (
-        // Every logo the same height (12% of the tile); width follows its
+        // Every logo the same height (16% of the tile); width follows its
         // shape, capped so wide wordmarks keep a margin.
         <div className="absolute inset-0 flex items-center justify-center transition-transform duration-700 ease-out group-hover:scale-[1.04]">
           <Image
@@ -200,7 +200,7 @@ function BrandTile({ study, overlay }: { study: CaseStudy; overlay?: string }) {
             alt={study.clientLogo.alt || `${study.title} logo`}
             width={study.clientLogo.width ?? 480}
             height={study.clientLogo.height ?? 160}
-            className="h-[12%] w-auto max-w-[70%] object-contain"
+            className="h-[16%] w-auto max-w-[70%] object-contain"
           />
         </div>
       ) : (
@@ -264,7 +264,7 @@ function DraftCaseStudyCard({ study }: { study: CaseStudy }) {
 function PlaceholderCard() {
   return (
     <div>
-      <div className="aspect-square rounded-[var(--radius-card)] bg-muted" />
+      <div className="aspect-[4/3] rounded-[var(--radius-card)] bg-muted" />
       <div className="pt-6 md:pt-8">
         <h3 className="type-title text-muted-foreground">Coming soon</h3>
       </div>
