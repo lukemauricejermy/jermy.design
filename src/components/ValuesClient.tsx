@@ -56,9 +56,6 @@ const REST = [
 ];
 const restFor = (i: number) => REST[i % REST.length];
 
-/** Scroll distance per card while the section is pinned, in viewport heights. */
-const SCROLL_PER_CARD = 0.6;
-
 function ValueIllustration({
   illustration,
   className,
@@ -213,7 +210,6 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
   const flippers = useRef<(HTMLDivElement | null)[]>([]);
   const dealtRef = useRef(0);
   const selectedRef = useRef<number | null>(null);
-  const triggerRef = useRef<ScrollTrigger | null>(null);
 
   /** Off-screen starting point: below the viewport, thrown in from the right. */
   const offscreen = useCallback(
@@ -226,8 +222,7 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
     []
   );
 
-  // Pin the section (the whole two-column layout on desktop, just the deck on
-  // mobile) and deal one card per stretch of scroll.
+  // Deal the cards while the section holds the screen (see the lock below).
   useLayoutEffect(() => {
     if (!total) return;
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -283,63 +278,101 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
       mm.add(
         { desktop: "(min-width: 1024px)", mobile: "(max-width: 1023.98px)" },
         (c) => {
-          const pin = c.conditions?.desktop ? sectionRef.current : deckAreaRef.current;
-          // Dealing is one card per gesture: while pinned, downward wheel and
-          // touch input is taken over and each gesture deals exactly one card.
-          // A gesture is a run of input events with no gap longer than
-          // GESTURE_GAP, so a trackpad flick and its momentum count once.
-          // Scrolling up is left alone, so a quick flick throws the whole
-          // stack back. Past the last card the page scrolls on as normal.
+          // The part that fills the screen while dealing: the whole two-column
+          // layout on desktop, just the deck on mobile.
+          const stage = c.conditions?.desktop ? sectionRef.current : deckAreaRef.current;
+
+          // No long pinned track: when the stage reaches the top of the screen
+          // the page locks in place, and scrolling deals the cards instead of
+          // moving the page. One card per gesture, where a gesture is a run of
+          // input with no gap longer than GESTURE_GAP (so a trackpad flick and
+          // its momentum count once); input that speeds up again is a fresh
+          // push, and active scrolling is never held longer than MAX_HOLD.
+          // After the last card the next scroll carries on down the page.
+          // Scrolling up unlocks at once, and the cards are thrown back.
           const GESTURE_GAP = 160;
+          const MIN_STEP = 450; // ms between cards, about the deal's touch-down
+          const MAX_HOLD = 1000;
+          let locked = false;
           let lastInput = 0;
+          let lastDelta = 0;
+          let lastStep = 0;
           let gestureUsed = false;
           let readyAt = 0;
           let touchY: number | null = null;
 
-          const st: ScrollTrigger = ScrollTrigger.create({
-            trigger: pin,
-            pin,
+          const st = ScrollTrigger.create({
+            trigger: stage,
             start: "top top",
-            end: () => `+=${window.innerHeight * SCROLL_PER_CARD * total}`,
-            onUpdate: (self) =>
-              deal(self.progress <= 0 ? 0 : Math.min(total, Math.floor(self.progress * total) + 1)),
-            onEnter: () => deal(Math.max(dealtRef.current, 1)),
-            onLeaveBack: () => deal(0),
-            onToggle: (self) => {
-              if (!self.isActive || self.direction < 0) return;
-              // Arriving from above: settle on the first card, and don't let
-              // the gesture that carried us in deal a second one.
+            onEnter: (self) => {
+              if (dealtRef.current >= total) return;
+              // Loaded (or jumped) well past the section: just show the stack.
+              if (self.scroll() - self.start > window.innerHeight * 0.5) return deal(total);
+              // Lock at the stage, swallowing any overshoot. One pixel inside:
+              // sitting exactly on the start counts as having left it.
+              window.scrollTo({ top: self.start + 1, behavior: "instant" });
+              locked = true;
+              // The gesture that carried us here doesn't also deal a card.
               gestureUsed = true;
-              readyAt = performance.now() + 300;
-              goTo(1);
+              lastStep = performance.now();
+              readyAt = lastStep + MIN_STEP;
+              deal(Math.max(dealtRef.current, 1));
+            },
+            onLeaveBack: () => {
+              locked = false;
+              deal(0);
+            },
+            onUpdate: (self) => {
+              // Dragged past with the scrollbar: just show the full stack.
+              if (locked && self.scroll() > self.start + 6) {
+                locked = false;
+                deal(total);
+              }
             },
           });
-          triggerRef.current = st;
 
-          const positionFor = (k: number) => st.start + ((k - 0.5) / total) * (st.end - st.start);
-          const goTo = (k: number) => window.scrollTo({ top: positionFor(k), behavior: "instant" });
-
-          /** Downward input while pinned: returns true if it was handled. */
-          const forward = () => {
-            if (!st.isActive) return false;
-            const now = performance.now();
-            if (now - lastInput > GESTURE_GAP) gestureUsed = false;
-            lastInput = now;
-            if (gestureUsed || now < readyAt) return true;
-            gestureUsed = true;
-            const next = dealtRef.current + 1;
-            if (next > total) {
-              // Hand the scroll back: step just past the pin.
-              window.scrollTo({ top: st.end + 2, behavior: "instant" });
-              return true;
+          /** Deal the next card; after the last one, let the page go. */
+          const next = () => {
+            if (dealtRef.current >= total) {
+              locked = false;
+              return false;
             }
-            goTo(next);
+            deal(dealtRef.current + 1);
+            if (dealtRef.current >= total) readyAt = performance.now() + MIN_STEP;
             return true;
           };
 
+          /** Downward input while locked. Returns true to swallow it. */
+          const forward = (delta: number) => {
+            const now = performance.now();
+            const pause = now - lastInput > GESTURE_GAP;
+            if (!locked) {
+              // Keep tracking the flow, so arrival momentum isn't a new gesture.
+              lastInput = now;
+              lastDelta = delta;
+              return false;
+            }
+            // Momentum only ever decays; a jump in speed is a new push.
+            const push = delta > lastDelta * 1.5 + 8;
+            // The hold only lapses for active scrolling, not momentum's faint tail.
+            const held = now - lastStep > MAX_HOLD && delta >= 16;
+            if (pause || push || held) gestureUsed = false;
+            lastInput = now;
+            lastDelta = delta;
+            if (gestureUsed || now < readyAt) return true;
+            gestureUsed = true;
+            lastStep = now;
+            readyAt = now + MIN_STEP;
+            return next();
+          };
+
           const onWheel = (e: WheelEvent) => {
-            if (e.deltaY > 0 && !e.ctrlKey && forward()) e.preventDefault();
-            else if (e.deltaY < 0) gestureUsed = false;
+            if (e.ctrlKey) return;
+            if (e.deltaY > 0) {
+              if (forward(e.deltaY)) e.preventDefault();
+            } else if (e.deltaY < 0) {
+              locked = false;
+            }
           };
           const onTouchStart = (e: TouchEvent) => {
             touchY = e.touches[0]?.clientY ?? null;
@@ -347,23 +380,61 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
           const onTouchMove = (e: TouchEvent) => {
             const y = e.touches[0]?.clientY;
             if (touchY === null || y === undefined) return;
-            // Finger moving up means scrolling down.
-            if (touchY - y > 4 && forward()) e.preventDefault();
+            const delta = touchY - y; // finger moving up = scrolling down
             touchY = y;
+            if (delta > 2) {
+              if (forward(delta)) e.preventDefault();
+            } else if (delta < -2) {
+              locked = false;
+            }
+          };
+          const onKey = (e: KeyboardEvent) => {
+            if (!locked || e.altKey || e.metaKey || e.ctrlKey) return;
+            if (e.target instanceof Element && e.target.closest("input, textarea, select, [contenteditable]"))
+              return;
+            const down = ["ArrowDown", "PageDown", " "].includes(e.key) && !(e.key === " " && e.shiftKey);
+            const up = ["ArrowUp", "PageUp", "Home"].includes(e.key) || (e.key === " " && e.shiftKey);
+            if (down) {
+              // Space on a focused card turns it over instead.
+              if (e.key === " " && e.target instanceof Element && e.target.closest("[data-value-card]")) return;
+              if (next()) e.preventDefault();
+            } else if (up) {
+              locked = false;
+            }
           };
           window.addEventListener("wheel", onWheel, { passive: false });
           window.addEventListener("touchstart", onTouchStart, { passive: true });
           window.addEventListener("touchmove", onTouchMove, { passive: false });
+          document.addEventListener("keydown", onKey);
 
           return () => {
+            st.kill();
             window.removeEventListener("wheel", onWheel);
             window.removeEventListener("touchstart", onTouchStart);
             window.removeEventListener("touchmove", onTouchMove);
+            document.removeEventListener("keydown", onKey);
           };
         }
       );
     });
-    return () => ctx.revert();
+    // Sections above load images after this runs and push the section down;
+    // re-measure whenever the page's height changes so the lock engages on time.
+    let lastHeight = document.body.scrollHeight;
+    let refreshTimer: ReturnType<typeof setTimeout> | undefined;
+    const resizeObserver = new ResizeObserver(() => {
+      const h = document.body.scrollHeight;
+      if (h === lastHeight) return;
+      lastHeight = h;
+      clearTimeout(refreshTimer);
+      refreshTimer = setTimeout(() => ScrollTrigger.refresh(), 100);
+    });
+    resizeObserver.observe(document.body);
+
+    return () => {
+      resizeObserver.disconnect();
+      clearTimeout(refreshTimer);
+      ctx.revert();
+    };
     // turnBack is stable (refs only)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [total, offscreen]);
@@ -457,26 +528,6 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
       document.removeEventListener("pointerdown", onPointer);
     };
   }, [selected, turnBack]);
-
-  // Arrow keys while the deck is pinned: down deals the next card, up takes
-  // one back. They scroll to that card's stretch of the pin, so keys and
-  // scrolling stay in step. Past either end the keys scroll the page as usual.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
-      const st = triggerRef.current;
-      if (!st?.isActive || e.altKey || e.metaKey || e.ctrlKey || e.shiftKey) return;
-      const target = e.target instanceof Element && e.target.closest("input, textarea, select, [contenteditable]");
-      if (target) return;
-      const next = dealtRef.current + (e.key === "ArrowDown" ? 1 : -1);
-      if (next < 1 || next > total) return;
-      e.preventDefault();
-      const progress = (next - 0.5) / total;
-      window.scrollTo({ top: st.start + progress * (st.end - st.start), behavior: "smooth" });
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [total]);
 
   const hint =
     selected !== null
