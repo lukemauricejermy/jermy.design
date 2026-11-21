@@ -189,8 +189,6 @@ async function fetchFeaturedCaseStudies(): Promise<CaseStudy[]> {
  * at 3x into public/images/cases/<slug>-vN/). Sizes and positions are in
  * container units of the tile, so the composition holds at any size.
  */
-const CARD_SHADOW = "drop-shadow(0 1.2cqw 2.4cqw rgb(0 0 0 / 0.18))";
-
 function VemiArt() {
   const dir = "/images/cases/vemi-v1";
   // Three account cards, straight, spaced and staggered beside the screen.
@@ -205,7 +203,6 @@ function VemiArt() {
       {/* The dark dashboard, cropped by the tile's bottom edge. */}
       <div
         className="absolute top-[8.25cqw] left-[7cqw] w-[34cqw] transition-transform duration-700 ease-out group-hover:-translate-y-[1cqw]"
-        style={{ filter: CARD_SHADOW }}
       >
         <div className="overflow-hidden rounded-[2.8cqw]">
           <Image
