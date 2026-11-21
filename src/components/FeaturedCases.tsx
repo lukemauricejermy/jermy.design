@@ -26,17 +26,9 @@ const ALL_CASE_STUDIES_QUERY = `
         url
         alt
       }
-      role
       year
-      projectDuration
       heroBackgroundColour {
         hex
-      }
-      clientLogo {
-        url
-        alt
-        width
-        height
       }
     }
   }
@@ -53,17 +45,9 @@ const FEATURED_CASE_STUDIES_PUBLISHED_QUERY = `
         url
         alt
       }
-      role
       year
-      projectDuration
       heroBackgroundColour {
         hex
-      }
-      clientLogo {
-        url
-        alt
-        width
-        height
       }
     }
   }
@@ -80,16 +64,8 @@ type CaseStudy = {
     url: string;
     alt: string | null;
   } | null;
-  role: string | null;
   year: string | null;
-  projectDuration: string | null;
   heroBackgroundColour: { hex: string } | null;
-  clientLogo: {
-    url: string;
-    alt: string | null;
-    width: number | null;
-    height: number | null;
-  } | null;
 };
 
 /**
@@ -103,13 +79,6 @@ const SHORT_LINES: Record<string, string> = {
   sourcewhere: "Finding the unfindable in luxury fashion",
   techsoup: "A tech marketplace for nonprofits",
 };
-
-/** ["2024", "Product Design Lead", "3 months"], from whatever is filled in. */
-function specParts(study: CaseStudy) {
-  return [study.year, study.role, study.projectDuration?.toLowerCase()]
-    .map((part) => part?.trim())
-    .filter((part): part is string => Boolean(part));
-}
 
 type AllCaseStudiesQueryResult = {
   allCaseStudies: CaseStudy[];
@@ -194,42 +163,26 @@ async function fetchFeaturedCaseStudies(): Promise<CaseStudy[]> {
 }
 
 /**
- * The brand tile: the project's own colour with its logo in the corner and
- * the cover image below. Without a brand colour it falls back to the muted
- * surface and the image alone. Radius is concentric with the card padding.
+ * The brand tile: the cover image on the project's own colour (which shows
+ * while it loads, and around any image that doesn't fill). Without a brand
+ * colour it falls back to the muted surface. Radius is concentric with the
+ * card padding.
  */
 function BrandTile({ study, overlay }: { study: CaseStudy; overlay?: string }) {
   const brand = study.heroBackgroundColour?.hex;
-  const logo = study.clientLogo;
   return (
     <div
-      className="relative aspect-[4/3] overflow-hidden rounded-[calc(var(--radius-card)-0.75rem)] bg-muted md:rounded-[calc(var(--radius-card)-1rem)]"
+      className="relative aspect-[16/10] overflow-hidden rounded-[calc(var(--radius-card)-0.75rem)] bg-muted md:rounded-[calc(var(--radius-card)-1rem)]"
       style={brand ? { backgroundColor: brand } : undefined}
     >
-      {logo && (
-        <Image
-          src={logo.url}
-          alt={logo.alt || `${study.title} logo`}
-          width={logo.width ?? 240}
-          height={logo.height ?? 80}
-          className="absolute left-[6%] top-[7%] h-[7%] w-auto"
-        />
-      )}
       {study.coverImage && (
-        <div
-          className={cn(
-            "absolute inset-x-0 bottom-0 overflow-hidden",
-            logo ? "top-[22%]" : "top-0"
-          )}
-        >
-          <Image
-            src={study.coverImage.url}
-            alt={study.coverImage.alt || study.title}
-            fill
-            sizes="(min-width: 640px) 50vw, 100vw"
-            className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
-          />
-        </div>
+        <Image
+          src={study.coverImage.url}
+          alt={study.coverImage.alt || study.title}
+          fill
+          sizes="(min-width: 640px) 50vw, 100vw"
+          className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.03]"
+        />
       )}
       {overlay && (
         <div className="absolute inset-0 flex items-center justify-center bg-background/60 backdrop-blur-sm">
@@ -240,23 +193,13 @@ function BrandTile({ study, overlay }: { study: CaseStudy; overlay?: string }) {
   );
 }
 
-/** Spec line, big title and a short line. */
+/** Year, big title and a short line. */
 function CaseStudyCardText({ study, linked }: { study: CaseStudy; linked: boolean }) {
-  const spec = specParts(study);
+  const year = study.year?.trim();
   const short = SHORT_LINES[study.slug] ?? study.excerpt;
   return (
     <div className="flex flex-1 flex-col gap-3 px-3 pt-6 pb-4 md:px-4 md:pt-8 md:pb-5">
-      {spec.length > 0 && (
-        // Each item stays whole; lines only break between items.
-        <p className="type-overline flex flex-wrap gap-x-2 text-muted-foreground">
-          {spec.map((part, i) => (
-            <span key={part} className="whitespace-nowrap">
-              {i > 0 && <span aria-hidden className="mr-2">·</span>}
-              {part}
-            </span>
-          ))}
-        </p>
-      )}
+      {year && <p className="type-overline text-muted-foreground">{year}</p>}
       <div className="flex items-end justify-between gap-6">
         <div className="flex min-w-0 flex-col gap-2">
           <h3 className="type-title-lg text-balance">{study.title}</h3>
@@ -304,7 +247,7 @@ function DraftCaseStudyCard({ study }: { study: CaseStudy }) {
 function PlaceholderCard() {
   return (
     <Card className={cn(cardClass, "min-h-[280px]")}>
-      <div className="relative aspect-[4/3] rounded-[calc(var(--radius-card)-0.75rem)] bg-muted md:rounded-[calc(var(--radius-card)-1rem)]" />
+      <div className="relative aspect-[16/10] rounded-[calc(var(--radius-card)-0.75rem)] bg-muted md:rounded-[calc(var(--radius-card)-1rem)]" />
       <div className="px-3 pt-6 pb-4 md:px-4 md:pt-8 md:pb-5">
         <h3 className="type-title-lg text-muted-foreground">Coming soon</h3>
       </div>
