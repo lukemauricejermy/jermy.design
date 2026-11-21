@@ -22,7 +22,7 @@ const PORTRAIT_OVERLAP_EM = 0.4;
 const PORTRAIT_SCREEN_SHARE = 0.4;
 // …but never wider than this share of the screen width (tall windows).
 const PORTRAIT_MAX_WIDTH_SHARE = 0.4;
-const PORTRAIT_ASPECT = 830 / 602;
+const PORTRAIT_ASPECT = 810 / 604;
 const PORTRAIT_SCALE_STACKED = 2.2;
 
 type WordBox = { text: string; top: number; right: number; bottom: number };
@@ -191,7 +191,7 @@ export default function Hero() {
         data-hero-portrait
         // Already in place when the preloader swipes away; the headline
         // animates in around it.
-        className="pointer-events-none relative z-10 mt-6 block aspect-[830/602] h-[min(24svh,60vw)] self-end md:absolute md:right-[7.5vw] md:bottom-[7.5svh] md:mt-0 md:h-[min(26svh,20vw)]"
+        className="pointer-events-none relative z-10 mt-6 block aspect-[810/604] h-[min(24svh,60vw)] self-end md:absolute md:right-[7.5vw] md:bottom-[7.5svh] md:mt-0 md:h-[min(26svh,20vw)]"
       >
         <HeroPortrait />
       </span>

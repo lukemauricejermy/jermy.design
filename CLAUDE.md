@@ -100,9 +100,10 @@ src/
 
 ### Hero video
 
-- 8-second seamless loop made with `node scripts/generate-video.mjs --loop` (Gemini Omni Flash via the Interactions API; Veo is retired). The start frame is the approved still on chroma green (`--bg green`) and is passed as both first and last frame. About $0.07/s at 720p.
-- Keyed and encoded with ffmpeg, mirroring `cutout.swift` (ffmpeg's `colorkey` leaves a dark halo): a `geq` key on green excess (alpha from `g − max(r, b)`, thresholds scaled to the sampled green), despill (`g = min(g, max(r, b))`), fully transparent pixels set to neutral grey (stops chroma-subsampling bleed), a 1px `erosion` choke on the alpha, then a crop to the union box of all frames measured per pixel (not `cropdetect`, which rounds inwards and clips) plus ~8px. Encode VP9 WebM with alpha (`-pix_fmt yuva420p`, Chrome/Firefox) and HEVC with alpha (`hevc_videotoolbox -alpha_quality`, `-tag:v hvc1`, Safari); audio stripped; poster = first keyed frame. Version the filenames (`hero-loop-vN`).
-- `HeroPortrait` picks the encode on the client, shows the poster until the video plays, and keeps the poster for reduced motion. Dark mode plays a night loop (laptop-lit), scaled 0.865 and shifted so its outline matches the day loop exactly, then cropped to the same box; the incoming loop is synced on theme change.
+- Day loop: `node scripts/generate-video.mjs --loop --from <green still>` (Gemini Omni Flash via the Interactions API; Veo is retired). The still is passed as both first and last frame so it loops. Each take saves its interaction ID next to the .mp4.
+- Night loop: relight the chosen take with `--previous <take>.interaction.txt` and a "change only the lighting" prompt. That's a follow-up turn on the stored interaction, so the motion matches frame for frame. Uploading a video to edit is blocked in the UK/EEA; editing the model's own output is not. Never fake the night version with masks.
+- Key and encode both together with `python3 scripts/key-video.py --name hero-loop-vN take.mp4:light night.mp4:dark`. It uses one shared crop (union of all frames plus padding), green-excess key + despill + choke, VP9-alpha WebM (Chrome/Firefox) + HEVC-alpha MOV (Safari), and posters. Version the names.
+- `HeroPortrait` picks the encode on the client, shows each mode's poster until its video plays, keeps posters for reduced motion, and syncs the incoming loop on theme change. About $0.07/s of video at 720p.
 
 ### Design system page
 

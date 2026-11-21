@@ -8,8 +8,9 @@ import { cn } from "@/lib/utils";
 /**
  * Hero portrait: an 8-second seamless loop (Gemini Omni from the approved
  * still, keyed off green, transparent) of typing, looking up and waving.
- * Light mode plays the daylight loop; dark mode plays a night loop lit by
- * the laptop screen, scaled and cropped to line up with the day one.
+ * Light mode plays the daylight loop; dark mode plays the same take relit
+ * for night by the model (a follow-up turn on the stored interaction), so
+ * every frame matches and both share one crop (scripts/key-video.py).
  *
  * Each mode shows its first frame as a poster, so the portrait is in place
  * the instant the preloader reveals the page; the video takes over once it
@@ -20,11 +21,11 @@ import { cn } from "@/lib/utils";
  * Firefox, Edge) and HEVC with alpha (Safari, which can't do VP9 alpha).
  * Process: scripts/generate-video.mjs, then ffmpeg (see CLAUDE.md).
  */
-export const HERO_PORTRAIT = { width: 830, height: 602 };
+export const HERO_PORTRAIT = { width: 810, height: 604 };
 
 const MODES = {
-  light: { video: "/videos/hero-loop-v3", poster: "/images/hero/hero-loop-v3-poster.png" },
-  dark: { video: "/videos/hero-loop-dark-v8", poster: "/images/hero/hero-loop-dark-v8-poster.png" },
+  light: { video: "/videos/hero-loop-v4-light", poster: "/images/hero/hero-loop-v4-light-poster.png" },
+  dark: { video: "/videos/hero-loop-v4-dark", poster: "/images/hero/hero-loop-v4-dark-poster.png" },
 } as const;
 
 function prefersSafariHevc() {

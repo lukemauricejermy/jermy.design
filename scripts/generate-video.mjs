@@ -4,6 +4,8 @@
 //
 //   node scripts/generate-video.mjs --name hero-loop --from art/generated/video-start-1.png \
 //     --loop --duration 8 --count 2 --prompt "…"
+//   node scripts/generate-video.mjs --name hero-loop-night --edit art/generated/hero-loop-2.mp4 \
+//     --prompt "Change only the lighting to …"
 //
 // --loop passes the start image as both first and last frame, so the clip
 // loops seamlessly (two-frame interpolation allows 3–10 s).
@@ -65,6 +67,8 @@ async function generateOne(body, key, file) {
   const json = await response.json()
   if (!response.ok) throw new Error(`${response.status} ${json.error?.status ?? ""}: ${json.error?.message ?? JSON.stringify(json).slice(0, 400)}`)
 
+  // Keep the interaction ID so a follow-up turn can edit this video in place.
+  if (json.id) writeFileSync(file.replace(/\.mp4$/, ".interaction.txt"), json.id)
   const video = findVideo(json)
   if (!video) {
     writeFileSync(`${file}.response.json`, JSON.stringify(json, null, 2))
@@ -99,19 +103,42 @@ async function main() {
       resolution: { type: "string", default: "720p" },
       aspect: { type: "string", default: "16:9" },
       count: { type: "string", default: "1" },
+      // Edit an existing video instead of generating from a still (e.g.
+      // relight the day loop for dark mode, keeping every frame's motion).
+      edit: { type: "string" },
+      // Edit a video this model generated, by its interaction ID (saved next
+      // to each take as .interaction.txt). Works where uploads are blocked.
+      previous: { type: "string" },
     },
   })
-  if (!values.name || !values.from || !values.prompt) throw new Error("Needs --name, --from and --prompt.")
+  if (!values.name || !(values.from || values.edit || values.previous) || !values.prompt)
+    throw new Error("Needs --name, --prompt and --from (or --edit / --previous).")
+  const previousId = values.previous && existsSync(values.previous)
+    ? readFileSync(values.previous, "utf8").trim()
+    : values.previous
 
-  const start = imageItem(values.from)
+  const input = previousId
+    ? values.prompt
+    : values.edit
+    ? [
+        { type: "video", data: readFileSync(resolve(values.edit)).toString("base64"), mime_type: "video/mp4" },
+        { type: "text", text: values.prompt },
+      ]
+    : (() => {
+        const start = imageItem(values.from)
+        return [start, ...(values.loop ? [start] : []), { type: "text", text: values.prompt }]
+      })()
   const body = {
     model: MODEL,
-    input: [start, ...(values.loop ? [start] : []), { type: "text", text: values.prompt }],
+    ...(previousId ? { previous_interaction_id: previousId } : {}),
+    input,
+    ...(values.edit ? { generation_config: { video_config: { task: "edit" } } } : {}),
     response_format: {
       type: "video",
-      aspect_ratio: values.aspect,
-      resolution: values.resolution,
-      duration: `${values.duration}s`,
+      // Edits keep the input's length, shape and size.
+      ...(values.edit || previousId
+        ? {}
+        : { aspect_ratio: values.aspect, resolution: values.resolution, duration: `${values.duration}s` }),
       delivery: "uri",
     },
     background: false,
