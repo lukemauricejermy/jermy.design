@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState, useCallback, useRef, useEffect, useLayoutEffect } from "react";
-import { createPortal } from "react-dom";
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { StructuredText } from "react-datocms";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { H2, H3, Lead } from "@/components/ui/typography";
 import { Button } from "@/components/ui/button";
-import { FadeUp, StaggerChildren, TextReveal } from "@/components/animations";
+import { FadeUp, TextReveal } from "@/components/animations";
 import {
   animationDurations,
   animationEasings,
@@ -16,8 +16,10 @@ import {
   animationDelays,
 } from "@/lib/animation-config";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Cancel01Icon } from "@hugeicons/core-free-icons";
+import { ArrowTurnBackwardIcon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
+
+gsap.registerPlugin(ScrollTrigger);
 
 /** DatoCMS Structured Text field – matches StructuredText data prop */
 export type StructuredTextData = React.ComponentProps<typeof StructuredText>["data"];
@@ -38,6 +40,25 @@ type ValueWithSvg = {
   illustration: ValueIllustrationData | null;
 };
 
+/**
+ * Where each card comes to rest on the stack, relative to its centre. Fixed
+ * (not random) so server and client agree and the pile looks the same every
+ * visit: a rough, hand-dealt stack, with the later cards straighter so the
+ * top one stays readable.
+ */
+const REST = [
+  { x: -22, y: 14, rotation: -7 },
+  { x: 18, y: -10, rotation: 5 },
+  { x: -10, y: -16, rotation: -4 },
+  { x: 24, y: 10, rotation: 6 },
+  { x: -16, y: 4, rotation: -3 },
+  { x: 8, y: -4, rotation: 2 },
+];
+const restFor = (i: number) => REST[i % REST.length];
+
+/** Scroll distance per card while the section is pinned, in viewport heights. */
+const SCROLL_PER_CARD = 0.6;
+
 function ValueIllustration({
   illustration,
   className,
@@ -47,9 +68,9 @@ function ValueIllustration({
 }) {
   if (!illustration) return null;
   const { src, darkSrc, width, height } = illustration;
-  const sizes = "(min-width: 1024px) 560px, (min-width: 768px) 50vw, 90vw";
+  const sizes = "(min-width: 1024px) 400px, 80vw";
   const img =
-    "absolute inset-0 size-full object-contain object-top transition-opacity duration-[320ms]";
+    "absolute inset-0 size-full object-cover object-top transition-opacity duration-[320ms]";
   return (
     <div
       className={cn(
@@ -65,6 +86,7 @@ function ValueIllustration({
         width={width}
         height={height}
         sizes={sizes}
+        loading="eager"
         className={cn(img, darkSrc && "dark:opacity-0")}
       />
       {darkSrc && (
@@ -74,6 +96,7 @@ function ValueIllustration({
           width={width}
           height={height}
           sizes={sizes}
+        loading="eager"
           className={cn(img, "opacity-0 dark:opacity-100")}
         />
       )}
@@ -81,578 +104,325 @@ function ValueIllustration({
   );
 }
 
-// Collapsed card: portrait, illustration TOP, title BELOW
-const ValueCard = React.forwardRef<
-  HTMLDivElement,
-  { value: ValueWithSvg; onClick?: () => void; className?: string; "aria-hidden"?: boolean }
->(function ValueCard({ value, onClick, className, "aria-hidden": ariaHidden }, ref) {
-  return (
-    <div ref={ref} className={cn("h-full", className)} aria-hidden={ariaHidden}>
-      <Card
-        className={cn(
-          "overflow-hidden flex flex-col h-full transition-shadow hover:shadow-lg p-6 md:p-8 cursor-pointer"
-        )}
-        onClick={onClick}
-      >
-        {/* Illustration - scales with card width, max 388×388 — identical styling to modal for seamless swap */}
-        <div
-          data-illustration
-          className="flex-shrink-0 w-full max-w-[300px] aspect-square mx-auto flex items-center justify-center transition-none"
-        >
-          <ValueIllustration illustration={value.illustration} className="w-full h-full" />
-        </div>
-        {/* Title BELOW illustration — data-collapsed-title for post-unmount animation */}
-        <CardHeader className="flex-1 flex items-end pb-0 pt-8 px-0 text-left min-h-0">
-          <H3 data-collapsed-title className="type-title-lg">
-            {value.title}
-          </H3>
-        </CardHeader>
-      </Card>
-    </div>
-  );
-});
+const face = "absolute inset-0 [backface-visibility:hidden] [-webkit-backface-visibility:hidden]";
 
-// Illustration dimensions: desktop 388x388, mobile 320x280
-const ILLUSTRATION_W_DESKTOP = 388;
-const ILLUSTRATION_H_DESKTOP = 388;
-const ILLUSTRATION_W_MOBILE = 320;
-const ILLUSTRATION_H_MOBILE = 280;
-
-// Expanded modal card: desktop = landscape (illustration LEFT, content RIGHT); mobile = stacked (illustration TOP, content BELOW)
-function ExpandedValueCard({
+/** One playing card: illustration and title on the front, the detail on the back. */
+function ValueCard({
   value,
-  illustrationRef,
-  collapsedTitleRef,
-  expandedContentRef,
-  showExpandedContent,
-  isMobile,
+  index,
+  total,
+  flipped,
+  dealt,
+  onSelect,
+  onTurnBack,
+  cardRef,
+  flipperRef,
 }: {
   value: ValueWithSvg;
-  illustrationRef: React.RefObject<HTMLDivElement | null>;
-  collapsedTitleRef: React.RefObject<HTMLDivElement | null>;
-  expandedContentRef: React.RefObject<HTMLDivElement | null>;
-  showExpandedContent: boolean;
-  isMobile: boolean;
+  index: number;
+  total: number;
+  flipped: boolean;
+  dealt: boolean;
+  onSelect: () => void;
+  onTurnBack: () => void;
+  cardRef: (el: HTMLDivElement | null) => void;
+  flipperRef: (el: HTMLDivElement | null) => void;
 }) {
-  const illustrationW = isMobile ? ILLUSTRATION_W_MOBILE : ILLUSTRATION_W_DESKTOP;
-  const illustrationH = isMobile ? ILLUSTRATION_H_MOBILE : ILLUSTRATION_H_DESKTOP;
-  const isStacked = isMobile;
-
+  const number = `${String(index + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}`;
   return (
-    <Card
-      className={cn(
-        "isolate overflow-hidden h-full w-full p-6 md:p-8 relative",
-        isStacked ? "flex flex-col" : "flex flex-row"
-      )}
+    <div
+      ref={cardRef}
+      data-value-card
+      className="@container absolute inset-0 will-change-transform"
+      style={{ zIndex: index + 1 }}
     >
-      {/* Illustration - absolute, position animated by GSAP — identical styling to card for seamless swap */}
       <div
-        ref={illustrationRef}
-        data-illustration
-        data-mobile={isMobile}
-        className="absolute [&_svg]:w-full [&_svg]:h-full [&_svg]:object-contain flex items-center justify-center transition-none"
-        style={{ width: illustrationW, height: illustrationH, zIndex: 0 }}
+        ref={flipperRef}
+        role="button"
+        tabIndex={dealt ? 0 : -1}
+        aria-hidden={!dealt}
+        aria-pressed={flipped}
+        aria-label={flipped ? `${value.title}: turn back over` : `${value.title}: turn over`}
+        onClick={flipped ? onTurnBack : onSelect}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            (flipped ? onTurnBack : onSelect)();
+          }
+        }}
+        className="relative size-full cursor-pointer rounded-4xl outline-none [transform-style:preserve-3d] focus-visible:ring-3 focus-visible:ring-ring/50"
       >
-        <ValueIllustration illustration={value.illustration} className="w-full h-full" />
-      </div>
-      {/* Collapsed title - absolute bottom, fades out during expand. Match ValueCard's leading-tight exactly to avoid jump. */}
-      <div
-        ref={collapsedTitleRef}
-        className="absolute bottom-8 left-8 right-8 min-h-[2.5rem] text-left [contain:layout]"
-      >
-        <H3 className="type-title-lg">{value.title}</H3>
-      </div>
-      {/* Expanded content - right side on desktop, below illustration on mobile */}
-      {showExpandedContent && (
-        <div
-          ref={expandedContentRef}
-          className={cn(
-            "relative flex-1 flex flex-col gap-4 min-w-0 overflow-y-auto",
-            isStacked ? "mt-0 px-0" : "justify-center pl-[420px] pr-8"
-          )}
-          style={{
-            zIndex: 10,
-            ...(isStacked && {
-              paddingTop: ILLUSTRATION_H_MOBILE + 32,
-            }),
-          }}
-        >
+        {/* Front */}
+        <Card className={cn(face, "flex flex-col gap-0 p-[8cqw] shadow-lg")}>
+          {/* Fixed-height illustration (the square frame, cropped at the faded
+              bottom), title straight below it: every title starts on the same line. */}
+          <ValueIllustration
+            illustration={value.illustration}
+            className="h-[68cqw] w-full shrink-0"
+          />
           <H3
-            id="value-modal-title"
-            className="type-title-lg"
+            className="type-headline pt-[8cqw] text-left text-balance"
+            // Proportional to the card (container width), like the padding, so
+            // the title keeps the same share of the card at any size.
+            style={{ fontSize: "11cqw" }}
           >
-            <TextReveal triggerOnScroll={false} delay={0} duration={600} stagger={0.015} easing={animationEasings.robust}>
-              {value.title}
-            </TextReveal>
+            {value.title}
           </H3>
-          {value.description && (
-            <FadeUp
-              triggerOnScroll={false}
-              delay={animationDelays.medium}
-              duration={animationDurations.default}
+        </Card>
+
+        {/* Back */}
+        <Card
+          aria-hidden={!flipped}
+          className={cn(face, "flex flex-col gap-0 p-6 md:p-7 shadow-lg [transform:rotateY(180deg)]")}
+        >
+          <span className="type-overline text-muted-foreground">{number}</span>
+          <H3 className="type-title-lg pt-4 text-left">{value.title}</H3>
+          <div className="type-body mt-4 min-h-0 flex-1 overflow-y-auto pb-6 text-foreground [mask-image:linear-gradient(to_bottom,black_calc(100%-2rem),transparent)] [&_p]:mb-3 [&_p:last-child]:mb-0">
+            <StructuredText data={value.description} />
+          </div>
+          <div className="flex justify-end pt-4">
+            <Button
+              variant="secondary"
+              size="icon-lg"
+              type="button"
+              tabIndex={flipped ? 0 : -1}
+              aria-label="Turn the card back over"
+              onClick={(e) => {
+                e.stopPropagation();
+                onTurnBack();
+              }}
             >
-              <div className="type-body text-foreground [&_p]:mb-2 [&_p:last-child]:mb-0">
-                <StructuredText data={value.description} />
-              </div>
-            </FadeUp>
-          )}
-        </div>
-      )}
-    </Card>
+              <HugeiconsIcon icon={ArrowTurnBackwardIcon} />
+            </Button>
+          </div>
+        </Card>
+      </div>
+    </div>
   );
 }
 
-// Expanded card dimensions - larger than collapsed for takeover feel (Figma: 920px max-width)
-const EXPANDED_WIDTH = 920;
-const EXPANDED_HEIGHT = 520;
-
 export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
-  const [expansionComplete, setExpansionComplete] = useState(false);
-  const [showCloseButton, setShowCloseButton] = useState(false);
-  const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
-  const overlayRef = useRef<HTMLDivElement>(null);
-  const modalCardRef = useRef<HTMLDivElement>(null);
-  const scrimRef = useRef<HTMLDivElement>(null);
-  const collapsedTitleRef = useRef<HTMLDivElement>(null);
-  const illustrationRef = useRef<HTMLDivElement>(null);
-  const expandedContentRef = useRef<HTMLDivElement>(null);
-  const closeButtonRef = useRef<HTMLDivElement>(null);
-  const openCardRectRef = useRef<DOMRect | null>(null);
-  const openCardIllustrationRectRef = useRef<DOMRect | null>(null);
-  const checkMobile = useCallback(() => {
-    setIsMobile(typeof window !== "undefined" && window.innerWidth < 768);
-  }, []);
+  const total = values.length;
+  const [dealt, setDealt] = useState(0);
+  const [selected, setSelected] = useState<number | null>(null);
+  const [reducedMotion, setReducedMotion] = useState(false);
 
-  useEffect(() => {
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, [checkMobile]);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const deckAreaRef = useRef<HTMLDivElement>(null);
+  const cards = useRef<(HTMLDivElement | null)[]>([]);
+  const flippers = useRef<(HTMLDivElement | null)[]>([]);
+  const dealtRef = useRef(0);
+  const selectedRef = useRef<number | null>(null);
+  const triggerRef = useRef<ScrollTrigger | null>(null);
 
-  const handleOpen = useCallback((id: string) => {
-    const cardEl = cardRefs.current.get(id);
-    if (!cardEl || typeof document === "undefined") return;
+  /** Off-screen starting point: below the viewport, thrown in from the right. */
+  const offscreen = useCallback(
+    (i: number) => ({
+      x: 140 + (i % 2) * 60,
+      y: window.innerHeight * 1.15,
+      rotation: 28 + (i % 3) * 6,
+    }),
+    []
+  );
 
-    const rect = cardEl.getBoundingClientRect();
-    openCardRectRef.current = rect;
-    const cardIllustrationEl = cardEl.querySelector<HTMLElement>("[data-illustration]");
-    openCardIllustrationRectRef.current = cardIllustrationEl?.getBoundingClientRect() ?? null;
-
-    setExpandedId(id);
-    setExpansionComplete(false);
-    setShowCloseButton(false);
-  }, []);
-
-  // Run expand animation when modal mounts - useLayoutEffect to avoid flash
+  // Pin the section (the whole two-column layout on desktop, just the deck on
+  // mobile) and deal one card per stretch of scroll.
   useLayoutEffect(() => {
-    if (!expandedId) return;
+    if (!total) return;
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setReducedMotion(prefersReduced);
 
-    const rect = openCardRectRef.current;
-    if (!rect) return;
+    const els = cards.current.filter(Boolean) as HTMLDivElement[];
+    flippers.current.forEach((f) => f && gsap.set(f, { transformPerspective: 1800 }));
 
-    const modalCard = modalCardRef.current;
-    const scrim = scrimRef.current;
-    const collapsedTitle = collapsedTitleRef.current;
-
-    if (!modalCard || !scrim) return;
-
-    const illustration = illustrationRef.current;
-
-    const cardIllustrationRect = openCardIllustrationRectRef.current;
-    const cardEl = cardRefs.current.get(expandedId ?? "");
-    const cardIllustrationEl = cardEl?.querySelector<HTMLElement>("[data-illustration]");
-
-    gsap.set(scrim, { opacity: 0 });
-    gsap.set(modalCard, {
-      opacity: 1,
-      position: "fixed",
-      top: rect.top,
-      left: rect.left,
-      x: 0,
-      y: 0,
-      width: rect.width,
-      height: rect.height,
-    });
-    // Illustration: start at card's exact position and size (captured before state change for sub-pixel precision)
-    // Use card illustration's actual dimensions (can be smaller than 388 when card scales)
-    const startW = cardIllustrationRect?.width ?? (isMobile ? 388 : ILLUSTRATION_W_DESKTOP);
-    const startH = cardIllustrationRect?.height ?? (isMobile ? 388 : ILLUSTRATION_H_DESKTOP);
-    if (illustration && cardIllustrationRect && rect) {
-      const startLeft = cardIllustrationRect.left - rect.left;
-      const startTop = cardIllustrationRect.top - rect.top;
-      gsap.set(illustration, {
-        top: 0,
-        left: 0,
-        x: startLeft,
-        y: startTop,
-        width: startW,
-        height: startH,
-      });
-    } else if (illustration && rect) {
-      const left = Math.max(0, (rect.width - 64 - startW) / 2);
-      gsap.set(illustration, {
-        top: 32,
-        left,
-        x: 0,
-        y: 0,
-        width: startW,
-        height: startH,
-      });
-    }
-
-    // Freeze collapsed title width to prevent reflow/jump as card expands (titles break onto 2 lines)
-    if (collapsedTitle) {
-      const titleWidth = rect.width - 64; // matches left-8 + right-8
-      gsap.set(collapsedTitle, { opacity: 1, y: 0, width: titleWidth, maxWidth: titleWidth });
-    }
-
-    const expandW = isMobile
-      ? (typeof window !== "undefined" ? window.innerWidth - 32 : 360)
-      : EXPANDED_WIDTH;
-    const expandH = isMobile
-      ? Math.min(85 * 0.01 * (typeof window !== "undefined" ? window.innerHeight : 700), 800)
-      : EXPANDED_HEIGHT;
-
-    const tl = gsap.timeline({
-      onComplete: () => {
-        setExpansionComplete(true);
-        // Show close button when title + description animations finish
-        // FadeUp (description): 400ms delay + 600ms = 1000ms; TextReveal (title): ~900ms + stagger
-        const textAnimDone =
-          animationDelays.medium + animationDurations.default + 100; // ~1100ms
-        setTimeout(() => setShowCloseButton(true), textAnimDone);
-      },
-    });
-
-    // 1. Title fades out instantly when card is selected
-    tl.to(collapsedTitle, {
-      opacity: 0,
-      y: -10,
-      duration: 0.1,
-      ease: animationEasings.smooth,
-    });
-    // 2. Scrim + card expand + illustration — run after title is gone
-    tl.to(
-      scrim,
-      {
-        opacity: 1,
-        duration: animationDurations.fast / 1000,
-        ease: animationEasings.smooth,
-      },
-      "+=0"
-    );
-    tl.to(
-      modalCard,
-      {
-        top: "50%",
-        left: "50%",
-        x: "-50%",
-        y: "-50%",
-        width: expandW,
-        height: expandH,
-        duration: animationDurations.default / 1000,
-        ease: animationEasings.smooth,
-      },
-      "-=0.2"
-    );
-    if (illustration) {
-      tl.to(
-        illustration,
-        isMobile
-          ? {
-              left: "50%",
-              x: "-50%",
-              top: 32,
-              y: 0,
-              width: ILLUSTRATION_W_MOBILE,
-              height: ILLUSTRATION_H_MOBILE,
-              duration: animationDurations.default / 1000,
-              ease: animationEasings.smooth,
-            }
-          : {
-              left: 32,
-              x: 0,
-              top: "50%",
-              y: "-50%",
-              duration: animationDurations.default / 1000,
-              ease: animationEasings.smooth,
-            },
-        "-=0.6"
-      );
-    }
-
-    return () => {
-      const els = [modalCard, scrim, collapsedTitle];
-      if (illustration) els.push(illustration);
-      gsap.killTweensOf(els);
-    };
-  }, [expandedId, isMobile]);
-
-  const handleClose = useCallback(() => {
-    const id = expandedId;
-    if (!id || typeof document === "undefined") return;
-
-    // Use stored rect from when we opened — matches the ValueCard’s layout
-    const rect = openCardRectRef.current;
-
-    const modalCard = modalCardRef.current;
-    const scrim = scrimRef.current;
-    const closeButton = closeButtonRef.current;
-    const expandedContent = expandedContentRef.current;
-    const illustration = illustrationRef.current;
-
-    if (!modalCard || !scrim) {
-      setExpandedId(null);
-      setExpansionComplete(false);
-      setShowCloseButton(false);
+    if (prefersReduced) {
+      els.forEach((el, i) => gsap.set(el, restFor(i)));
+      dealtRef.current = total;
+      setDealt(total);
       return;
     }
 
-    const overlay = overlayRef.current;
-    const tl = gsap.timeline({
-      onComplete: () => {
-        const modalIllustration = modalCard?.querySelector<HTMLElement>("[data-illustration]");
-        const cardIllustration = gridCard?.querySelector<HTMLElement>("[data-illustration]");
-        if (modalIllustration && cardIllustration && gridCard) {
-          const modalRect = modalIllustration.getBoundingClientRect();
-          const cardRect = cardIllustration.getBoundingClientRect();
+    const ctx = gsap.context(() => {
+      els.forEach((el, i) => gsap.set(el, offscreen(i)));
 
-          // Calculate the difference and adjust modal illustration to match card exactly
-          const diffLeft = modalRect.left - cardRect.left;
-          const diffTop = modalRect.top - cardRect.top;
-          if (diffLeft !== 0 || diffTop !== 0) {
-            const currentLeft = parseFloat(modalIllustration.style.left) || modalRect.left;
-            const currentTop = parseFloat(modalIllustration.style.top) || modalRect.top;
-            modalIllustration.style.left = `${currentLeft - diffLeft}px`;
-            modalIllustration.style.top = `${currentTop - diffTop}px`;
-          }
-          void modalIllustration.offsetHeight;
+      const deal = (count: number) => {
+        const prev = dealtRef.current;
+        if (count === prev) return;
+        dealtRef.current = count;
+        setDealt(count);
+        // Scrolling moves on from whatever card is turned over.
+        if (selectedRef.current !== null) turnBack(selectedRef.current, true);
 
-          // Prepare grid card title: start hidden so we can animate it in AFTER unmount
-          const gridCardTitle = gridCard.querySelector<HTMLElement>("[data-collapsed-title]");
-          if (gridCardTitle) {
-            gsap.set(gridCardTitle, { opacity: 0, y: 8 });
-          }
-
-          // Swap: hide overlay/scrim, position modal illustration, then show card
-          overlay && (overlay.style.opacity = "0");
-          scrim && (scrim.style.opacity = "0");
-
-          gsap.set(modalIllustration, {
-            position: "fixed",
-            left: cardRect.left,
-            top: cardRect.top,
-            width: cardRect.width,
-            height: cardRect.height,
-            x: 0,
-            y: 0,
-            zIndex: 60,
-            clearProps: "transform",
-          });
-
-          // Show card first
-          gridCard.style.visibility = "visible";
-          gridCard.style.opacity = "1";
-
-          // Force paint
-          void gridCard.offsetHeight;
-
-          // Then completely remove modal illustration from rendering
-          modalIllustration.style.display = "none";
-
-          const closedId = id;
-          // Wait 2 frames then unmount; animate grid card title AFTER unmount
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              setExpandedId(null);
-              setExpansionComplete(false);
-              setShowCloseButton(false);
-
-              setTimeout(() => {
-                const card = cardRefs.current.get(closedId);
-                const title = card?.querySelector<HTMLElement>("[data-collapsed-title]");
-                if (title) {
-                  gsap.fromTo(
-                    title,
-                    { opacity: 0, y: 8 },
-                    { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }
-                  );
-                }
-              }, 50);
+        if (count > prev) {
+          for (let i = prev; i < count; i++) {
+            gsap.killTweensOf(els[i]);
+            gsap.to(els[i], {
+              ...restFor(i),
+              duration: 0.75,
+              delay: (i - prev) * 0.08,
+              ease: "back.out(1.1)",
             });
-          });
+          }
         } else {
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              setExpandedId(null);
-              setExpansionComplete(false);
-              setShowCloseButton(false);
+          for (let i = prev - 1; i >= count; i--) {
+            gsap.killTweensOf(els[i]);
+            gsap.to(els[i], {
+              ...offscreen(i),
+              duration: 0.45,
+              delay: (prev - 1 - i) * 0.05,
+              ease: "power2.in",
             });
+          }
+        }
+      };
+
+      const mm = gsap.matchMedia();
+      mm.add(
+        { desktop: "(min-width: 1024px)", mobile: "(max-width: 1023.98px)" },
+        (c) => {
+          const pin = c.conditions?.desktop ? sectionRef.current : deckAreaRef.current;
+          triggerRef.current = ScrollTrigger.create({
+            trigger: pin,
+            pin,
+            start: "top top",
+            end: () => `+=${window.innerHeight * SCROLL_PER_CARD * total}`,
+            onUpdate: (self) =>
+              deal(self.progress <= 0 ? 0 : Math.min(total, Math.floor(self.progress * total) + 1)),
+            onEnter: () => deal(Math.max(dealtRef.current, 1)),
+            onLeaveBack: () => deal(0),
           });
         }
-      },
+      );
     });
+    return () => ctx.revert();
+    // turnBack is stable (refs only)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [total, offscreen]);
 
-    // 1. Close button fades out (0-150ms)
-    if (closeButton) {
-      tl.to(closeButton, {
-        opacity: 0,
-        duration: 0.15,
-        ease: animationEasings.smooth,
-      });
-    }
+  const select = useCallback(
+    (i: number) => {
+      if (i >= dealtRef.current) return;
+      const prev = selectedRef.current;
+      if (prev === i) return;
+      if (prev !== null) turnBack(prev);
+      selectedRef.current = i;
+      setSelected(i);
 
-    // 2. Title + description fade out - fade down with translateY (150-400ms)
-    if (expandedContent) {
-      tl.to(
-        expandedContent,
-        {
-          opacity: 0,
-          y: 15,
-          duration: 0.25,
+      const card = cards.current[i];
+      const flipper = flippers.current[i];
+      if (!card || !flipper) return;
+      gsap.killTweensOf([card, flipper]);
+      const isTop = i === dealtRef.current - 1;
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      if (reduced) {
+        gsap.set(card, { zIndex: 100, x: 0, y: 0, rotation: 0 });
+        gsap.set(flipper, { rotationY: 180 });
+        return;
+      }
+
+      const tl = gsap.timeline();
+      if (!isTop) {
+        // Slide a buried card out of the pile before it comes to the top.
+        tl.to(card, {
+          x: card.offsetWidth * 0.62,
+          y: -24,
+          rotation: 10,
+          duration: 0.3,
           ease: animationEasings.smooth,
-        },
-        0.15
-      );
-    }
-
-    // 3. Hide expanded content from DOM, then card resize + reposition (400-800ms)
-    tl.add(() => setExpansionComplete(false), 0.4);
-    tl.to(
-      modalCard,
-      {
-        top: rect?.top ?? "50%",
-        left: rect?.left ?? "50%",
-        x: rect ? 0 : "-50%",
-        y: rect ? 0 : "-50%",
-        width: rect?.width ?? 320,
-        height: rect?.height ?? 360,
-        duration: 0.4,
-        ease: animationEasings.smooth,
-      },
-      0.4
-    );
-
-    // 4. Illustration moves back to top-center of card (same time as card resize)
-    // Use card illustration's actual position AND size so modal ends exactly where card sits (no jump)
-    const gridCard = id ? cardRefs.current.get(id) : null;
-    const cardIllustrationEl = gridCard?.querySelector("[data-illustration]");
-    const cardIllustrationRect = cardIllustrationEl?.getBoundingClientRect();
-    const closeIllVars: gsap.TweenVars = {
-      x: 0,
-      y: 0,
-      duration: 0.4,
-      ease: animationEasings.smooth,
-      clearProps: "transform",
-    };
-    // Always animate to card's actual dimensions (can be scaled on both desktop and mobile)
-    if (cardIllustrationRect) {
-      (closeIllVars as Record<string, unknown>).width = cardIllustrationRect.width;
-      (closeIllVars as Record<string, unknown>).height = cardIllustrationRect.height;
-    }
-    if (illustration && rect && cardIllustrationRect) {
-      const finalLeft = cardIllustrationRect.left - rect.left;
-      const finalTop = cardIllustrationRect.top - rect.top;
-      tl.to(illustration, { ...closeIllVars, left: finalLeft, top: finalTop }, 0.4);
-    } else if (illustration && rect) {
-      const finalLeft = 32 + Math.max(0, (rect.width - 64 - 388) / 2);
-      tl.to(
-        illustration,
-        { ...closeIllVars, left: finalLeft, top: 32 },
-        0.4
-      );
-    } else if (illustration) {
-      tl.to(
-        illustration,
-        { ...closeIllVars, left: "50%", x: "-50%", top: 32 },
-        0.4
-      );
-    }
-
-    // 5. Collapsed title animation removed — now happens AFTER modal unmounts (in onComplete)
-
-    // 6. Scrim fades out (starts 600ms, ends with card animation)
-    tl.to(
-      scrim,
-      {
-        opacity: 0,
-        duration: 0.2,
-        ease: animationEasings.smooth,
-      },
-      0.6
-    );
-
-  }, [expandedId, isMobile]);
-
-  useEffect(() => {
-    const onEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") handleClose();
-    };
-    if (expandedId) {
-      document.addEventListener("keydown", onEscape);
-      document.body.style.overflow = "hidden";
-    }
-    return () => {
-      document.removeEventListener("keydown", onEscape);
-      document.body.style.overflow = "";
-    };
-  }, [expandedId, handleClose]);
-
-  const expandedValue = expandedId ? values.find((v) => v.id === expandedId) : null;
-
-  const modal = expandedValue && typeof document !== "undefined" && (
-    <div
-      ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      aria-modal
-      aria-labelledby="value-modal-title"
-    >
-      <div
-        ref={scrimRef}
-        className="absolute inset-0 bg-background/60 backdrop-blur-sm"
-        onClick={handleClose}
-      />
-      <div
-        ref={modalCardRef}
-        className="absolute z-10 overflow-hidden rounded-4xl"
-        role="dialog"
-      >
-        <ExpandedValueCard
-          value={expandedValue}
-          illustrationRef={illustrationRef}
-          collapsedTitleRef={collapsedTitleRef}
-          expandedContentRef={expandedContentRef}
-          showExpandedContent={expansionComplete}
-          isMobile={isMobile}
-        />
-        {/* Close button - fades in last, positioned in card top-right */}
-        <div
-          ref={closeButtonRef}
-          className={cn(
-            "absolute top-4 right-4 z-20 transition-opacity duration-300",
-            showCloseButton ? "opacity-100" : "opacity-0 pointer-events-none"
-          )}
-        >
-          <Button
-            variant="secondary"
-            size="icon-lg"
-            onClick={handleClose}
-            aria-label="Close"
-            type="button"
-          >
-            <HugeiconsIcon icon={Cancel01Icon} />
-          </Button>
-        </div>
-      </div>
-    </div>
+        });
+      }
+      tl.set(card, { zIndex: 100 });
+      tl.to(card, { x: 0, y: -8, rotation: 0, scale: 1.02, duration: 0.55, ease: animationEasings.robust });
+      tl.to(flipper, { rotationY: 180, duration: 0.7, ease: "power3.inOut" }, "<");
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
   );
 
+  const turnBack = useCallback((i: number, quick = false) => {
+    const card = cards.current[i];
+    const flipper = flippers.current[i];
+    if (selectedRef.current === i) {
+      selectedRef.current = null;
+      setSelected(null);
+    }
+    if (!card || !flipper) return;
+    gsap.killTweensOf([card, flipper]);
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const rest = i < dealtRef.current ? restFor(i) : null;
+    if (reduced) {
+      gsap.set(flipper, { rotationY: 0 });
+      gsap.set(card, { ...(rest ?? {}), scale: 1, zIndex: i + 1 });
+      return;
+    }
+    const d = quick ? 0.35 : 0.6;
+    gsap.to(flipper, { rotationY: 0, duration: d, ease: "power3.inOut" });
+    if (rest) {
+      gsap.to(card, {
+        ...rest,
+        scale: 1,
+        duration: d,
+        ease: animationEasings.robust,
+        onComplete: () => {
+          gsap.set(card, { zIndex: i + 1 });
+        },
+      });
+    } else {
+      gsap.set(card, { scale: 1, zIndex: i + 1 });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (selected === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") turnBack(selected);
+    };
+    const onPointer = (e: PointerEvent) => {
+      if (!deckAreaRef.current?.contains(e.target as Node)) turnBack(selected);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onPointer);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onPointer);
+    };
+  }, [selected, turnBack]);
+
+  // Arrow keys while the deck is pinned: down deals the next card, up takes
+  // one back. They scroll to that card's stretch of the pin, so keys and
+  // scrolling stay in step. Past either end the keys scroll the page as usual.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+      const st = triggerRef.current;
+      if (!st?.isActive || e.altKey || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      const target = e.target instanceof Element && e.target.closest("input, textarea, select, [contenteditable]");
+      if (target) return;
+      const next = dealtRef.current + (e.key === "ArrowDown" ? 1 : -1);
+      if (next < 1 || next > total) return;
+      e.preventDefault();
+      const progress = (next - 0.5) / total;
+      window.scrollTo({ top: st.start + progress * (st.end - st.start), behavior: "smooth" });
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [total]);
+
+  const hint =
+    selected !== null
+      ? "Tap the card to turn it back"
+      : dealt < total && !reducedMotion
+        ? "Keep scrolling to deal"
+        : "Tap a card to turn it over";
+
   return (
-    <section className="bg-background py-56 px-6">
-      <div className="max-w-[1440px] mx-auto flex flex-col gap-16">
-        <div className="flex flex-col gap-6 max-w-2xl">
+    <section className="bg-background px-6 py-24 lg:py-0">
+      <div
+        ref={sectionRef}
+        className="mx-auto grid max-w-[1440px] items-center gap-12 lg:h-svh lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16"
+      >
+        <div className="flex max-w-2xl flex-col gap-6">
           <H2>
             <TextReveal
               triggerOnScroll={true}
@@ -690,35 +460,42 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
           </FadeUp>
         </div>
 
-        <StaggerChildren
-          triggerOnScroll={true}
-          delayStart={0}
-          delayBetween={80}
-          duration={animationDurations.default}
-          distance={animationDistances.default}
-          easing={animationEasings.smooth}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full"
+        <div
+          ref={deckAreaRef}
+          className="flex h-svh flex-col items-center justify-center gap-8 lg:h-auto"
         >
-          {values.map((value) => (
-            <ValueCard
-              key={value.id}
-              ref={(el) => {
-                if (el) cardRefs.current.set(value.id, el);
-              }}
-              value={value}
-              onClick={() => handleOpen(value.id)}
-              className={
-                expandedId === value.id
-                  ? "invisible opacity-0 pointer-events-none transition-none"
-                  : undefined
-              }
-              aria-hidden={expandedId === value.id}
-            />
-          ))}
-        </StaggerChildren>
+          <div
+            className="relative aspect-[5/7]"
+            style={{ width: "min(36rem, 78vw, calc((100svh - 10rem) * 5 / 7))" }}
+          >
+            {values.map((value, i) => (
+              <ValueCard
+                key={value.id}
+                value={value}
+                index={i}
+                total={total}
+                flipped={selected === i}
+                dealt={i < dealt}
+                onSelect={() => select(i)}
+                onTurnBack={() => turnBack(i)}
+                cardRef={(el) => {
+                  cards.current[i] = el;
+                }}
+                flipperRef={(el) => {
+                  flippers.current[i] = el;
+                }}
+              />
+            ))}
+          </div>
+          <p className="type-caption text-muted-foreground" aria-live="polite">
+            <span className="font-mono tabular-nums">
+              {String(dealt).padStart(2, "0")} / {String(total).padStart(2, "0")}
+            </span>
+            <span className="mx-2">·</span>
+            {hint}
+          </p>
+        </div>
       </div>
-
-      {expandedId && createPortal(modal, document.body)}
     </section>
   );
 }
