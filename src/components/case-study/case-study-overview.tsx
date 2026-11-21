@@ -127,7 +127,7 @@ export function CaseStudyOverview({ caseStudy }: CaseStudyOverviewProps) {
 
   return (
     <section className="flex items-center justify-center gap-2 px-3 py-24">
-      <div className="flex w-full max-w-[1440px] flex-col gap-16 md:gap-24">
+      <div className="flex w-full max-w-[90rem] flex-col gap-16 md:gap-24">
         {/* Info chips */}
         {chips.length > 0 && (
           <StaggerChildren

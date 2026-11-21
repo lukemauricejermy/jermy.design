@@ -193,7 +193,7 @@ const logos = [
 export default function SocialProof() {
   return (
     <section className="bg-background flex flex-col gap-6 items-center justify-center px-6 py-[max(8rem,30svh)] w-full">
-      <div className="flex items-center justify-center max-w-[1440px] w-full">
+      <div className="flex items-center justify-center max-w-[90rem] w-full">
         <FadeUp
           triggerOnScroll={true}
           duration={animationDurations.default}
@@ -207,7 +207,7 @@ export default function SocialProof() {
         </FadeUp>
       </div>
 
-      <div className="flex flex-col items-center max-w-[1440px] w-full">
+      <div className="flex flex-col items-center max-w-[90rem] w-full">
         <StaggerChildren
           triggerOnScroll={true}
           delayStart={0}
@@ -215,7 +215,7 @@ export default function SocialProof() {
           duration={animationDurations.default}
           distance={15}
           easing={animationEasings.smooth}
-          className="grid grid-cols-4 gap-6 md:gap-8 lg:gap-10 items-center justify-items-center py-6 w-full max-w-[800px] mx-auto [--logo-base-width:48px] md:[--logo-base-width:76px] lg:[--logo-base-width:98px]"
+          className="grid grid-cols-4 gap-6 md:gap-8 lg:gap-10 items-center justify-items-center py-6 w-full max-w-[50rem] mx-auto [--logo-base-width:3rem] md:[--logo-base-width:4.75rem] lg:[--logo-base-width:6.125rem]"
         >
           {logos.map((logo) => {
             const LogoComponent = logo.component;

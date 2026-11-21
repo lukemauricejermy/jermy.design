@@ -585,7 +585,7 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
     <section className="overflow-x-clip bg-background px-6 py-24 lg:py-0">
       <div
         ref={sectionRef}
-        className="mx-auto grid max-w-[1440px] items-center gap-12 lg:h-svh lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16"
+        className="mx-auto grid max-w-[90rem] items-center gap-12 lg:h-svh lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16"
       >
         <div className="flex max-w-2xl flex-col gap-6">
           <H2>

@@ -132,7 +132,7 @@ export default function DesignSystemPage() {
   return (
     <>
       <Header />
-      <main className="mx-auto w-full max-w-[1440px] px-6 pt-32 pb-32 md:pt-40">
+      <main className="mx-auto w-full max-w-[90rem] px-6 pt-32 pb-32 md:pt-40">
         <header className="flex max-w-3xl flex-col gap-6 pb-20 md:pb-28">
           <Typography variant="overline">jermy.design</Typography>
           <Typography variant="display" as="h1">

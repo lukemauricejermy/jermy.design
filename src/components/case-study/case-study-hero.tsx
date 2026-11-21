@@ -35,7 +35,7 @@ export function CaseStudyHero({
               alt={logo.alt ?? `${title} logo`}
               width={logo.width ?? undefined}
               height={logo.height ?? undefined}
-              className="h-auto w-[180px] md:h-auto md:max-h-full md:w-full md:object-contain"
+              className="h-auto w-[11.25rem] md:h-auto md:max-h-full md:w-full md:object-contain"
             />
           </div>
         )}

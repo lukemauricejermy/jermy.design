@@ -102,7 +102,7 @@ export function CaseStudyCallouts({ callouts }: CaseStudyCalloutsProps) {
 
   return (
     <section className="flex items-center justify-center gap-2 px-3 py-32">
-      <div className="flex w-full max-w-[1440px] flex-col items-start">
+      <div className="flex w-full max-w-[90rem] flex-col items-start">
         {callouts.map((callout) => (
           <div
             key={callout.id}

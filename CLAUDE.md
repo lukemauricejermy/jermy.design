@@ -114,6 +114,7 @@ src/
 - When adding a component or token, add it to the page too (`src/app/design-system/`).
 - Use design tokens (`bg-background`, `text-muted-foreground`, `bg-chip-surface`, etc.), not raw colours. New tokens go in `globals.css` under both `:root` and `.dark`, then get mapped in `@theme inline`.
 - Every change must look right in **both light and dark mode** and across mobile / tablet / desktop.
+- **Large screens scale the whole UI**: the root font size is 16px up to 1440px wide, then grows to 22px at 2560px (`html` in `globals.css`). So size layout in rem, not px (content widths are `max-w-[90rem]`, not `max-w-[1440px]`), or it won't grow with everything else.
 - Nested rounded elements use the concentric radius tokens (`--radius-inner-gap-*`) so inner radius = outer radius − gap.
 - Header and case study hero share layout spacing variables (`--header-*`, `--hero-*`) in `globals.css`; change them together.
 - Page layout: content sits in a `relative z-10` wrapper above a fixed `Footer`, with a spacer sized by `--footer-height` so the footer is revealed on scroll. New pages should follow the same structure as `src/app/page.tsx` and `src/app/work/[slug]/page.tsx`.

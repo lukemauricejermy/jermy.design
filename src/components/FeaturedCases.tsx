@@ -292,7 +292,7 @@ export default async function FeaturedCases() {
 
   return (
     <section className="bg-background py-56 px-6">
-      <div className="max-w-[1440px] mx-auto flex flex-col gap-32">
+      <div className="max-w-[90rem] mx-auto flex flex-col gap-32">
         {/* Row 1: H2 on LEFT, Lead + Button on RIGHT */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-24">
           <H2 className="text-balance">
