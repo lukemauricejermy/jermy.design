@@ -199,7 +199,7 @@ function CaseStudyCardText({ study }: { study: CaseStudy }) {
   return (
     <div className="flex flex-1 flex-col gap-2 px-3 pt-6 pb-4 md:px-4 md:pt-8 md:pb-5">
       <div className="flex items-center justify-between gap-4">
-        <h3 className="type-title-lg min-w-0 text-balance">{study.title}</h3>
+        <h3 className="type-title min-w-0 text-balance">{study.title}</h3>
         {year && (
           <Badge variant="secondary" size="lg">
             {year}
@@ -242,7 +242,7 @@ function PlaceholderCard() {
     <Card className={cn(cardClass, "min-h-[280px]")}>
       <div className="relative aspect-[16/10] rounded-[calc(var(--radius-card)-0.75rem)] bg-muted md:rounded-[calc(var(--radius-card)-1rem)]" />
       <div className="px-3 pt-6 pb-4 md:px-4 md:pt-8 md:pb-5">
-        <h3 className="type-title-lg text-muted-foreground">Coming soon</h3>
+        <h3 className="type-title text-muted-foreground">Coming soon</h3>
       </div>
     </Card>
   );
