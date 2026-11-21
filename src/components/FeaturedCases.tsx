@@ -2,13 +2,10 @@ import Link from "next/link";
 import { performRequest } from "@/lib/datocms";
 import Image from "next/image";
 import { H2, Lead } from "@/components/ui/typography";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight02Icon } from "@hugeicons/core-free-icons";
+import { cn } from "@/lib/utils";
 import { FadeUp, StaggerChildren, TextReveal } from "@/components/animations";
 import {
   animationDurations,
@@ -29,6 +26,18 @@ const ALL_CASE_STUDIES_QUERY = `
         url
         alt
       }
+      role
+      year
+      projectDuration
+      heroBackgroundColour {
+        hex
+      }
+      clientLogo {
+        url
+        alt
+        width
+        height
+      }
     }
   }
 `;
@@ -43,6 +52,18 @@ const FEATURED_CASE_STUDIES_PUBLISHED_QUERY = `
       coverImage {
         url
         alt
+      }
+      role
+      year
+      projectDuration
+      heroBackgroundColour {
+        hex
+      }
+      clientLogo {
+        url
+        alt
+        width
+        height
       }
     }
   }
@@ -59,7 +80,36 @@ type CaseStudy = {
     url: string;
     alt: string | null;
   } | null;
+  role: string | null;
+  year: string | null;
+  projectDuration: string | null;
+  heroBackgroundColour: { hex: string } | null;
+  clientLogo: {
+    url: string;
+    alt: string | null;
+    width: number | null;
+    height: number | null;
+  } | null;
 };
+
+/**
+ * Short lines for the cards: a scannable few words in place of the full
+ * excerpt (which stays on the case study page). Temporary: these belong in
+ * Dato as a short "tagline" field on the case study; until then, keyed by slug.
+ */
+const SHORT_LINES: Record<string, string> = {
+  vemi: "Ethical banking, from zero to MVP",
+  foundgood: "Measuring impact for philanthropy",
+  sourcewhere: "Finding the unfindable in luxury fashion",
+  techsoup: "A tech marketplace for nonprofits",
+};
+
+/** ["2024", "Product Design Lead", "3 months"], from whatever is filled in. */
+function specParts(study: CaseStudy) {
+  return [study.year, study.role, study.projectDuration?.toLowerCase()]
+    .map((part) => part?.trim())
+    .filter((part): part is string => Boolean(part));
+}
 
 type AllCaseStudiesQueryResult = {
   allCaseStudies: CaseStudy[];
@@ -143,118 +193,121 @@ async function fetchFeaturedCaseStudies(): Promise<CaseStudy[]> {
     }));
 }
 
-function CaseStudyCoverImage({ study }: { study: CaseStudy }) {
+/**
+ * The brand tile: the project's own colour with its logo in the corner and
+ * the cover image below. Without a brand colour it falls back to the muted
+ * surface and the image alone. Radius is concentric with the card padding.
+ */
+function BrandTile({ study, overlay }: { study: CaseStudy; overlay?: string }) {
+  const brand = study.heroBackgroundColour?.hex;
+  const logo = study.clientLogo;
   return (
-    <div className="aspect-video bg-muted relative rounded-[calc(var(--radius-card)-0.75rem)] md:rounded-lg overflow-hidden">
-      {study.coverImage ? (
-        <div className="absolute inset-0">
+    <div
+      className="relative aspect-[4/3] overflow-hidden rounded-[calc(var(--radius-card)-0.75rem)] bg-muted md:rounded-[calc(var(--radius-card)-1rem)]"
+      style={brand ? { backgroundColor: brand } : undefined}
+    >
+      {logo && (
+        <Image
+          src={logo.url}
+          alt={logo.alt || `${study.title} logo`}
+          width={logo.width ?? 240}
+          height={logo.height ?? 80}
+          className="absolute left-[6%] top-[7%] h-[7%] w-auto"
+        />
+      )}
+      {study.coverImage && (
+        <div
+          className={cn(
+            "absolute inset-x-0 bottom-0 overflow-hidden",
+            logo ? "top-[22%]" : "top-0"
+          )}
+        >
           <Image
             src={study.coverImage.url}
             alt={study.coverImage.alt || study.title}
-            width={600}
-            height={338}
-            className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.02]"
+            fill
+            sizes="(min-width: 640px) 50vw, 100vw"
+            className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
           />
         </div>
-      ) : (
-        <div className="absolute inset-0 flex items-center justify-center bg-muted" />
+      )}
+      {overlay && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/60 backdrop-blur-sm">
+          <span className="type-label text-foreground">{overlay}</span>
+        </div>
       )}
     </div>
   );
 }
 
-function CaseStudyCardContent({ study }: { study: CaseStudy }) {
+/** Spec line, big title and a short line. */
+function CaseStudyCardText({ study, linked }: { study: CaseStudy; linked: boolean }) {
+  const spec = specParts(study);
+  const short = SHORT_LINES[study.slug] ?? study.excerpt;
   return (
-    <>
-      <CardContent className="pt-0 px-3 md:px-6">
-        <CaseStudyCoverImage study={study} />
-      </CardContent>
-      <CardHeader className="gap-1.5 px-3 md:px-6 pb-5 md:pb-7">
-        <CardTitle className="type-title-sm">
-          {study.title}
-        </CardTitle>
-        {study.excerpt && (
-          <CardDescription className="type-body text-foreground">
-            {study.excerpt}
-          </CardDescription>
+    <div className="flex flex-1 flex-col gap-3 px-3 pt-6 pb-4 md:px-4 md:pt-8 md:pb-5">
+      {spec.length > 0 && (
+        // Each item stays whole; lines only break between items.
+        <p className="type-overline flex flex-wrap gap-x-2 text-muted-foreground">
+          {spec.map((part, i) => (
+            <span key={part} className="whitespace-nowrap">
+              {i > 0 && <span aria-hidden className="mr-2">·</span>}
+              {part}
+            </span>
+          ))}
+        </p>
+      )}
+      <div className="flex items-end justify-between gap-6">
+        <div className="flex min-w-0 flex-col gap-2">
+          <h3 className="type-title-lg text-balance">{study.title}</h3>
+          {short && <p className="type-lead text-muted-foreground text-balance">{short}</p>}
+        </div>
+        {linked && (
+          <span
+            aria-hidden
+            className="mb-1 flex size-11 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground transition-transform duration-300 group-hover:-rotate-45"
+          >
+            <HugeiconsIcon icon={ArrowRight02Icon} className="size-5" />
+          </span>
         )}
-      </CardHeader>
-    </>
+      </div>
+    </div>
+  );
+}
+
+const cardClass =
+  "flex h-full flex-col gap-0 overflow-hidden rounded-[var(--radius-card)] p-3 md:p-4";
+
+function PublishedCaseStudyCard({ study }: { study: CaseStudy }) {
+  return (
+    <Link href={`/work/${study.slug}`} className="group block h-full select-none">
+      <Card className={cn(cardClass, "transition-shadow group-hover:shadow-md")}>
+        <BrandTile study={study} />
+        <CaseStudyCardText study={study} linked />
+      </Card>
+    </Link>
   );
 }
 
 function DraftCaseStudyCard({ study }: { study: CaseStudy }) {
   return (
     <div className="block h-full select-none">
-      <Card className="overflow-hidden h-full flex flex-col rounded-[var(--radius-card)] py-3 md:py-6">
-        <CardContent className="pt-0 px-3 md:px-6">
-          <div className="aspect-video bg-muted relative rounded-[calc(var(--radius-card)-0.75rem)] md:rounded-lg overflow-hidden">
-            {study.coverImage ? (
-              <div className="absolute inset-0">
-                <Image
-                  src={study.coverImage.url}
-                  alt={study.coverImage.alt || study.title}
-                  width={600}
-                  height={338}
-                  className="w-full h-full object-cover object-center"
-                />
-              </div>
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center bg-muted" />
-            )}
-            <div className="absolute inset-0 rounded-[calc(var(--radius-card)-0.75rem)] md:rounded-lg bg-background/60 backdrop-blur-sm flex items-center justify-center pointer-events-none z-10">
-              <span className="type-label text-foreground">
-                Full case coming soon
-              </span>
-            </div>
-          </div>
-        </CardContent>
-        <CardHeader className="gap-1.5 px-3 md:px-6 pb-5 md:pb-7">
-          <CardTitle className="type-title-sm">
-            {study.title}
-          </CardTitle>
-          {study.excerpt && (
-            <CardDescription className="type-body text-foreground">
-              {study.excerpt}
-            </CardDescription>
-          )}
-        </CardHeader>
+      <Card className={cardClass}>
+        <BrandTile study={study} overlay="Full case coming soon" />
+        <CaseStudyCardText study={study} linked={false} />
       </Card>
     </div>
-  );
-}
-
-function PublishedCaseStudyCard({ study }: { study: CaseStudy }) {
-  return (
-    <Link
-      href={`/work/${study.slug}`}
-      className="group block h-full select-none"
-    >
-      <Card className="overflow-hidden h-full flex flex-col rounded-[var(--radius-card)] py-3 md:py-6 transition-shadow group-hover:shadow-md">
-        <CaseStudyCardContent study={study} />
-      </Card>
-    </Link>
   );
 }
 
 // Placeholder card when fewer than 4 featured case studies
 function PlaceholderCard() {
   return (
-    <Card className="overflow-hidden h-full min-h-[280px] flex flex-col rounded-[var(--radius-card)] py-3 md:py-6">
-      <CardContent className="pt-0 px-3 md:px-6">
-        <div className="aspect-video bg-muted rounded-[calc(var(--radius-card)-0.75rem)] md:rounded-lg overflow-hidden relative">
-          <div className="absolute inset-0 rounded-[calc(var(--radius-card)-0.75rem)] md:rounded-lg bg-background/60 backdrop-blur-sm flex items-center justify-center pointer-events-none">
-            <span className="type-label text-foreground">
-              Full case coming soon
-            </span>
-          </div>
-        </div>
-      </CardContent>
-      <CardHeader className="px-3 md:px-6 pb-5 md:pb-7">
-        <CardTitle className="text-muted-foreground font-normal">
-          Coming soon
-        </CardTitle>
-      </CardHeader>
+    <Card className={cn(cardClass, "min-h-[280px]")}>
+      <div className="relative aspect-[4/3] rounded-[calc(var(--radius-card)-0.75rem)] bg-muted md:rounded-[calc(var(--radius-card)-1rem)]" />
+      <div className="px-3 pt-6 pb-4 md:px-4 md:pt-8 md:pb-5">
+        <h3 className="type-title-lg text-muted-foreground">Coming soon</h3>
+      </div>
     </Card>
   );
 }
