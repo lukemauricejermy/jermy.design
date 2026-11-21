@@ -13,7 +13,7 @@ import {
 import { Linkedin } from "lucide-react";
 
 const SOCIAL_LINKS = [
-  { label: "LinkedIn", href: "https://linkedin.com", icon: Linkedin },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/lukejermy/", icon: Linkedin },
 ];
 
 export default async function Footer() {
