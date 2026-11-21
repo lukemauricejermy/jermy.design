@@ -2,9 +2,7 @@ import Link from "next/link";
 import { performRequest } from "@/lib/datocms";
 import Image from "next/image";
 import { H2, Lead } from "@/components/ui/typography";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import { FadeUp, StaggerChildren, TextReveal } from "@/components/animations";
 import {
   animationDurations,
@@ -162,16 +160,16 @@ async function fetchFeaturedCaseStudies(): Promise<CaseStudy[]> {
 }
 
 /**
- * The brand tile: the cover image on the project's own colour (which shows
- * while it loads, and around any image that doesn't fill). Without a brand
- * colour it falls back to the muted surface. Radius is concentric with the
- * card padding.
+ * The tile is the whole visual: no card around it. A square field of the
+ * project's brand colour with the cover fitted inside it (covers are wide,
+ * so nothing important is cropped). Without a brand colour it falls back to
+ * the muted surface.
  */
 function BrandTile({ study, overlay }: { study: CaseStudy; overlay?: string }) {
   const brand = study.heroBackgroundColour?.hex;
   return (
     <div
-      className="relative aspect-[16/10] overflow-hidden rounded-[calc(var(--radius-card)-0.75rem)] bg-muted md:rounded-[calc(var(--radius-card)-1rem)]"
+      className="relative aspect-square overflow-hidden rounded-[var(--radius-card)] bg-muted"
       style={brand ? { backgroundColor: brand } : undefined}
     >
       {study.coverImage && (
@@ -180,7 +178,7 @@ function BrandTile({ study, overlay }: { study: CaseStudy; overlay?: string }) {
           alt={study.coverImage.alt || study.title}
           fill
           sizes="(min-width: 640px) 50vw, 100vw"
-          className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.03]"
+          className="object-contain object-center transition-transform duration-700 ease-out group-hover:scale-[1.04]"
         />
       )}
       {overlay && (
@@ -192,12 +190,12 @@ function BrandTile({ study, overlay }: { study: CaseStudy; overlay?: string }) {
   );
 }
 
-/** Title with the year badge beside it, then a short line. */
-function CaseStudyCardText({ study }: { study: CaseStudy }) {
+/** Title with the year badge beside it, then a short line, on the page. */
+function CaseStudyText({ study }: { study: CaseStudy }) {
   const year = study.year?.trim();
   const short = SHORT_LINES[study.slug] ?? study.excerpt;
   return (
-    <div className="flex flex-1 flex-col gap-2 px-3 pt-6 pb-4 md:px-4 md:pt-8 md:pb-5">
+    <div className="flex flex-col gap-2 pt-6 md:pt-8">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <h3 className="type-title min-w-0 text-balance">{study.title}</h3>
         {year && (
@@ -211,40 +209,33 @@ function CaseStudyCardText({ study }: { study: CaseStudy }) {
   );
 }
 
-const cardClass =
-  "flex h-full flex-col gap-0 overflow-hidden rounded-[var(--radius-card)] p-3 md:p-4";
-
 function PublishedCaseStudyCard({ study }: { study: CaseStudy }) {
   return (
-    <Link href={`/work/${study.slug}`} className="group block h-full select-none">
-      <Card className={cn(cardClass, "transition-shadow group-hover:shadow-md")}>
-        <BrandTile study={study} />
-        <CaseStudyCardText study={study} />
-      </Card>
+    <Link href={`/work/${study.slug}`} className="group block select-none">
+      <BrandTile study={study} />
+      <CaseStudyText study={study} />
     </Link>
   );
 }
 
 function DraftCaseStudyCard({ study }: { study: CaseStudy }) {
   return (
-    <div className="block h-full select-none">
-      <Card className={cardClass}>
-        <BrandTile study={study} overlay="Full case coming soon" />
-        <CaseStudyCardText study={study} />
-      </Card>
+    <div className="block select-none">
+      <BrandTile study={study} overlay="Full case coming soon" />
+      <CaseStudyText study={study} />
     </div>
   );
 }
 
-// Placeholder card when fewer than 4 featured case studies
+// Placeholder when fewer than 4 featured case studies
 function PlaceholderCard() {
   return (
-    <Card className={cn(cardClass, "min-h-[280px]")}>
-      <div className="relative aspect-[16/10] rounded-[calc(var(--radius-card)-0.75rem)] bg-muted md:rounded-[calc(var(--radius-card)-1rem)]" />
-      <div className="px-3 pt-6 pb-4 md:px-4 md:pt-8 md:pb-5">
+    <div>
+      <div className="aspect-square rounded-[var(--radius-card)] bg-muted" />
+      <div className="pt-6 md:pt-8">
         <h3 className="type-title text-muted-foreground">Coming soon</h3>
       </div>
-    </Card>
+    </div>
   );
 }
 
@@ -310,7 +301,7 @@ export default async function FeaturedCases() {
           duration={animationDurations.default}
           distance={animationDistances.default}
           easing={animationEasings.smooth}
-          className="featured-cases grid grid-cols-1 sm:grid-cols-2 gap-8 w-full"
+          className="featured-cases grid w-full grid-cols-1 gap-x-8 gap-y-16 sm:grid-cols-2 md:gap-y-24"
         >
           {cards}
         </StaggerChildren>
