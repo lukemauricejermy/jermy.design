@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { gsap } from "gsap";
-import { Lead } from "@/components/ui/typography";
+import { Badge } from "@/components/ui/badge";
 import {
   animationDistances,
   animationDurations,
@@ -18,22 +18,39 @@ const TEXT_MOVE_DISTANCE = animationDistances.default;
 const SWIPE_DURATION_SECONDS = animationDurations.verySlow / 1000;
 const SWIPE_EXIT_Y_PERCENT = -120;
 
-function getTimeOfDayGreeting(now: Date) {
-  const secondsSinceMidnight =
-    now.getHours() * 60 * 60 + now.getMinutes() * 60 + now.getSeconds();
-  const morningStart = 4 * 60 * 60 + 1; // 04:00:01
-  const afternoonStart = 12 * 60 * 60 + 1; // 12:00:01
-  const eveningStart = 16 * 60 * 60 + 1; // 16:00:01
-  const nightStart = 20 * 60 * 60 + 1; // 20:00:01
-
-  if (secondsSinceMidnight >= morningStart && secondsSinceMidnight <= 12 * 60 * 60)
-    return "👋 Good morning friend!";
-  if (secondsSinceMidnight >= afternoonStart && secondsSinceMidnight <= 16 * 60 * 60)
-    return "👋 Good afternoon friend!";
-  if (secondsSinceMidnight >= eveningStart && secondsSinceMidnight <= 20 * 60 * 60)
-    return "👋 Good evening friend!";
-  return "🦉 Hello there, night owl!";
+/** Morning 04:00–12:00, afternoon 12:00–17:00, evening otherwise. */
+function timeOfDay(now: Date) {
+  const h = now.getHours();
+  if (h >= 4 && h < 12) return "morning";
+  if (h >= 12 && h < 17) return "afternoon";
+  return "evening";
 }
+
+/** The visitor's city, from the cookie set by src/proxy.ts (Vercel geo IP). */
+function visitorCity() {
+  const match = document.cookie.match(/(?:^|;\s*)visitor-city=([^;]+)/);
+  if (!match) return null;
+  try {
+    return decodeURIComponent(decodeURIComponent(match[1])).trim() || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * "Good evening, Copenhagen." in the visitor's own local time, or just
+ * "Good evening." when we don't know where they are. Read on the client
+ * only (the server knows neither), so it renders empty on the server.
+ */
+let cachedGreeting: string | null = null;
+function getGreeting() {
+  if (cachedGreeting === null) {
+    const city = visitorCity();
+    cachedGreeting = `Good ${timeOfDay(new Date())}${city ? `, ${city}` : ""}.`;
+  }
+  return cachedGreeting;
+}
+const noSubscribe = () => () => {};
 
 declare global {
   interface Window {
@@ -42,7 +59,7 @@ declare global {
 }
 
 export function PreLoader() {
-  const greeting = getTimeOfDayGreeting(new Date());
+  const greeting = useSyncExternalStore(noSubscribe, getGreeting, () => "");
   const [isVisible, setIsVisible] = useState(true);
   const overlayRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
@@ -138,10 +155,14 @@ export function PreLoader() {
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-secondary"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-background"
     >
       <div ref={textRef} className="opacity-0">
-        <Lead className="text-foreground text-xl md:text-2xl">{greeting}</Lead>
+        {greeting && (
+          <Badge variant="secondary" size="lg">
+            {greeting}
+          </Badge>
+        )}
       </div>
     </div>
   );

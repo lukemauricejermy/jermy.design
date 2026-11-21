@@ -41,6 +41,7 @@ Dev CSS quirk: Turbopack serves `globals.css` one save behind, and a `touch` doe
 
 ```
 src/
+  proxy.ts                Edge proxy: puts the visitor's city (Vercel geo IP) in a cookie for the preloader greeting
   app/
     layout.tsx            Root layout: PreLoader + ThemeProvider
     page.tsx              Homepage (force-dynamic): Header, Hero, SocialProof, FeaturedCases, Values, Footer
@@ -86,7 +87,7 @@ src/
 - Matter metrics: cap 0.70em, x-height 0.504em, ink ~0.9em, ascent/descent box 0.95/0.24. Weights shipped: 400/500/600 (`font-synthesis: none`).
 - `TextReveal` inherits line height from its parent. Each word's mask extends 0.25em below the line (descenders) and 0.12em to each side (glyphs overhang under tight tracking), with matching negative margins, so parents need no clipping. Never put `overflow-hidden` on a reveal heading.
 - **Headings, lead and body are fluid** (`clamp()`): each grows in a straight line from its phone size at 375px through the old desktop size at ~1280px, capped near 1920px (e.g. headline 36 → 64 → 80, lead 18 → 24, body 16 → 18). Label, small, caption and overline stay fixed. Keep new sizes in the same form so the /design-system readouts can parse the range.
-- Known off-scale one-offs (left as-is deliberately): footer `Lead`, preloader greeting.
+- Known off-scale one-offs (left as-is deliberately): footer `Lead`.
 - Fonts: Matter (400/500/600) from `public/fonts`, and DM Mono via `next/font` (`preload: false`) for `type-overline`, `font-mono` and code.
 
 ### Artwork
