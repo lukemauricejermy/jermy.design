@@ -184,14 +184,79 @@ async function fetchFeaturedCaseStudies(): Promise<CaseStudy[]> {
  * better covers; a case without a logo falls back to its cover, fitted.
  * Without a brand colour the field is the muted surface.
  */
+/**
+ * Tile art composed from the project's real UI (exported from its Figma file
+ * at 3x into public/images/cases/<slug>-vN/). Sizes and positions are in
+ * container units of the tile, so the composition holds at any size.
+ */
+const CARD_SHADOW = "drop-shadow(0 1.2cqw 2.4cqw rgb(0 0 0 / 0.18))";
+
+function VemiArt() {
+  const dir = "/images/cases/vemi-v1";
+  const cards = [
+    // src, left, top, rotation, hover lift delay
+    { src: "card-expected", left: 47, top: 11, rotate: -4, delay: 0 },
+    { src: "card-deposit", left: 52, top: 31, rotate: 3, delay: 60 },
+    { src: "card-goal", left: 44, top: 51, rotate: -2, delay: 120 },
+  ];
+  return (
+    <>
+      {/* The dark dashboard, cropped by the tile's bottom edge. */}
+      <div
+        className="absolute top-[10cqw] left-[9cqw] w-[36cqw] overflow-hidden rounded-[3cqw] transition-transform duration-700 ease-out group-hover:-translate-y-[1cqw]"
+        style={{ filter: CARD_SHADOW }}
+      >
+        <Image
+          src={`${dir}/dashboard-dark.png`}
+          alt="Vemi dashboard in dark mode, showing total savings and three savings accounts"
+          width={1179}
+          height={3198}
+          sizes="(min-width: 640px) 20vw, 40vw"
+          className="h-auto w-full"
+        />
+      </div>
+      {/* Account cards in three of their states, floating over it. */}
+      {cards.map((card) => (
+        <div
+          key={card.src}
+          className="absolute w-[44cqw] transition-transform duration-700 ease-out"
+          style={{
+            left: `${card.left}cqw`,
+            top: `${card.top}cqw`,
+            rotate: `${card.rotate}deg`,
+            filter: CARD_SHADOW,
+            transitionDelay: `${card.delay}ms`,
+          }}
+        >
+          <Image
+            src={`${dir}/${card.src}.png`}
+            alt=""
+            width={1083}
+            height={474}
+            sizes="(min-width: 640px) 25vw, 50vw"
+            className="h-auto w-full transition-transform duration-700 ease-out group-hover:-translate-y-[1.5cqw]"
+          />
+        </div>
+      ))}
+    </>
+  );
+}
+
+const TILE_ART: Record<string, () => React.ReactNode> = {
+  vemi: VemiArt,
+};
+
 function BrandTile({ study, overlay }: { study: CaseStudy; overlay?: string }) {
+  const Art = TILE_ART[study.slug];
   const brand = study.heroBackgroundColour?.hex;
   return (
     <div
-      className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-card)] bg-muted"
+      className="@container relative aspect-[4/3] overflow-hidden rounded-[var(--radius-card)] bg-muted"
       style={brand ? { backgroundColor: brand } : undefined}
     >
-      {study.clientLogo ? (
+      {Art ? (
+        <Art />
+      ) : study.clientLogo ? (
         // Every logo the same height (16% of the tile); width follows its
         // shape, capped so wide wordmarks keep a margin.
         <div className="absolute inset-0 flex items-center justify-center transition-transform duration-700 ease-out group-hover:scale-[1.04]">
