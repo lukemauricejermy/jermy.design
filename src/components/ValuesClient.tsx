@@ -284,7 +284,19 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
         { desktop: "(min-width: 1024px)", mobile: "(max-width: 1023.98px)" },
         (c) => {
           const pin = c.conditions?.desktop ? sectionRef.current : deckAreaRef.current;
-          triggerRef.current = ScrollTrigger.create({
+          // Dealing is one card per gesture: while pinned, downward wheel and
+          // touch input is taken over and each gesture deals exactly one card.
+          // A gesture is a run of input events with no gap longer than
+          // GESTURE_GAP, so a trackpad flick and its momentum count once.
+          // Scrolling up is left alone, so a quick flick throws the whole
+          // stack back. Past the last card the page scrolls on as normal.
+          const GESTURE_GAP = 160;
+          let lastInput = 0;
+          let gestureUsed = false;
+          let readyAt = 0;
+          let touchY: number | null = null;
+
+          const st: ScrollTrigger = ScrollTrigger.create({
             trigger: pin,
             pin,
             start: "top top",
@@ -293,7 +305,61 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
               deal(self.progress <= 0 ? 0 : Math.min(total, Math.floor(self.progress * total) + 1)),
             onEnter: () => deal(Math.max(dealtRef.current, 1)),
             onLeaveBack: () => deal(0),
+            onToggle: (self) => {
+              if (!self.isActive || self.direction < 0) return;
+              // Arriving from above: settle on the first card, and don't let
+              // the gesture that carried us in deal a second one.
+              gestureUsed = true;
+              readyAt = performance.now() + 300;
+              goTo(1);
+            },
           });
+          triggerRef.current = st;
+
+          const positionFor = (k: number) => st.start + ((k - 0.5) / total) * (st.end - st.start);
+          const goTo = (k: number) => window.scrollTo({ top: positionFor(k), behavior: "instant" });
+
+          /** Downward input while pinned: returns true if it was handled. */
+          const forward = () => {
+            if (!st.isActive) return false;
+            const now = performance.now();
+            if (now - lastInput > GESTURE_GAP) gestureUsed = false;
+            lastInput = now;
+            if (gestureUsed || now < readyAt) return true;
+            gestureUsed = true;
+            const next = dealtRef.current + 1;
+            if (next > total) {
+              // Hand the scroll back: step just past the pin.
+              window.scrollTo({ top: st.end + 2, behavior: "instant" });
+              return true;
+            }
+            goTo(next);
+            return true;
+          };
+
+          const onWheel = (e: WheelEvent) => {
+            if (e.deltaY > 0 && !e.ctrlKey && forward()) e.preventDefault();
+            else if (e.deltaY < 0) gestureUsed = false;
+          };
+          const onTouchStart = (e: TouchEvent) => {
+            touchY = e.touches[0]?.clientY ?? null;
+          };
+          const onTouchMove = (e: TouchEvent) => {
+            const y = e.touches[0]?.clientY;
+            if (touchY === null || y === undefined) return;
+            // Finger moving up means scrolling down.
+            if (touchY - y > 4 && forward()) e.preventDefault();
+            touchY = y;
+          };
+          window.addEventListener("wheel", onWheel, { passive: false });
+          window.addEventListener("touchstart", onTouchStart, { passive: true });
+          window.addEventListener("touchmove", onTouchMove, { passive: false });
+
+          return () => {
+            window.removeEventListener("wheel", onWheel);
+            window.removeEventListener("touchstart", onTouchStart);
+            window.removeEventListener("touchmove", onTouchMove);
+          };
         }
       );
     });
