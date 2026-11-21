@@ -193,37 +193,40 @@ const CARD_SHADOW = "drop-shadow(0 1.2cqw 2.4cqw rgb(0 0 0 / 0.18))";
 
 function VemiArt() {
   const dir = "/images/cases/vemi-v1";
+  // Three account cards, straight, spaced and staggered beside the screen.
+  // Width 40cqw makes each 17.5cqw tall; 3cqw between them.
   const cards = [
-    // src, left, top, rotation, hover lift delay
-    { src: "card-expected", left: 47, top: 11, rotate: -4, delay: 0 },
-    { src: "card-deposit", left: 52, top: 31, rotate: 3, delay: 60 },
-    { src: "card-goal", left: 44, top: 51, rotate: -2, delay: 120 },
+    { src: "card-expected", left: 47, top: 8.25, delay: 0 },
+    { src: "card-deposit", left: 54, top: 28.75, delay: 60 },
+    { src: "card-goal", left: 47, top: 49.25, delay: 120 },
   ];
   return (
     <>
       {/* The dark dashboard, cropped by the tile's bottom edge. */}
       <div
-        className="absolute top-[10cqw] left-[9cqw] w-[36cqw] overflow-hidden rounded-[3cqw] transition-transform duration-700 ease-out group-hover:-translate-y-[1cqw]"
+        className="absolute top-[8.25cqw] left-[7cqw] w-[34cqw] transition-transform duration-700 ease-out group-hover:-translate-y-[1cqw]"
         style={{ filter: CARD_SHADOW }}
       >
-        <Image
-          src={`${dir}/dashboard-dark.png`}
-          alt="Vemi dashboard in dark mode, showing total savings and three savings accounts"
-          width={1179}
-          height={3198}
-          sizes="(min-width: 640px) 20vw, 40vw"
-          className="h-auto w-full"
-        />
+        <div className="overflow-hidden rounded-[2.8cqw]">
+          <Image
+            src={`${dir}/dashboard-dark.png`}
+            alt="Vemi dashboard in dark mode, showing total savings and three savings accounts"
+            width={1179}
+            height={3198}
+            sizes="(min-width: 640px) 20vw, 40vw"
+            className="h-auto w-full"
+          />
+        </div>
       </div>
-      {/* Account cards in three of their states, floating over it. */}
+      {/* Account cards in three of their states. The exports carry the dark
+          canvas in their corners, so each is clipped to the card's own radius. */}
       {cards.map((card) => (
         <div
           key={card.src}
-          className="absolute w-[44cqw] transition-transform duration-700 ease-out"
+          className="absolute w-[40cqw] transition-transform duration-700 ease-out group-hover:-translate-y-[1.2cqw]"
           style={{
             left: `${card.left}cqw`,
             top: `${card.top}cqw`,
-            rotate: `${card.rotate}deg`,
             filter: CARD_SHADOW,
             transitionDelay: `${card.delay}ms`,
           }}
@@ -234,7 +237,8 @@ function VemiArt() {
             width={1083}
             height={474}
             sizes="(min-width: 640px) 25vw, 50vw"
-            className="h-auto w-full transition-transform duration-700 ease-out group-hover:-translate-y-[1.5cqw]"
+            className="h-auto w-full"
+            style={{ clipPath: "inset(0.15% round 1.45cqw)" }}
           />
         </div>
       ))}
