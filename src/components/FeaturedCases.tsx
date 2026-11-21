@@ -3,8 +3,7 @@ import { performRequest } from "@/lib/datocms";
 import Image from "next/image";
 import { H2, Lead } from "@/components/ui/typography";
 import { Card } from "@/components/ui/card";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowRight02Icon } from "@hugeicons/core-free-icons";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { FadeUp, StaggerChildren, TextReveal } from "@/components/animations";
 import {
@@ -193,27 +192,21 @@ function BrandTile({ study, overlay }: { study: CaseStudy; overlay?: string }) {
   );
 }
 
-/** Year, big title and a short line. */
-function CaseStudyCardText({ study, linked }: { study: CaseStudy; linked: boolean }) {
+/** Title with the year badge beside it, then a short line. */
+function CaseStudyCardText({ study }: { study: CaseStudy }) {
   const year = study.year?.trim();
   const short = SHORT_LINES[study.slug] ?? study.excerpt;
   return (
-    <div className="flex flex-1 flex-col gap-3 px-3 pt-6 pb-4 md:px-4 md:pt-8 md:pb-5">
-      {year && <p className="type-overline text-muted-foreground">{year}</p>}
-      <div className="flex items-end justify-between gap-6">
-        <div className="flex min-w-0 flex-col gap-2">
-          <h3 className="type-title-lg text-balance">{study.title}</h3>
-          {short && <p className="type-lead text-muted-foreground text-balance">{short}</p>}
-        </div>
-        {linked && (
-          <span
-            aria-hidden
-            className="mb-1 flex size-11 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground transition-transform duration-300 group-hover:-rotate-45"
-          >
-            <HugeiconsIcon icon={ArrowRight02Icon} className="size-5" />
-          </span>
+    <div className="flex flex-1 flex-col gap-2 px-3 pt-6 pb-4 md:px-4 md:pt-8 md:pb-5">
+      <div className="flex items-center justify-between gap-4">
+        <h3 className="type-title-lg min-w-0 text-balance">{study.title}</h3>
+        {year && (
+          <Badge variant="secondary" className="type-label h-8 px-3">
+            {year}
+          </Badge>
         )}
       </div>
+      {short && <p className="type-lead text-balance text-muted-foreground">{short}</p>}
     </div>
   );
 }
@@ -226,7 +219,7 @@ function PublishedCaseStudyCard({ study }: { study: CaseStudy }) {
     <Link href={`/work/${study.slug}`} className="group block h-full select-none">
       <Card className={cn(cardClass, "transition-shadow group-hover:shadow-md")}>
         <BrandTile study={study} />
-        <CaseStudyCardText study={study} linked />
+        <CaseStudyCardText study={study} />
       </Card>
     </Link>
   );
@@ -237,7 +230,7 @@ function DraftCaseStudyCard({ study }: { study: CaseStudy }) {
     <div className="block h-full select-none">
       <Card className={cardClass}>
         <BrandTile study={study} overlay="Full case coming soon" />
-        <CaseStudyCardText study={study} linked={false} />
+        <CaseStudyCardText study={study} />
       </Card>
     </div>
   );
