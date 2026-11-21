@@ -22,8 +22,9 @@ const badgeVariants = cva(
       size: {
         default:
           "h-5 px-2 py-0.5 text-xs has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&>svg]:size-3!",
-        // One step up: the label type style and the next padding tokens.
-        lg: "h-6 px-3 py-1 type-label has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&>svg]:size-4!",
+        // Sits beside big titles: lead-size text (fluid, 18 → 24px), medium
+        // weight, single line height, and roomy padding.
+        lg: "h-auto px-4 py-2 type-lead font-medium leading-none has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3 [&>svg]:size-5!",
       },
     },
     defaultVariants: {
