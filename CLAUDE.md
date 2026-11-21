@@ -77,6 +77,10 @@ src/
 - Server components by default; add `"use client"` only where needed (animation, theme toggles, interactivity). Pattern: server wrapper fetches data → client component animates (e.g. `Values` → `ValuesClient`).
 - Use `cn()` from `@/lib/utils` to merge classes. It's shadcn's `cn` extended to understand the type scale. UI components must import it from `@/lib/utils`, not from `"cn"`; after `shadcn add`, repoint the new file's import.
 
+### Copy
+
+- Any words on the site (headings, intros, case lines, buttons, microcopy) follow the `voice-and-tone` skill in `.claude/skills/voice-and-tone/`: Luke's voice (plain, confident, a bit wry), UX writing fundamentals from NN/g and GOV.UK, house style (British English, sentence case, spaced em dashes) and a review checklist.
+
 ### Typography
 
 - The type scale lives in `globals.css` as `type-*` utilities: `display`, `headline`, `title-lg`, `title`, `title-sm`, `lead`, `body`, `body-long`, `label`, `small`, `caption`, `overline`. Each sets size, line height, tracking and weight, with responsive steps built in.

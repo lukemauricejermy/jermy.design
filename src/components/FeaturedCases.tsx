@@ -408,9 +408,9 @@ export default async function FeaturedCases() {
           >
             <Lead>
               I&apos;ve spent the last 20 years creating digital products —
-              in-house, as a consultant, and as the founder of my own design
-              studio. I&apos;ve worked across industries and alongside some
-              exceptional teams and people.
+              leading design teams in-house, consulting, and running my own
+              design studio. I&apos;ve worked across many industries, alongside
+              some exceptional teams and people.
             </Lead>
             <Lead>
               This portfolio is a curated snapshot of that work — a selection of
