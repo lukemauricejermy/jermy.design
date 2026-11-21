@@ -201,7 +201,7 @@ function CaseStudyCardText({ study }: { study: CaseStudy }) {
       <div className="flex items-center justify-between gap-4">
         <h3 className="type-title-lg min-w-0 text-balance">{study.title}</h3>
         {year && (
-          <Badge variant="secondary" className="type-label h-8 px-3">
+          <Badge variant="secondary" size="lg">
             {year}
           </Badge>
         )}

@@ -137,6 +137,19 @@ export function BadgeGallery() {
             </Badge>
           ))}
         </Row>
+        <Row label="sizes">
+          <Badge variant="secondary">default</Badge>
+          <Badge variant="secondary" size="lg">
+            lg
+          </Badge>
+          <Badge variant="outline" size="lg">
+            2024
+          </Badge>
+          <Badge size="lg">
+            <HugeiconsIcon icon={PaintBrush01Icon} data-icon="inline-start" />
+            Product design
+          </Badge>
+        </Row>
         <Row label="with icon">
           <Badge variant="secondary">
             <HugeiconsIcon icon={PaintBrush01Icon} data-icon="inline-start" />
