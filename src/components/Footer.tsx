@@ -10,10 +10,11 @@ import {
   animationDistances,
   animationDelays,
 } from "@/lib/animation-config";
-import { Linkedin } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Linkedin01Icon } from "@hugeicons/core-free-icons";
 
 const SOCIAL_LINKS = [
-  { label: "LinkedIn", href: "https://www.linkedin.com/in/lukejermy/", icon: Linkedin },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/lukejermy/", icon: Linkedin01Icon },
 ];
 
 export default async function Footer() {
@@ -55,7 +56,7 @@ export default async function Footer() {
               {SOCIAL_LINKS.map(({ label, href, icon: Icon }) => (
                 <Button key={label} asChild variant="outline" size="lg" className="w-fit">
                   <Link href={href} target="_blank" rel="noopener noreferrer">
-                    <Icon className="size-4" />
+                    <HugeiconsIcon icon={Icon} className="size-4" />
                     {label}
                   </Link>
                 </Button>

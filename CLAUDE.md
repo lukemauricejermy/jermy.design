@@ -6,7 +6,7 @@ Personal design portfolio. Next.js App Router site, content from DatoCMS, deploy
 
 - **Next.js 16** (App Router, React Server Components) + **React 19**, TypeScript
 - **Tailwind CSS v4** — CSS-first config, no `tailwind.config`. Tokens live in `src/app/globals.css` (`@theme inline` + `:root` / `.dark` variables)
-- **shadcn/ui** — preset `beEgoVTk`: `radix-luma` style, zinc base colour, Hugeicons for new components (older site code still uses lucide). Primitives in `src/components/ui/`, which import `cn` from shadcn's `cn` package. Add new ones with `npx shadcn@latest add <name>`. `typography.tsx` is custom, not from the registry.
+- **shadcn/ui** — preset `beEgoVTk`: `radix-luma` style, zinc base colour. **All icons are Hugeicons** (`@hugeicons/react` + `@hugeicons/core-free-icons`); lucide has been removed, so don't reintroduce it. Primitives in `src/components/ui/`, which import `cn` from shadcn's `cn` package. Add new ones with `npx shadcn@latest add <name>`. `typography.tsx` is custom, not from the registry.
 - **Design happens in code, not Figma.** The shadcn preset tokens in `globals.css` are the source of truth. Fonts are the exception: always Matter (sans/headings) and DM Mono. Never let shadcn swap in Inter or another `next/font`.
 - **GSAP** for animation
 - **next-themes** for light/dark (class-based, defaults to system)

@@ -1,7 +1,8 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { Moon, Sun } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Moon02Icon, Sun03Icon } from "@hugeicons/core-free-icons";
 import { useEffect, useState } from "react";
 
 export function ThemeToggle() {
@@ -31,9 +32,9 @@ export function ThemeToggle() {
       aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
     >
       {theme === "dark" ? (
-        <Sun className="size-5 text-foreground" />
+        <HugeiconsIcon icon={Sun03Icon} className="size-5 text-foreground" />
       ) : (
-        <Moon className="size-5 text-foreground" />
+        <HugeiconsIcon icon={Moon02Icon} className="size-5 text-foreground" />
       )}
     </button>
   );
