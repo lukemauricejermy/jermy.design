@@ -221,6 +221,7 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
       x: 140 + (i % 2) * 60,
       y: window.innerHeight * 1.15,
       rotation: 28 + (i % 3) * 6,
+      scale: 1.06,
     }),
     []
   );
@@ -256,12 +257,14 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
         if (count > prev) {
           for (let i = prev; i < count; i++) {
             gsap.killTweensOf(els[i]);
-            gsap.to(els[i], {
-              ...restFor(i),
-              duration: 0.75,
-              delay: (i - prev) * 0.08,
-              ease: "back.out(1.1)",
-            });
+            // Dealt, not dropped: the card arrives slightly lifted, touches
+            // down early (scale eases in to 1) and then slides to a stop on
+            // friction. Everything decelerates; nothing overshoots.
+            const { rotation, ...pos } = restFor(i);
+            const delay = (i - prev) * 0.08;
+            gsap.to(els[i], { ...pos, duration: 0.7, delay, ease: "power4.out" });
+            gsap.to(els[i], { rotation, duration: 0.8, delay, ease: "power3.out" });
+            gsap.to(els[i], { scale: 1, duration: 0.28, delay, ease: "power2.in" });
           }
         } else {
           for (let i = prev - 1; i >= count; i--) {
