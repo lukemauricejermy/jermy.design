@@ -227,7 +227,6 @@ function VemiArt() {
           style={{
             left: `${card.left}cqw`,
             top: `${card.top}cqw`,
-            filter: CARD_SHADOW,
             transitionDelay: `${card.delay}ms`,
           }}
         >
