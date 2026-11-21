@@ -27,6 +27,12 @@ const ALL_CASE_STUDIES_QUERY = `
       heroBackgroundColour {
         hex
       }
+      clientLogo {
+        url
+        alt
+        width
+        height
+      }
     }
   }
 `;
@@ -46,6 +52,12 @@ const FEATURED_CASE_STUDIES_PUBLISHED_QUERY = `
       heroBackgroundColour {
         hex
       }
+      clientLogo {
+        url
+        alt
+        width
+        height
+      }
     }
   }
 `;
@@ -63,6 +75,12 @@ type CaseStudy = {
   } | null;
   year: string | null;
   heroBackgroundColour: { hex: string } | null;
+  clientLogo: {
+    url: string;
+    alt: string | null;
+    width: number | null;
+    height: number | null;
+  } | null;
 };
 
 /**
@@ -161,9 +179,10 @@ async function fetchFeaturedCaseStudies(): Promise<CaseStudy[]> {
 
 /**
  * The tile is the whole visual: no card around it. A square field of the
- * project's brand colour with the cover fitted inside it (covers are wide,
- * so nothing important is cropped). Without a brand colour it falls back to
- * the muted surface.
+ * project's brand colour with the client logo centred on it. Temporary: the
+ * cover images crop badly in a square, so logos stand in until there are
+ * square covers; a case without a logo falls back to its cover, fitted.
+ * Without a brand colour the field is the muted surface.
  */
 function BrandTile({ study, overlay }: { study: CaseStudy; overlay?: string }) {
   const brand = study.heroBackgroundColour?.hex;
@@ -172,14 +191,26 @@ function BrandTile({ study, overlay }: { study: CaseStudy; overlay?: string }) {
       className="relative aspect-square overflow-hidden rounded-[var(--radius-card)] bg-muted"
       style={brand ? { backgroundColor: brand } : undefined}
     >
-      {study.coverImage && (
-        <Image
-          src={study.coverImage.url}
-          alt={study.coverImage.alt || study.title}
-          fill
-          sizes="(min-width: 640px) 50vw, 100vw"
-          className="object-contain object-center transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-        />
+      {study.clientLogo ? (
+        <div className="absolute inset-0 flex items-center justify-center p-[22%] transition-transform duration-700 ease-out group-hover:scale-[1.04]">
+          <Image
+            src={study.clientLogo.url}
+            alt={study.clientLogo.alt || `${study.title} logo`}
+            width={study.clientLogo.width ?? 480}
+            height={study.clientLogo.height ?? 160}
+            className="h-auto max-h-full w-full object-contain"
+          />
+        </div>
+      ) : (
+        study.coverImage && (
+          <Image
+            src={study.coverImage.url}
+            alt={study.coverImage.alt || study.title}
+            fill
+            sizes="(min-width: 640px) 50vw, 100vw"
+            className="object-contain object-center transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+          />
+        )
       )}
       {overlay && (
         <div className="absolute inset-0 flex items-center justify-center bg-background/60 backdrop-blur-sm">
