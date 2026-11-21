@@ -606,7 +606,7 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
             distance={animationDistances.default}
             easing={animationEasings.smooth}
           >
-            <Lead>
+            <Lead className="text-foreground">
               There&apos;s a core set of principles that guide how I work — part
               manifesto, part checklist. They&apos;re what I return to when I need
               to sense-check decisions and stay true to myself.
@@ -619,7 +619,7 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
             distance={animationDistances.default}
             easing={animationEasings.smooth}
           >
-            <Lead>
+            <Lead className="text-foreground">
               If you know me, you&apos;ve probably heard these before.
             </Lead>
           </FadeUp>

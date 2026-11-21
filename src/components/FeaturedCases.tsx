@@ -406,13 +406,14 @@ export default async function FeaturedCases() {
             easing={animationEasings.smooth}
             className="flex flex-col gap-8"
           >
-            <Lead>
+            <Lead className="text-foreground">
               I&apos;ve spent the last 20 years creating digital products —
-              leading design teams in-house, consulting, and running my own
+              leading design teams{" "}
+              <span className="whitespace-nowrap">in-house</span>, consulting, and running my own
               design studio. I&apos;ve worked across many industries, alongside
               some exceptional teams and people.
             </Lead>
-            <Lead>
+            <Lead className="text-foreground">
               This portfolio is a curated snapshot of that work — a selection of
               the projects I&apos;m most proud of and able to share publicly.
             </Lead>
