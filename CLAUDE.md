@@ -85,7 +85,8 @@ src/
 - **Display and all title styles** (`hero`, `display`, `headline`, `title-lg`, `title`, `title-sm`) are SemiBold with tight line height (0.97–1.1) and negative tracking. Display is 0.97 / −4%, matched to Displaay's type tester; the others taper to about −2% at 24px. All values are em or ratios, so they scale with font size. Don't loosen them back. A `type-*` class overrides any earlier weight, leading or tracking class (e.g. CardTitle's base `font-medium`).
 - Matter metrics: cap 0.70em, x-height 0.504em, ink ~0.9em, ascent/descent box 0.95/0.24. Weights shipped: 400/500/600 (`font-synthesis: none`).
 - `TextReveal` inherits line height from its parent. Each word's mask extends 0.25em below the line (descenders) and 0.12em to each side (glyphs overhang under tight tracking), with matching negative margins, so parents need no clipping. Never put `overflow-hidden` on a reveal heading.
-- Known off-scale one-offs (left as-is deliberately): values intro `Lead` (20/28 at all widths), footer `Lead`, preloader greeting.
+- **Headings, lead and body are fluid** (`clamp()`): each grows in a straight line from its phone size at 375px through the old desktop size at ~1280px, capped near 1920px (e.g. headline 36 → 64 → 80, lead 18 → 24, body 16 → 18). Label, small, caption and overline stay fixed. Keep new sizes in the same form so the /design-system readouts can parse the range.
+- Known off-scale one-offs (left as-is deliberately): footer `Lead`, preloader greeting.
 - Fonts: Matter (400/500/600) from `public/fonts`, and DM Mono via `next/font` (`preload: false`) for `type-overline`, `font-mono` and code.
 
 ### Artwork

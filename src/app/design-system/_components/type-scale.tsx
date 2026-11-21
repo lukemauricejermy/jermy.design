@@ -252,6 +252,8 @@ function TypeRow({
               const lhSource = spec.lineHeight ?? base?.lineHeight
               const lhPx = lhSource ? toPx(lhSource, sizePx ?? undefined) : null
               const fluid = fluidRange(spec.fontSize)
+              // A breakpoint that only retunes leading/tracking on a fluid size.
+              const fluidBase = !spec.fontSize && fluidRange(base?.fontSize)
               const lhRatio = lhSource ? fallback(lhSource) : null
               return (
                 <span
@@ -265,7 +267,7 @@ function TypeRow({
                   title={minWidth ? `≥ ${minWidth}px` : "All widths"}
                 >
                   {BREAKPOINT_NAMES[minWidth] ?? `${minWidth}px`}{" "}
-                  {fluid ? `fluid ${fluid} / ${lhRatio}` : (
+                  {fluid ? `fluid ${fluid} / ${lhRatio}` : fluidBase ? `/ ${lhRatio}` : (
                     <>
                       {sizePx ?? "?"}
                       {lhPx ? `/${+lhPx.toFixed(1)}` : ""}

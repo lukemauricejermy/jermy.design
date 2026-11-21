@@ -582,7 +582,7 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
   }, [selected, turnBack]);
 
   return (
-    <section className="bg-background px-6 py-24 lg:py-0">
+    <section className="overflow-x-clip bg-background px-6 py-24 lg:py-0">
       <div
         ref={sectionRef}
         className="mx-auto grid max-w-[1440px] items-center gap-12 lg:h-svh lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16"
@@ -606,7 +606,7 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
             distance={animationDistances.default}
             easing={animationEasings.smooth}
           >
-            <Lead className="text-xl leading-7">
+            <Lead>
               There&apos;s a core set of principles that guide how I work — part
               manifesto, part checklist. They&apos;re what I return to when I need
               to sense-check decisions and stay true to myself.
@@ -619,7 +619,7 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
             distance={animationDistances.default}
             easing={animationEasings.smooth}
           >
-            <Lead className="text-xl leading-7">
+            <Lead>
               If you know me, you&apos;ve probably heard these before.
             </Lead>
           </FadeUp>
