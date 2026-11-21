@@ -192,7 +192,7 @@ const logos = [
 
 export default function SocialProof() {
   return (
-    <section className="bg-background flex flex-col gap-6 items-center justify-center px-6 py-[max(8rem,30svh)] w-full">
+    <section className="bg-background flex flex-col gap-6 items-center justify-center px-6 py-[max(10rem,40svh)] w-full">
       <div className="flex items-center justify-center max-w-[90rem] w-full">
         <FadeUp
           triggerOnScroll={true}
@@ -202,7 +202,7 @@ export default function SocialProof() {
           className="w-full"
         >
           <Lead className="text-center">
-            Worked as part of some of the world's best digital and design teams:
+            Worked as part of some of the world&apos;s best digital and design teams:
           </Lead>
         </FadeUp>
       </div>
@@ -215,7 +215,7 @@ export default function SocialProof() {
           duration={animationDurations.default}
           distance={15}
           easing={animationEasings.smooth}
-          className="grid grid-cols-4 gap-6 md:gap-8 lg:gap-10 items-center justify-items-center py-6 w-full max-w-[50rem] mx-auto [--logo-base-width:3rem] md:[--logo-base-width:4.75rem] lg:[--logo-base-width:6.125rem]"
+          className="grid grid-cols-4 gap-6 md:gap-10 lg:gap-16 items-center justify-items-center py-6 w-full max-w-[64rem] mx-auto [--logo-base-width:3.5rem] md:[--logo-base-width:5.5rem] lg:[--logo-base-width:7.5rem]"
         >
           {logos.map((logo) => {
             const LogoComponent = logo.component;
@@ -226,7 +226,8 @@ export default function SocialProof() {
                 key={logo.name}
                 className="relative shrink-0 flex items-center justify-center"
               >
-                <div style={{ width: `${scaledWidth}px`, height: `${scaledHeight}px` }}>
+                {/* rem-based, so the logos grow with the rest of the site */}
+                <div style={{ width: scaledWidth, height: scaledHeight }}>
                   <LogoComponent width={logo.width} height={logo.height} />
                 </div>
               </div>
