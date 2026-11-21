@@ -86,7 +86,7 @@ export default async function Footer() {
             className="object-contain object-bottom transition-opacity duration-300 dark:opacity-0"
           />
           <Image
-            src="/images/footer/coffee-v1-dark.png"
+            src="/images/footer/coffee-v2-dark.png"
             alt=""
             fill
             sizes="(min-width: 1024px) 50vw, 80vw"
