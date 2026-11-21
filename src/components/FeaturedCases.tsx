@@ -192,13 +192,15 @@ function BrandTile({ study, overlay }: { study: CaseStudy; overlay?: string }) {
       style={brand ? { backgroundColor: brand } : undefined}
     >
       {study.clientLogo ? (
-        <div className="absolute inset-0 flex items-center justify-center p-[22%] transition-transform duration-700 ease-out group-hover:scale-[1.04]">
+        // Every logo the same height (12% of the tile); width follows its
+        // shape, capped so wide wordmarks keep a margin.
+        <div className="absolute inset-0 flex items-center justify-center transition-transform duration-700 ease-out group-hover:scale-[1.04]">
           <Image
             src={study.clientLogo.url}
             alt={study.clientLogo.alt || `${study.title} logo`}
             width={study.clientLogo.width ?? 480}
             height={study.clientLogo.height ?? 160}
-            className="h-auto max-h-full w-full object-contain"
+            className="h-[12%] w-auto max-w-[70%] object-contain"
           />
         </div>
       ) : (
