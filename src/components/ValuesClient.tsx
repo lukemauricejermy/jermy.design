@@ -202,7 +202,6 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
   const total = values.length;
   const [dealt, setDealt] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
-  const [reducedMotion, setReducedMotion] = useState(false);
 
   const sectionRef = useRef<HTMLDivElement>(null);
   const deckAreaRef = useRef<HTMLDivElement>(null);
@@ -226,7 +225,6 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
   useLayoutEffect(() => {
     if (!total) return;
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    setReducedMotion(prefersReduced);
 
     const els = cards.current.filter(Boolean) as HTMLDivElement[];
     flippers.current.forEach((f) => f && gsap.set(f, { transformPerspective: 1800 }));
@@ -289,15 +287,33 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
           // its momentum count once); input that speeds up again is a fresh
           // push, and active scrolling is never held longer than MAX_HOLD.
           // After the last card the next scroll carries on down the page.
-          // Scrolling up unlocks at once, and the cards are thrown back.
+          // Going back up mirrors it: a short scroll up takes back the top card
+          // (scrolling up into the section locks it again), and a long scroll
+          // up throws every card back and lets the page go.
           const GESTURE_GAP = 160;
-          const MIN_STEP = 450; // ms between cards, about the deal's touch-down
-          const MAX_HOLD = 1000;
+          const MIN_STEP = 700; // ms between cards, about the length of a deal
+          const MAX_HOLD = 1400;
+          const LONG_UP = 600; // px scrolled up in one gesture that means "let me out"
           let locked = false;
+          let lockAt = 0;
+          const root = document.documentElement;
+          /**
+           * While locked the page itself can't scroll (overflow hidden), which
+           * also stops any smooth-scroll animation already in flight; wheel,
+           * touch and key input still arrive and deal the cards.
+           */
+          const setLocked = (on: boolean, at = lockAt) => {
+            locked = on;
+            lockAt = at;
+            root.style.overflow = on ? "hidden" : "";
+            if (on) window.scrollTo({ top: at, behavior: "instant" });
+          };
           let lastInput = 0;
-          let lastDelta = 0;
+          let recent: number[] = []; // the last few deltas of the current flow
           let lastStep = 0;
           let gestureUsed = false;
+          let gestureDir: 1 | -1 = 1;
+          let gestureDist = 0;
           let readyAt = 0;
           let touchY: number | null = null;
 
@@ -306,73 +322,114 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
             start: "top top",
             onEnter: (self) => {
               if (dealtRef.current >= total) return;
-              // Loaded (or jumped) well past the section: just show the stack.
-              if (self.scroll() - self.start > window.innerHeight * 0.5) return deal(total);
+              // Loaded or jumped (a link, a reload) well past the section: just
+              // show the stack. Scrolling can't travel this far in one frame.
+              if (self.scroll() - self.start > window.innerHeight * 1.5) return deal(total);
               // Lock at the stage, swallowing any overshoot. One pixel inside:
               // sitting exactly on the start counts as having left it.
-              window.scrollTo({ top: self.start + 1, behavior: "instant" });
-              locked = true;
-              // The gesture that carried us here doesn't also deal a card.
-              gestureUsed = true;
-              lastStep = performance.now();
-              readyAt = lastStep + MIN_STEP;
+              lockFor(1, self.start + 1);
               deal(Math.max(dealtRef.current, 1));
             },
-            onLeaveBack: () => {
-              locked = false;
-              deal(0);
+            onLeaveBack: (self) => {
+              if (dealtRef.current > 0) {
+                // Scrolling back up into the section: lock again so cards can be
+                // taken back one at a time (a long scroll up still gets out).
+                lockFor(-1, self.start + 1);
+                return;
+              }
+              setLocked(false);
             },
             onUpdate: (self) => {
-              // Dragged past with the scrollbar: just show the full stack.
-              if (locked && self.scroll() > self.start + 6) {
-                locked = false;
-                deal(total);
+              // Anything that still moves the page while locked is undone.
+              if (locked && Math.abs(self.scroll() - lockAt) > 2) {
+                window.scrollTo({ top: lockAt, behavior: "instant" });
               }
             },
           });
 
-          /** Deal the next card; after the last one, let the page go. */
+          /** Lock in place, treating the gesture that carried us here as spent. */
+          function lockFor(dir: 1 | -1, at: number) {
+            setLocked(true, at);
+            gestureUsed = true;
+            gestureDir = dir;
+            gestureDist = 0;
+            lastStep = performance.now();
+            readyAt = lastStep + MIN_STEP;
+          }
+
+          /** Deal the next card; after the last one, let the page go on down. */
           const next = () => {
             if (dealtRef.current >= total) {
-              locked = false;
+              setLocked(false);
               return false;
             }
             deal(dealtRef.current + 1);
-            if (dealtRef.current >= total) readyAt = performance.now() + MIN_STEP;
             return true;
           };
 
-          /** Downward input while locked. Returns true to swallow it. */
-          const forward = (delta: number) => {
-            const now = performance.now();
-            const pause = now - lastInput > GESTURE_GAP;
-            if (!locked) {
-              // Keep tracking the flow, so arrival momentum isn't a new gesture.
-              lastInput = now;
-              lastDelta = delta;
+          /** Take back the top card; with none left, let the page go back up. */
+          const prev = () => {
+            if (dealtRef.current <= 0) {
+              setLocked(false);
               return false;
             }
-            // Momentum only ever decays; a jump in speed is a new push.
-            const push = delta > lastDelta * 1.5 + 8;
-            // The hold only lapses for active scrolling, not momentum's faint tail.
-            const held = now - lastStep > MAX_HOLD && delta >= 16;
-            if (pause || push || held) gestureUsed = false;
+            deal(dealtRef.current - 1);
+            return true;
+          };
+
+          /** Throw every card back and let the page scroll up. */
+          const leaveUp = () => {
+            deal(0);
+            setLocked(false);
+            return false;
+          };
+
+          /**
+           * Scroll input. dir 1 is down, -1 is up; delta is the distance, always
+           * positive. Returns true to swallow the event.
+           */
+          const input = (dir: 1 | -1, delta: number) => {
+            const now = performance.now();
+            const pause = now - lastInput > GESTURE_GAP;
+            const turned = dir !== gestureDir;
+            if (!locked) {
+              // Keep tracking the flow, so arrival momentum isn't a new gesture.
+              if (pause || turned) recent = [];
+              recent.push(delta);
+              if (recent.length > 8) recent.shift();
+              lastInput = now;
+              gestureDir = dir;
+              return false;
+            }
+            if (pause || turned) recent = [];
+            recent.push(delta);
+            if (recent.length > 8) recent.shift();
+            // Momentum decays; a new push speeds up again. Compare averages, not
+            // single events, so one lumpy (coalesced) event can't count as a push.
+            const avg = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / Math.max(xs.length, 1);
+            const latest = avg(recent.slice(-3));
+            const before = avg(recent.slice(0, -3));
+            const push = recent.length >= 8 && latest > before * 2.5 && latest > 20;
+            // The hold only lapses for firm, ongoing scrolling, not momentum's tail.
+            const held = now - lastStep > MAX_HOLD && latest >= 30;
+            if (pause || push || held || turned) gestureUsed = false;
+            if (push) recent = recent.slice(-3);
+            if (pause || turned) gestureDist = 0;
+            gestureDist += delta;
             lastInput = now;
-            lastDelta = delta;
+            gestureDir = dir;
+            // A long scroll up means "let me out": all the cards go.
+            if (dir < 0 && gestureDist > LONG_UP) return leaveUp();
             if (gestureUsed || now < readyAt) return true;
             gestureUsed = true;
             lastStep = now;
             readyAt = now + MIN_STEP;
-            return next();
+            return dir > 0 ? next() : prev();
           };
 
           const onWheel = (e: WheelEvent) => {
-            if (e.ctrlKey) return;
-            if (e.deltaY > 0) {
-              if (forward(e.deltaY)) e.preventDefault();
-            } else if (e.deltaY < 0) {
-              locked = false;
-            }
+            if (e.ctrlKey || e.deltaY === 0) return;
+            if (input(e.deltaY > 0 ? 1 : -1, Math.abs(e.deltaY))) e.preventDefault();
           };
           const onTouchStart = (e: TouchEvent) => {
             touchY = e.touches[0]?.clientY ?? null;
@@ -382,25 +439,19 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
             if (touchY === null || y === undefined) return;
             const delta = touchY - y; // finger moving up = scrolling down
             touchY = y;
-            if (delta > 2) {
-              if (forward(delta)) e.preventDefault();
-            } else if (delta < -2) {
-              locked = false;
-            }
+            if (Math.abs(delta) > 2 && input(delta > 0 ? 1 : -1, Math.abs(delta))) e.preventDefault();
           };
           const onKey = (e: KeyboardEvent) => {
             if (!locked || e.altKey || e.metaKey || e.ctrlKey) return;
             if (e.target instanceof Element && e.target.closest("input, textarea, select, [contenteditable]"))
               return;
-            const down = ["ArrowDown", "PageDown", " "].includes(e.key) && !(e.key === " " && e.shiftKey);
-            const up = ["ArrowUp", "PageUp", "Home"].includes(e.key) || (e.key === " " && e.shiftKey);
-            if (down) {
-              // Space on a focused card turns it over instead.
-              if (e.key === " " && e.target instanceof Element && e.target.closest("[data-value-card]")) return;
-              if (next()) e.preventDefault();
-            } else if (up) {
-              locked = false;
-            }
+            // Space on a focused card turns it over instead.
+            if (e.key === " " && e.target instanceof Element && e.target.closest("[data-value-card]")) return;
+            const down = ["ArrowDown", "PageDown"].includes(e.key) || (e.key === " " && !e.shiftKey);
+            const up = ["ArrowUp", "PageUp"].includes(e.key) || (e.key === " " && e.shiftKey);
+            if (e.key === "Home") leaveUp();
+            else if (down && next()) e.preventDefault();
+            else if (up && prev()) e.preventDefault();
           };
           window.addEventListener("wheel", onWheel, { passive: false });
           window.addEventListener("touchstart", onTouchStart, { passive: true });
@@ -408,6 +459,7 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
           document.addEventListener("keydown", onKey);
 
           return () => {
+            root.style.overflow = "";
             st.kill();
             window.removeEventListener("wheel", onWheel);
             window.removeEventListener("touchstart", onTouchStart);
@@ -529,13 +581,6 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
     };
   }, [selected, turnBack]);
 
-  const hint =
-    selected !== null
-      ? "Tap the card to turn it back"
-      : dealt < total && !reducedMotion
-        ? "Keep scrolling to deal"
-        : "Tap a card to turn it over";
-
   return (
     <section className="bg-background px-6 py-24 lg:py-0">
       <div
@@ -607,12 +652,9 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
               />
             ))}
           </div>
-          <p className="type-caption text-muted-foreground" aria-live="polite">
-            <span className="font-mono tabular-nums">
-              {String(dealt).padStart(2, "0")} / {String(total).padStart(2, "0")}
-            </span>
-            <span className="mx-2">·</span>
-            {hint}
+          {/* No visible caption; screen readers hear each card as it's dealt. */}
+          <p className="sr-only" aria-live="polite">
+            {dealt} of {total} values dealt
           </p>
         </div>
       </div>
