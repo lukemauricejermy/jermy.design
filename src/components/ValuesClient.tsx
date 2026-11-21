@@ -631,7 +631,9 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
         >
           <div
             className="relative aspect-[5/7]"
-            style={{ width: "min(36rem, 78vw, calc((100svh - 10rem) * 5 / 7))" }}
+            // Sized by whichever is tightest: a cap, the column (leaving room
+            // for the stack's tilt), the screen width, or the screen height.
+            style={{ width: "min(36rem, 85%, 78vw, calc((100svh - 10rem) * 5 / 7))" }}
           >
             {values.map((value, i) => (
               <ValueCard
