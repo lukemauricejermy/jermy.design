@@ -5,7 +5,7 @@ import {
   ItemTitle,
   ItemDescription,
 } from "@/components/ui/item";
-import { FadeUp, StaggerChildren, TextReveal } from "@/components/animations";
+import { FadeUp, StaggerChildren } from "@/components/animations";
 import {
   animationDurations,
   animationEasings,
@@ -163,14 +163,7 @@ export function CaseStudyOverview({ caseStudy }: CaseStudyOverviewProps) {
               column scrolls past, until the section bottom is reached. */}
           <div className="flex flex-col gap-6 lg:sticky lg:top-28 lg:self-start">
             <H2>
-              <TextReveal
-                triggerOnScroll
-                duration={750}
-                stagger={0.02}
-                easing={animationEasings.robust}
-              >
-                Overview
-              </TextReveal>
+              Overview
             </H2>
             {caseStudy.overviewText && (
               <FadeUp

@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { StaggerChildren, TextReveal } from "@/components/animations";
+import { StaggerChildren } from "@/components/animations";
 import {
   animationDurations,
   animationEasings,
@@ -69,14 +69,7 @@ export function CaseStudyRelated({ related }: CaseStudyRelatedProps) {
       <div className="mx-auto flex w-full max-w-[90rem] flex-col items-center gap-16">
         {/* Full-width section title */}
         <H2 className="w-full">
-          <TextReveal
-            triggerOnScroll
-            duration={750}
-            stagger={0.015}
-            easing={animationEasings.robust}
-          >
-            Carry on through the archives
-          </TextReveal>
+          Carry on through the archives
         </H2>
 
         <StaggerChildren

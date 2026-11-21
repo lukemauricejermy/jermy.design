@@ -1,6 +1,6 @@
 import { H2 } from "@/components/ui/typography";
 import { Item, ItemContent } from "@/components/ui/item";
-import { StaggerChildren, TextReveal } from "@/components/animations";
+import { StaggerChildren } from "@/components/animations";
 import {
   animationDurations,
   animationEasings,
@@ -110,14 +110,7 @@ export function CaseStudyCallouts({ callouts }: CaseStudyCalloutsProps) {
           >
             {callout.title && (
               <H2>
-                <TextReveal
-                  triggerOnScroll
-                  duration={750}
-                  stagger={0.02}
-                  easing={animationEasings.robust}
-                >
-                  {callout.title}
-                </TextReveal>
+                {callout.title}
               </H2>
             )}
             <StaggerChildren
