@@ -15,7 +15,8 @@ import {
   animationDistances,
   animationDelays,
 } from "@/lib/animation-config";
-import { X } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 
 /** DatoCMS Structured Text field – matches StructuredText data prop */
@@ -89,7 +90,7 @@ const ValueCard = React.forwardRef<
     <div ref={ref} className={cn("h-full", className)} aria-hidden={ariaHidden}>
       <Card
         className={cn(
-          "overflow-hidden flex flex-col h-full transition-shadow hover:shadow-md border border-border rounded-3xl shadow-sm p-8 cursor-pointer"
+          "overflow-hidden flex flex-col h-full transition-shadow hover:shadow-lg p-6 md:p-8 cursor-pointer"
         )}
         onClick={onClick}
       >
@@ -140,7 +141,7 @@ function ExpandedValueCard({
   return (
     <Card
       className={cn(
-        "isolate overflow-hidden h-full w-full border border-border rounded-3xl shadow-sm p-8 relative",
+        "isolate overflow-hidden h-full w-full p-6 md:p-8 relative",
         isStacked ? "flex flex-col" : "flex flex-row"
       )}
     >
@@ -615,7 +616,7 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
       />
       <div
         ref={modalCardRef}
-        className="absolute z-10 overflow-hidden rounded-3xl"
+        className="absolute z-10 overflow-hidden rounded-4xl"
         role="dialog"
       >
         <ExpandedValueCard
@@ -640,9 +641,8 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
             onClick={handleClose}
             aria-label="Close"
             type="button"
-            className="rounded-inner-gap-4"
           >
-            <X className="size-5" />
+            <HugeiconsIcon icon={Cancel01Icon} />
           </Button>
         </div>
       </div>

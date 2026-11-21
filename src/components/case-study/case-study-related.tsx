@@ -26,9 +26,9 @@ function RelatedCard({ study }: { study: RelatedCaseStudy }) {
       href={`/work/${study.slug}`}
       className="group block h-full select-none"
     >
-      <Card className="h-full flex flex-col overflow-hidden rounded-2xl md:rounded-[var(--radius-card)] py-3 md:py-6 transition-shadow group-hover:shadow-md">
+      <Card className="h-full flex flex-col overflow-hidden rounded-[var(--radius-card)] py-3 md:py-6 transition-shadow group-hover:shadow-md">
         <CardContent className="pt-0 px-3 md:px-6">
-          <div className="aspect-video bg-muted relative rounded md:rounded-lg overflow-hidden">
+          <div className="aspect-video bg-muted relative rounded-[calc(var(--radius-card)-0.75rem)] md:rounded-lg overflow-hidden">
             {study.coverImage ? (
               <Image
                 src={study.coverImage.url}

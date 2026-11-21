@@ -145,7 +145,7 @@ async function fetchFeaturedCaseStudies(): Promise<CaseStudy[]> {
 
 function CaseStudyCoverImage({ study }: { study: CaseStudy }) {
   return (
-    <div className="aspect-video bg-muted relative rounded md:rounded-lg overflow-hidden">
+    <div className="aspect-video bg-muted relative rounded-[calc(var(--radius-card)-0.75rem)] md:rounded-lg overflow-hidden">
       {study.coverImage ? (
         <div className="absolute inset-0">
           <Image
@@ -186,9 +186,9 @@ function CaseStudyCardContent({ study }: { study: CaseStudy }) {
 function DraftCaseStudyCard({ study }: { study: CaseStudy }) {
   return (
     <div className="block h-full select-none">
-      <Card className="overflow-hidden h-full flex flex-col rounded-2xl md:rounded-[var(--radius-card)] py-3 md:py-6">
+      <Card className="overflow-hidden h-full flex flex-col rounded-[var(--radius-card)] py-3 md:py-6">
         <CardContent className="pt-0 px-3 md:px-6">
-          <div className="aspect-video bg-muted relative rounded md:rounded-lg overflow-hidden">
+          <div className="aspect-video bg-muted relative rounded-[calc(var(--radius-card)-0.75rem)] md:rounded-lg overflow-hidden">
             {study.coverImage ? (
               <div className="absolute inset-0">
                 <Image
@@ -202,7 +202,7 @@ function DraftCaseStudyCard({ study }: { study: CaseStudy }) {
             ) : (
               <div className="absolute inset-0 flex items-center justify-center bg-muted" />
             )}
-            <div className="absolute inset-0 rounded md:rounded-lg bg-background/60 backdrop-blur-sm flex items-center justify-center pointer-events-none z-10">
+            <div className="absolute inset-0 rounded-[calc(var(--radius-card)-0.75rem)] md:rounded-lg bg-background/60 backdrop-blur-sm flex items-center justify-center pointer-events-none z-10">
               <span className="type-label text-foreground">
                 Full case coming soon
               </span>
@@ -230,7 +230,7 @@ function PublishedCaseStudyCard({ study }: { study: CaseStudy }) {
       href={`/work/${study.slug}`}
       className="group block h-full select-none"
     >
-      <Card className="overflow-hidden h-full flex flex-col rounded-2xl md:rounded-[var(--radius-card)] py-3 md:py-6 transition-shadow group-hover:shadow-md">
+      <Card className="overflow-hidden h-full flex flex-col rounded-[var(--radius-card)] py-3 md:py-6 transition-shadow group-hover:shadow-md">
         <CaseStudyCardContent study={study} />
       </Card>
     </Link>
@@ -240,10 +240,10 @@ function PublishedCaseStudyCard({ study }: { study: CaseStudy }) {
 // Placeholder card when fewer than 4 featured case studies
 function PlaceholderCard() {
   return (
-    <Card className="overflow-hidden h-full min-h-[280px] flex flex-col rounded-2xl md:rounded-[var(--radius-card)] py-3 md:py-6">
+    <Card className="overflow-hidden h-full min-h-[280px] flex flex-col rounded-[var(--radius-card)] py-3 md:py-6">
       <CardContent className="pt-0 px-3 md:px-6">
-        <div className="aspect-video bg-muted rounded md:rounded-lg overflow-hidden relative">
-          <div className="absolute inset-0 rounded md:rounded-lg bg-background/60 backdrop-blur-sm flex items-center justify-center pointer-events-none">
+        <div className="aspect-video bg-muted rounded-[calc(var(--radius-card)-0.75rem)] md:rounded-lg overflow-hidden relative">
+          <div className="absolute inset-0 rounded-[calc(var(--radius-card)-0.75rem)] md:rounded-lg bg-background/60 backdrop-blur-sm flex items-center justify-center pointer-events-none">
             <span className="type-label text-foreground">
               Full case coming soon
             </span>
