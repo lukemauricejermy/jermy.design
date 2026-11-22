@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import { LoopPortrait } from "@/components/LoopPortrait";
 import { FooterWrapper } from "@/components/FooterWrapper";
 import { H1, Lead, P } from "@/components/ui/typography";
 import { Button } from "@/components/ui/button";
@@ -71,26 +71,21 @@ export default async function Footer() {
           </P>
         </div>
 
-        {/* Character: anchored to the bottom edge, facing the copy, sunk 12%
-            below it so the crop lands just under the mug (no over-long tee).
-            Night version in dark mode. */}
+        {/* Character: a loop of him sipping his coffee, looking pleased with
+            it, then waving goodbye (bookending the hero). Anchored to the
+            bottom edge, facing the copy, sunk so the crop lands just under the
+            mug (no over-long tee). Night take in dark mode. */}
         <div
           aria-hidden
-          className="pointer-events-none relative mx-auto -mb-[12%] aspect-square w-[min(64vw,20rem)] lg:absolute lg:right-0 lg:bottom-0 lg:mx-0 lg:mb-0 lg:h-[min(56svh,38rem)] lg:w-auto lg:translate-y-[12%]"
+          className="pointer-events-none relative mx-auto -mb-[12%] aspect-[684/660] w-[min(61vw,19rem)] lg:absolute lg:right-0 lg:bottom-0 lg:mx-0 lg:mb-0 lg:h-[min(51svh,35rem)] lg:w-auto lg:translate-y-[13%]"
         >
-          <Image
-            src="/images/footer/coffee-v1.png"
-            alt=""
-            fill
+          <LoopPortrait
+            light={{ video: "/videos/footer-coffee-v1-light", poster: "/images/footer/footer-coffee-v1-light-poster.png" }}
+            dark={{ video: "/videos/footer-coffee-v1-dark", poster: "/images/footer/footer-coffee-v1-dark-poster.png" }}
+            width={684}
+            height={660}
             sizes="(min-width: 1024px) 50vw, 80vw"
-            className="object-contain object-bottom transition-opacity duration-300 dark:opacity-0"
-          />
-          <Image
-            src="/images/footer/coffee-v2-dark.png"
-            alt=""
-            fill
-            sizes="(min-width: 1024px) 50vw, 80vw"
-            className="object-contain object-bottom opacity-0 transition-opacity duration-300 dark:opacity-100"
+            layerClassName="object-bottom"
           />
         </div>
 

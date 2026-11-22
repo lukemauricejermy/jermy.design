@@ -104,14 +104,15 @@ src/
 - Gemini won't reliably mirror a pose: flip the image yourself (`sips -f horizontal`), then ask it to re-light only.
 - When replacing an image in `public/`, use a new filename. Next's image optimiser caches by URL.
 
-### Hero video
+### Hero and footer video
 
 - The loop is built from two anchored halves so the face-on moment can't drift off-model: typing still → wave still (`generate-video.mjs --from A --to W --duration 4`) and wave → typing (`--from W --to A`). The wave still is made with `generate-art.mjs` and checked by eye first. Prompts lock the eyes ("small, solid dark eyes, no whites, never widened"); without anchoring, the model swaps in round eyes with whites whenever he faces the camera.
 - Join: re-encode each half to constant 24fps, `xfade` 0.25s at the join, then crossfade the last 0.5s into the first 0.5s for the loop point. Check with a frame-difference scan (`tblend` + `signalstats`) that no frame jumps more than normal motion.
 - Night: relight each half with `--previous <half>.interaction.txt` (a follow-up turn on the stored interaction, which is allowed in the UK, unlike uploading video) and assemble it with the identical joins, so it matches frame for frame. Never fake it with masks.
 - Colour-match the relit halves: compare the subject's mean RGB on the last frame of half one and the first frame of half two (same pose) and apply per-channel gains (`colorchannelmixer`) to half two before joining; separately relit halves come back at different brightness.
 - Key both with `python3 scripts/key-video.py --name hero-loop-vN day.mp4:light night.mp4:dark`. Key the night video by its own green when its background stayed clean: relighting subtly reshapes things like the cap, so the day matte doesn't fit (`:dark:light` is only for a dimmed backdrop). The key is green dominance relative to brightness, with edge colour recovery, despill and a 2px choke. One shared crop, VP9-alpha WebM + HEVC-alpha MOV, posters. Version the names.
-- `HeroPortrait` picks the encode on the client, shows posters until the video plays, keeps them for reduced motion, and syncs the incoming loop on theme change. About $0.07/s of video at 720p.
+- The footer loop (sip, a satisfied look, a wave) is built the same way: rest still → wave still (5s, the sip happens in between) and wave → rest (3s). Its stills are square, padded to 16:9 with their own green.
+- `LoopPortrait` (used by `HeroPortrait` and the footer) picks the encode on the client, shows posters until the video plays, keeps them for reduced motion, and syncs the incoming loop on theme change. About $0.07/s of video at 720p.
 
 ### Design system page
 
