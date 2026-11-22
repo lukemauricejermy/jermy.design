@@ -3,7 +3,7 @@ import { performRequest } from "@/lib/datocms";
 import Image from "next/image";
 import { H2, Lead } from "@/components/ui/typography";
 import { Badge } from "@/components/ui/badge";
-import { FadeUp, StaggerChildren, TextReveal } from "@/components/animations";
+import { DealIn, FadeUp, TextReveal } from "@/components/animations";
 import {
   animationDurations,
   animationEasings,
@@ -279,6 +279,7 @@ function BrandTile({ study, overlay }: { study: CaseStudy; overlay?: string }) {
   const brand = study.heroBackgroundColour?.hex;
   return (
     <div
+      data-deal="tile"
       className="@container relative aspect-[4/3] overflow-hidden rounded-[var(--radius-card)] bg-muted"
       style={brand ? { backgroundColor: brand } : undefined}
     >
@@ -322,7 +323,7 @@ function CaseStudyText({ study }: { study: CaseStudy }) {
   const short = SHORT_LINES[study.slug] ?? study.excerpt;
   return (
     <div className="flex flex-col gap-2 pt-6 text-center sm:text-left md:pt-8">
-      <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 sm:justify-start">
+      <div data-deal="text" className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 sm:justify-start">
         <h3 className="type-title min-w-0 text-balance">{study.title}</h3>
         {year && (
           <Badge variant="secondary" size="lg">
@@ -330,7 +331,7 @@ function CaseStudyText({ study }: { study: CaseStudy }) {
           </Badge>
         )}
       </div>
-      {short && <p className="type-lead text-balance text-muted-foreground">{short}</p>}
+      {short && <p data-deal="text" className="type-lead text-balance text-muted-foreground">{short}</p>}
     </div>
   );
 }
@@ -357,9 +358,9 @@ function DraftCaseStudyCard({ study }: { study: CaseStudy }) {
 function PlaceholderCard() {
   return (
     <div>
-      <div className="aspect-[4/3] rounded-[var(--radius-card)] bg-muted" />
+      <div data-deal="tile" className="aspect-[4/3] rounded-[var(--radius-card)] bg-muted" />
       <div className="pt-6 text-center sm:text-left md:pt-8">
-        <h3 className="type-title text-muted-foreground">Coming soon</h3>
+        <h3 data-deal="text" className="type-title text-muted-foreground">Coming soon</h3>
       </div>
     </div>
   );
@@ -384,7 +385,7 @@ export default async function FeaturedCases() {
   });
 
   return (
-    <section className="bg-background py-56 px-6">
+    <section className="overflow-x-clip bg-background py-56 px-6">
       <div className="max-w-[90rem] mx-auto flex flex-col gap-32">
         {/* Row 1: H2 on LEFT, Lead + Button on RIGHT */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-24 text-center md:text-left">
@@ -421,17 +422,11 @@ export default async function FeaturedCases() {
         </div>
 
         {/* Row 2: 2x2 grid of cards spanning full width */}
-        <StaggerChildren
-          triggerOnScroll={true}
-          delayStart={0}
-          delayBetween={80}
-          duration={animationDurations.default}
-          distance={animationDistances.default}
-          easing={animationEasings.smooth}
-          className="featured-cases grid w-full grid-cols-1 gap-x-8 gap-y-16 sm:grid-cols-2 md:gap-y-24"
-        >
+        {/* Tiles deal in as they reach the screen (a calmer take on the
+            values deck), text and year following. */}
+        <DealIn className="featured-cases grid w-full grid-cols-1 gap-x-8 gap-y-16 sm:grid-cols-2 md:gap-y-24">
           {cards}
-        </StaggerChildren>
+        </DealIn>
       </div>
     </section>
   );

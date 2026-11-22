@@ -52,7 +52,7 @@ src/
   components/
     ui/                   shadcn primitives
     case-study/           Case study sections (hero, overview, callouts, related, rich-text)
-    animations/           FadeUp, TextReveal, StaggerChildren
+    animations/           FadeUp, TextReveal, StaggerChildren, DealIn
   lib/
     datocms.ts            performRequest() — the single entry point for Dato queries
     queries/              GraphQL query strings + matching TS types
@@ -130,6 +130,7 @@ src/
 
 - Use GSAP. Pull timings and easings from `@/lib/animation-config` rather than hard-coding numbers, so motion stays consistent.
 - Prefer the reusable wrappers in `@/components/animations` before writing custom timelines.
+- `DealIn` deals cards in as they reach the screen (case tiles): a calmer cousin of the values deck, tuned in `dealIn` in animation-config. No fades and no overshoot: motion lands firmly (power4.out), the site's character is in the choreography, not in bounce.
 - Kill timelines / tweens on unmount.
 
 ## Workflow
