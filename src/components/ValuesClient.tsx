@@ -263,10 +263,10 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
       const mm = gsap.matchMedia();
       mm.add(
         { desktop: "(min-width: 1024px)", mobile: "(max-width: 1023.98px)" },
-        (c) => {
-          // The part that fills the screen while dealing: the whole two-column
-          // layout on desktop, just the deck on mobile.
-          const stage = c.conditions?.desktop ? sectionRef.current : deckAreaRef.current;
+        () => {
+          // The part that fills the screen while dealing: the whole section
+          // (intro and deck), at every size.
+          const stage = sectionRef.current;
 
           // No long pinned track: when the stage reaches the top of the screen
           // the page locks in place, and scrolling deals the cards instead of
@@ -577,12 +577,15 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
   }, [selected, turnBack]);
 
   return (
-    <section className="overflow-x-clip bg-background px-6 py-24 lg:py-0">
+    <section className="overflow-x-clip bg-background px-6">
       <div
         ref={sectionRef}
-        className="mx-auto grid max-w-[90rem] items-center gap-12 lg:h-svh lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16"
+        // One screen tall at every size, so the whole section locks while the
+        // cards deal: intro on top and the deck filling the rest when stacked,
+        // side by side from lg.
+        className="mx-auto grid h-svh min-h-[34rem] max-w-[90rem] grid-rows-[auto_minmax(0,1fr)] gap-6 pt-16 pb-6 md:gap-10 md:pt-24 md:pb-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:grid-rows-1 lg:items-center lg:gap-16 lg:py-0"
       >
-        <div className="mx-auto flex max-w-2xl flex-col gap-6 text-center lg:mx-0 lg:text-left">
+        <div className="mx-auto flex max-w-2xl flex-col gap-3 text-center md:gap-6 lg:mx-0 lg:text-left">
           <H2>
             <TextReveal
               triggerOnScroll={true}
@@ -622,13 +625,16 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
 
         <div
           ref={deckAreaRef}
-          className="flex h-svh flex-col items-center justify-center gap-8 lg:h-auto"
+          // Stacked, the deck sizes itself to the space left under the intro
+          // (a size container, so the card can use cqh).
+          className="flex min-h-0 flex-col items-center justify-center max-lg:[container-type:size]"
         >
           <div
-            className="relative aspect-[5/7]"
+            className="relative aspect-[5/7] [--deck-w:min(36rem,78vw,calc(94cqh*5/7))] lg:[--deck-w:min(36rem,85%,78vw,calc((100svh-10rem)*5/7))]"
             // Sized by whichever is tightest: a cap, the column (leaving room
-            // for the stack's tilt), the screen width, or the screen height.
-            style={{ width: "min(36rem, 85%, 78vw, calc((100svh - 10rem) * 5 / 7))" }}
+            // for the stack's tilt), the screen width, or the height available:
+            // the deck area when stacked, the screen beside the intro from lg.
+            style={{ width: "var(--deck-w)" }}
           >
             {values.map((value, i) => (
               <ValueCard
