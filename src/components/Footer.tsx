@@ -71,19 +71,19 @@ export default async function Footer() {
           </P>
         </div>
 
-        {/* Character: a loop of him sipping his coffee, looking pleased with
+        {/* Character: facing the camera, a loop of him sipping his coffee, looking pleased with
             it, then waving goodbye (bookending the hero). Anchored to the
             bottom edge, facing the copy, sunk so the crop lands just under the
             mug (no over-long tee). Night take in dark mode. */}
         <div
           aria-hidden
-          className="pointer-events-none relative mx-auto -mb-[12%] aspect-[684/660] w-[min(61vw,19rem)] lg:absolute lg:right-0 lg:bottom-0 lg:mx-0 lg:mb-0 lg:h-[min(51svh,35rem)] lg:w-auto lg:translate-y-[13%]"
+          className="pointer-events-none relative mx-auto -mb-[6%] aspect-[776/678] w-[min(69vw,21.5rem)] lg:absolute lg:right-0 lg:bottom-0 lg:mx-0 lg:mb-0 lg:h-[min(53svh,36rem)] lg:w-auto lg:translate-y-[13%]"
         >
           <LoopPortrait
-            light={{ video: "/videos/footer-coffee-v1-light", poster: "/images/footer/footer-coffee-v1-light-poster.png" }}
-            dark={{ video: "/videos/footer-coffee-v1-dark", poster: "/images/footer/footer-coffee-v1-dark-poster.png" }}
-            width={684}
-            height={660}
+            light={{ video: "/videos/footer-coffee-v2-light", poster: "/images/footer/footer-coffee-v2-light-poster.png" }}
+            dark={{ video: "/videos/footer-coffee-v2-dark", poster: "/images/footer/footer-coffee-v2-dark-poster.png" }}
+            width={776}
+            height={678}
             sizes="(min-width: 1024px) 50vw, 80vw"
             layerClassName="object-bottom"
           />
