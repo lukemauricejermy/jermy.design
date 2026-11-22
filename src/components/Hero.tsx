@@ -165,7 +165,7 @@ export default function Hero() {
         ref={headingRef}
         variant="hero"
         as="h1"
-        className="relative z-0 w-full text-left text-foreground"
+        className="relative z-0 w-full text-center text-foreground md:text-left"
       >
         {isPreloaderDone ? (
           <TextReveal
@@ -181,7 +181,8 @@ export default function Hero() {
         )}
       </Typography>
 
-      {/* Portrait: stacked under the headline on phones; from md, a floating
+      {/* Portrait: stacked under the headline on phones (centred, like the
+          headline above it); from md, a floating
           vignette in the bottom-right corner inside the padding, facing left so he
           faces into the page towards the type. */}
       <span
@@ -191,7 +192,7 @@ export default function Hero() {
         data-hero-portrait
         // Already in place when the preloader swipes away; the headline
         // animates in around it.
-        className="pointer-events-none relative z-10 mt-6 block aspect-[694/602] h-[min(24svh,60vw)] self-end md:absolute md:right-[7.5vw] md:bottom-[7.5svh] md:mt-0 md:h-[min(26svh,20vw)]"
+        className="pointer-events-none relative z-10 mt-6 block aspect-[694/602] h-[min(24svh,60vw)] self-center md:absolute md:right-[7.5vw] md:bottom-[7.5svh] md:mt-0 md:h-[min(26svh,20vw)]"
       >
         <HeroPortrait />
       </span>

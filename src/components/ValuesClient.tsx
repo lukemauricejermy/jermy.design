@@ -582,7 +582,7 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
         ref={sectionRef}
         className="mx-auto grid max-w-[90rem] items-center gap-12 lg:h-svh lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16"
       >
-        <div className="flex max-w-2xl flex-col gap-6">
+        <div className="mx-auto flex max-w-2xl flex-col gap-6 text-center lg:mx-0 lg:text-left">
           <H2>
             <TextReveal
               triggerOnScroll={true}

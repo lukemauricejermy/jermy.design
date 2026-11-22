@@ -22,11 +22,12 @@ export default async function Footer() {
 
   return (
     <FooterWrapper className="fixed bottom-0 left-0 right-0 z-0 overflow-hidden bg-secondary border-t border-border px-6">
-      {/* The page's last word: a big statement and one action on the left, the
+      {/* The page's last word: a big statement and one action on the left (centred while stacked,
+          below lg), the
           character waving goodbye on the right (bookending the hero), then a
           quiet row of small print. One screen tall on desktop. */}
       <div className="relative mx-auto flex max-w-[90rem] flex-col lg:h-svh">
-        <div className="relative z-10 flex flex-1 flex-col justify-center gap-8 pt-24 pb-10 md:gap-10 lg:max-w-[55%] lg:py-0">
+        <div className="relative z-10 flex flex-1 flex-col justify-center gap-8 pt-24 pb-10 text-center md:gap-10 lg:max-w-[55%] lg:py-0 lg:text-left">
           <FadeUp
             triggerOnScroll
             duration={animationDurations.default}
@@ -41,13 +42,13 @@ export default async function Footer() {
             duration={animationDurations.default}
             distance={animationDistances.default}
             easing={animationEasings.smooth}
-            className="flex flex-col gap-8"
+            className="flex flex-col items-center gap-8 lg:items-start"
           >
-            <Lead className="max-w-xl text-foreground">
+            <Lead className="max-w-xl text-balance text-foreground lg:text-pretty">
               Whether it&apos;s a role, a project or a sounding board, I&apos;m
               always up for a chat.
             </Lead>
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-3 lg:justify-start">
               <Button asChild size="lg" className="w-fit">
                 <Link href={bookingLink} target="_blank" rel="noopener noreferrer">
                   Book a chat
@@ -65,7 +66,7 @@ export default async function Footer() {
           </FadeUp>
         </div>
 
-        <div className="relative z-10 py-6 lg:absolute lg:bottom-0 lg:left-0">
+        <div className="relative z-10 py-6 text-center lg:absolute lg:bottom-0 lg:left-0 lg:text-left">
           <P className="type-small text-muted-foreground">
             © 2026 jermy.design. All rights reserved.
           </P>

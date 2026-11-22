@@ -120,6 +120,7 @@ src/
 - When adding a component or token, add it to the page too (`src/app/design-system/`).
 - Use design tokens (`bg-background`, `text-muted-foreground`, `bg-chip-surface`, etc.), not raw colours. New tokens go in `globals.css` under both `:root` and `.dark`, then get mapped in `@theme inline`.
 - Every change must look right in **both light and dark mode** and across mobile / tablet / desktop.
+- **Stacked layouts centre their text.** Wherever a section stacks into one column (phones, and tablets for sections that stack until `lg`), headings, intros, buttons and small print are centre-aligned; side-by-side layouts stay left-aligned (`text-center md:text-left`, `lg:` where the section stacks until `lg`). Text inside cards stays left.
 - **Large screens scale the whole UI**: the root font size is 16px up to 1440px wide, then grows to 22px at 2560px (`html` in `globals.css`). So size layout in rem, not px (content widths are `max-w-[90rem]`, not `max-w-[1440px]`), or it won't grow with everything else.
 - Nested rounded elements use the concentric radius tokens (`--radius-inner-gap-*`) so inner radius = outer radius − gap.
 - Header and case study hero share layout spacing variables (`--header-*`, `--hero-*`) in `globals.css`; change them together.

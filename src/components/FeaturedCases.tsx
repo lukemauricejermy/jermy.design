@@ -321,8 +321,8 @@ function CaseStudyText({ study }: { study: CaseStudy }) {
   const year = study.year?.trim();
   const short = SHORT_LINES[study.slug] ?? study.excerpt;
   return (
-    <div className="flex flex-col gap-2 pt-6 md:pt-8">
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+    <div className="flex flex-col gap-2 pt-6 text-center sm:text-left md:pt-8">
+      <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 sm:justify-start">
         <h3 className="type-title min-w-0 text-balance">{study.title}</h3>
         {year && (
           <Badge variant="secondary" size="lg">
@@ -358,7 +358,7 @@ function PlaceholderCard() {
   return (
     <div>
       <div className="aspect-[4/3] rounded-[var(--radius-card)] bg-muted" />
-      <div className="pt-6 md:pt-8">
+      <div className="pt-6 text-center sm:text-left md:pt-8">
         <h3 className="type-title text-muted-foreground">Coming soon</h3>
       </div>
     </div>
@@ -387,7 +387,7 @@ export default async function FeaturedCases() {
     <section className="bg-background py-56 px-6">
       <div className="max-w-[90rem] mx-auto flex flex-col gap-32">
         {/* Row 1: H2 on LEFT, Lead + Button on RIGHT */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-24 text-center md:text-left">
           <H2 className="text-balance">
             <TextReveal
               triggerOnScroll={true}
