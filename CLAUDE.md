@@ -80,6 +80,7 @@ src/
 ### Copy
 
 - Any words on the site (headings, intros, case lines, buttons, microcopy) follow the `voice-and-tone` skill in `.claude/skills/voice-and-tone/`: Luke's voice (plain, confident, a bit wry), UX writing fundamentals from NN/g and GOV.UK, house style (British English, sentence case, spaced em dashes) and a review checklist.
+- Case studies follow the `case-study-writing` skill in `.claude/skills/case-study-writing/`: outcome-first structure, the interview used to gather each case, and planned Dato fields. Interview notes and drafts live in `notes/cases/` (gitignored, because the repo is public).
 
 ### Typography
 

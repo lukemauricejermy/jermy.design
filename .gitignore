@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Generated artwork (review before bringing into public/)
 /art/generated/
+
+# Case study interview notes and drafts (may be confidential; repo is public)
+/notes/
