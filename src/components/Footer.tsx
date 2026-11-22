@@ -77,7 +77,7 @@ export default async function Footer() {
             mug (no over-long tee). Night take in dark mode. */}
         <div
           aria-hidden
-          className="pointer-events-none relative mx-auto -mb-[6%] aspect-[776/678] w-[min(69vw,21.5rem)] lg:absolute lg:right-0 lg:bottom-0 lg:mx-0 lg:mb-0 lg:h-[min(53svh,36rem)] lg:w-auto lg:translate-y-[13%]"
+          className="pointer-events-none relative mx-auto -mb-[6%] aspect-[776/678] w-[min(55vw,17rem)] lg:absolute lg:right-0 lg:bottom-0 lg:mx-0 lg:mb-0 lg:h-[min(43svh,37vw)] lg:w-auto lg:translate-y-[13%]"
         >
           <LoopPortrait
             light={{ video: "/videos/footer-coffee-v2-light", poster: "/images/footer/footer-coffee-v2-light-poster.png" }}
