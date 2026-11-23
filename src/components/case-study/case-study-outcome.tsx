@@ -124,7 +124,7 @@ export function CaseStudyOutcome({ draft }: { draft: OutcomeCase }) {
           delayBetween={80}
           className={cn(
             "grid grid-cols-1 gap-3 text-center sm:gap-4 lg:text-left",
-            draft.impact.length >= 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"
+            draft.impact.length === 4 ? "sm:grid-cols-2 lg:grid-cols-4" : draft.impact.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"
           )}
         >
           {draft.impact.map((stat) => (
@@ -221,7 +221,7 @@ export function CaseStudyHeldTrue({ draft }: { draft: OutcomeCase }) {
       {/* Same rhythm as the other sections: heading, a rule, then the content. */}
       <H2 className="pb-8 md:pb-12">{draft.heldTrueHeading ?? "What held true"}</H2>
       <div className="flex flex-col gap-12 border-t border-border pt-16 md:pt-20">
-        <StaggerChildren {...fade} delayBetween={80} className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <StaggerChildren {...fade} delayBetween={80} className={cn("grid grid-cols-1 gap-4", draft.heldTrue.length + (draft.nextTime ? 1 : 0) === 2 ? "md:grid-cols-2" : "md:grid-cols-3")}>
           {draft.heldTrue.map((item) => (
             <div key={item.title} className={cn("flex flex-col justify-between gap-6 rounded-[var(--radius-card)] p-6 md:p-8", SURFACE_CLASS)}>
               <Typography variant="title-sm" as="h3">
