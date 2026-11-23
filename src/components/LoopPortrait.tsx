@@ -78,7 +78,7 @@ export function LoopPortrait({
   }, []);
 
   const layer = cn(
-    "absolute inset-0 size-full object-contain transition-opacity duration-[320ms]",
+    "absolute inset-0 size-full object-contain",
     layerClassName
   );
   const show = { light: "dark:opacity-0", dark: "opacity-0 dark:opacity-100" };

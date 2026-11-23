@@ -108,12 +108,82 @@ export const CASE_STUDY_QUERY = `
         }
       }
 
-      # Related projects (reuse homepage tout card)
+      # Outcome-first template (switches on when outcomeHeadline is set)
+      outcomeHeadline
+      summary
+      facts {
+        ... on CaseFactRecord {
+          label
+          value
+        }
+      }
+      impact {
+        ... on CaseImpactRecord {
+          value
+          label
+        }
+      }
+      quoteText
+      quoteRole
+      startingPoint
+      myRole
+      highlightsHeading
+      highlights {
+        ... on CaseHighlightRecord {
+          id
+          title
+          body
+          images {
+            url
+            alt
+            title
+            width
+            height
+          }
+        }
+      }
+      waysOfWorking {
+        ... on CaseWayOfWorkingRecord {
+          id
+          title
+          body
+          visual
+          quoteText
+          quoteRole
+          image {
+            url
+            alt
+            title
+            width
+            height
+          }
+        }
+      }
+      principlesHeading
+      principles {
+        ... on CasePrincipleRecord {
+          title
+          body
+        }
+      }
+      nextTime
+
+      # Related projects (same tile as the homepage's featured cases)
       relatedCaseStudy1 {
         id
         title
         slug
         excerpt
+        year
+        heroBackgroundColour {
+          hex
+        }
+        clientLogo {
+          url
+          alt
+          width
+          height
+        }
         coverImage {
           url
           alt
@@ -124,6 +194,16 @@ export const CASE_STUDY_QUERY = `
         title
         slug
         excerpt
+        year
+        heroBackgroundColour {
+          hex
+        }
+        clientLogo {
+          url
+          alt
+          width
+          height
+        }
         coverImage {
           url
           alt
@@ -194,6 +274,14 @@ export interface RelatedCaseStudy {
   title: string;
   slug: string;
   excerpt: string | null;
+  year: string | null;
+  heroBackgroundColour: { hex: string } | null;
+  clientLogo: {
+    url: string;
+    alt: string | null;
+    width: number | null;
+    height: number | null;
+  } | null;
   coverImage: {
     url: string;
     alt: string | null;
@@ -225,6 +313,44 @@ export interface CaseStudy {
 
   relatedCaseStudy1: RelatedCaseStudy | null;
   relatedCaseStudy2: RelatedCaseStudy | null;
+
+  // Outcome-first template
+  outcomeHeadline: string | null;
+  summary: string | null;
+  facts: { label: string; value: string }[];
+  impact: { value: string; label: string }[];
+  quoteText: string | null;
+  quoteRole: string | null;
+  startingPoint: string | null;
+  myRole: string | null;
+  highlightsHeading: string | null;
+  highlights: {
+    id: string;
+    title: string;
+    body: string | null;
+    images: CaseAsset[];
+  }[];
+  waysOfWorking: {
+    id: string;
+    title: string;
+    body: string | null;
+    visual: string | null;
+    quoteText: string | null;
+    quoteRole: string | null;
+    image: CaseAsset | null;
+  }[];
+  principlesHeading: string | null;
+  principles: { title: string; body: string | null }[];
+  nextTime: string | null;
+}
+
+/** An image with its caption in the asset title. */
+export interface CaseAsset {
+  url: string;
+  alt: string | null;
+  title: string | null;
+  width: number | null;
+  height: number | null;
 }
 
 export interface CaseStudyQueryResult {

@@ -111,7 +111,7 @@
   --secondary: oklch(0.967 0.001 286.375);
   --secondary-foreground: oklch(0.21 0.006 285.885);
   --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
+  --muted-foreground: oklch(0.48 0.016 285.938); /* darker than zinc default: AA on chip/muted surfaces */
   --accent: oklch(0.967 0.001 286.375);
   --accent-foreground: oklch(0.21 0.006 285.885);
   --destructive: oklch(0.577 0.245 27.325);
@@ -226,43 +226,12 @@
     /* Only use the weights we ship (400/500/600); never fake bold/italic. */
     font-synthesis: none;
     font-kerning: normal;
-    transition: background-color 320ms cubic-bezier(0.4, 0, 0.2, 1);
     @apply font-sans;
   }
   body {
     @apply font-sans bg-background text-foreground;
-    transition: background-color 320ms cubic-bezier(0.4, 0, 0.2, 1),
-                color 320ms cubic-bezier(0.4, 0, 0.2, 1);
   }
-  /* Theme transitions */
-  section, div, button, a, nav, header, footer, main, article, aside {
-    transition-property: background-color, border-color;
-    transition-duration: 320ms;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  h1, h2, h3, h4, h5, h6, p, span, a, button, svg {
-    transition-property: background-color, border-color, fill, stroke;
-    transition-duration: 320ms;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  svg, svg path, svg rect, svg circle, svg ellipse, svg line, svg polyline, svg polygon {
-    transition-property: fill, stroke;
-    transition-duration: 320ms;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  /* Values cards: instant transition (Card bg matches illustration-surface, no visible jump) */
-  [data-slot="card"] [data-illustration] svg,
-  [data-slot="card"] [data-illustration] svg rect,
-  [data-slot="card"] [data-illustration] svg path,
-  [data-slot="card"] [data-illustration] svg circle,
-  [data-slot="card"] [data-illustration] svg ellipse,
-  [data-slot="card"] [data-illustration] svg line,
-  [data-slot="card"] [data-illustration] svg polyline,
-  [data-slot="card"] [data-illustration] svg polygon {
-    transition: none;
-  }
-  /* Don't transition text colors on headings/paragraphs to prevent flicker */
-  /* Text will still change, just without transition animation */
+  /* Theme switches are instant: no colour or crossfade transitions. */
 }
 
 /* Concentric border radius utilities: inner radius = outer - gap */
@@ -284,8 +253,9 @@
   border-radius: var(--radius-inner-lg-gap-3px);
 }
 
-/* Featured cases: card 32px radius, 12px padding → inner = 32 − 12 = 20px (concentric) */
-.featured-cases {
+/* Featured cases and case study pages: card 32px radius, 12px padding → inner = 32 − 12 = 20px (concentric) */
+.featured-cases,
+.case-study-page {
   --radius-card: 2rem;
   --radius-inner-gap-3: max(0px, calc(var(--radius-card) - 0.75rem)); /* 12px gap → 20px inner */
 }

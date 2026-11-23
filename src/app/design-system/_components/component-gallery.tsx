@@ -186,7 +186,7 @@ export function CardGallery() {
             </CardAction>
           </CardHeader>
           <CardContent>
-            <p className="type-body text-muted-foreground">
+            <p className="type-body text-foreground">
               Cross-functional product squad, from discovery to launch in nine months.
             </p>
           </CardContent>
@@ -206,7 +206,7 @@ export function CardGallery() {
             <CardDescription>Tighter spacing for dense layouts.</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="type-body text-muted-foreground">
+            <p className="type-body text-foreground">
               Same anatomy: header, title, description, action, content, footer.
             </p>
           </CardContent>

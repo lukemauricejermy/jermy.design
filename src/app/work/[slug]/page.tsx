@@ -7,28 +7,51 @@ import { CaseStudyOverview } from "@/components/case-study/case-study-overview";
 import { CaseStudyCallouts } from "@/components/case-study/case-study-callouts";
 import { CaseStudyRelated } from "@/components/case-study/case-study-related";
 import {
+  CaseStudyOutcome,
+  CaseStudyStory,
+  CaseStudyQuote,
+  CaseStudyDecisions,
+  CaseStudyHowWeWorked,
+  CaseStudyHeldTrue,
+} from "@/components/case-study/case-study-outcome";
+import { outcomeCaseFromDato } from "@/lib/outcome-case";
+import {
   CASE_STUDY_QUERY,
   type CaseStudyQueryResult,
 } from "@/lib/queries/case-study";
 
 export default async function CaseStudyPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { slug } = await params;
+  // Local only: /work/<slug>?preview=1 reads unpublished Dato changes, to
+  // check a case before publishing it. Production always reads published.
+  const preview =
+    process.env.NODE_ENV === "development" && (await searchParams).preview === "1";
 
   const { caseStudy } = await performRequest<CaseStudyQueryResult>({
     query: CASE_STUDY_QUERY,
     variables: { slug },
+    ...(preview && {
+      includeDrafts: true,
+      token: process.env.DATOCMS_PREVIEW_API_TOKEN,
+    }),
   });
 
   if (!caseStudy) {
     notFound();
   }
 
+  // Cases with an outcome headline use the outcome-first template; the rest
+  // keep the original overview + callouts layout until they're rewritten.
+  const outcome = outcomeCaseFromDato(caseStudy);
+
   return (
-    <main>
+    <main className="case-study-page">
       <div className="relative z-10 pointer-events-none">
         <div className="pointer-events-auto bg-background">
           <Header />
@@ -39,8 +62,21 @@ export default async function CaseStudyPage({
             imagery={caseStudy.heroImagery}
             imageryMobile={caseStudy.heroImageryMobile}
           />
-          <CaseStudyOverview caseStudy={caseStudy} />
-          <CaseStudyCallouts callouts={caseStudy.callouts} />
+          {outcome ? (
+            <>
+              <CaseStudyOutcome draft={outcome} />
+              <CaseStudyStory draft={outcome} />
+              <CaseStudyQuote draft={outcome} />
+              <CaseStudyDecisions draft={outcome} />
+              <CaseStudyHowWeWorked draft={outcome} />
+              <CaseStudyHeldTrue draft={outcome} />
+            </>
+          ) : (
+            <>
+              <CaseStudyOverview caseStudy={caseStudy} />
+              <CaseStudyCallouts callouts={caseStudy.callouts} />
+            </>
+          )}
           <CaseStudyRelated
             related={[caseStudy.relatedCaseStudy1, caseStudy.relatedCaseStudy2]}
           />

@@ -64,7 +64,7 @@ function ValueIllustration({
   const { src, darkSrc, width, height } = illustration;
   const sizes = "(min-width: 1024px) 400px, 80vw";
   const img =
-    "absolute inset-0 size-full object-cover object-top transition-opacity duration-[320ms]";
+    "absolute inset-0 size-full object-cover object-top";
   return (
     <div
       className={cn(
@@ -604,8 +604,8 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
             distance={animationDistances.default}
             easing={animationEasings.smooth}
           >
-            <Lead className="text-foreground">
-              There&apos;s a core set of principles that guide how I work — part
+            <Lead>
+              There&apos;s a core set of principles that guide how I work: part
               manifesto, part checklist. They&apos;re what I return to when I need
               to sense-check decisions and stay true to myself.
             </Lead>
@@ -617,7 +617,7 @@ export default function ValuesClient({ values }: { values: ValueWithSvg[] }) {
             distance={animationDistances.default}
             easing={animationEasings.smooth}
           >
-            <Lead className="text-foreground">
+            <Lead>
               If you know me, you&apos;ve probably heard these before.
             </Lead>
           </FadeUp>

@@ -45,3 +45,6 @@ next-env.d.ts
 
 # Case study interview notes and drafts (may be confidential; repo is public)
 /notes/
+
+# Local-only draft case study assets (repo is public)
+/public/drafts/

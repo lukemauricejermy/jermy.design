@@ -331,12 +331,12 @@ function CaseStudyText({ study }: { study: CaseStudy }) {
           </Badge>
         )}
       </div>
-      {short && <p data-deal="text" className="type-lead text-balance text-muted-foreground">{short}</p>}
+      {short && <p data-deal="text" className="type-lead text-balance text-foreground">{short}</p>}
     </div>
   );
 }
 
-function PublishedCaseStudyCard({ study }: { study: CaseStudy }) {
+export function PublishedCaseStudyCard({ study }: { study: CaseStudy }) {
   return (
     <Link href={`/work/${study.slug}`} className="group block select-none">
       <BrandTile study={study} />
@@ -407,16 +407,16 @@ export default async function FeaturedCases() {
             easing={animationEasings.smooth}
             className="flex flex-col gap-8"
           >
-            <Lead className="text-foreground">
-              I&apos;ve spent the last 20 years creating digital products —
+            <Lead>
+              I&apos;ve spent the last 20 years creating digital products:
               leading design teams{" "}
               <span className="whitespace-nowrap">in-house</span>, consulting, and running my own
               design studio. I&apos;ve worked across many industries, alongside
               some exceptional teams and people.
             </Lead>
-            <Lead className="text-foreground">
-              This portfolio is a curated snapshot of that work — a selection of
-              the projects I&apos;m most proud of and able to share publicly.
+            <Lead>
+              This portfolio is a curated snapshot of that work, the
+              projects I&apos;m most proud of and able to share publicly.
             </Lead>
           </FadeUp>
         </div>

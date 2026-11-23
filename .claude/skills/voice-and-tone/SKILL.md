@@ -72,7 +72,11 @@ GOV.UK style guide.
 - **British English**: colour, organisation, centre, -ise endings.
 - **Sentence case** for headings, buttons and labels. No title case, no full
   stops on headings, except for deliberate statements like the hero.
-- **Em dashes with spaces** ( — ) for asides, as in the existing copy.
+- **No em dashes** (— or –) anywhere in site copy, including case studies and
+  Dato content. They read as a tell of AI-written text. Rewrite instead: a
+  full stop and a new sentence, a colon before an explanation or list, a
+  comma for a light aside, or brackets. Don't just swap in an en dash or
+  hyphen. (Em dashes in code comments are fine.)
 - **Numbers as numerals** (20 years, 3 months); thousands with commas (5,652).
 - **Hyphenate compound modifiers** before a noun: early-stage startups,
   long-term thinking.
@@ -92,7 +96,7 @@ Before shipping copy, check:
 - [ ] Active voice, concrete verbs, no hype adjectives?
 - [ ] Jargon or acronyms the visitor might not know?
 - [ ] Links and buttons say what they do?
-- [ ] British spelling, sentence case, spaced em dashes?
+- [ ] British spelling, sentence case, no em dashes?
 - [ ] Reads aloud like Luke talking, not a brochure?
 
 ## References

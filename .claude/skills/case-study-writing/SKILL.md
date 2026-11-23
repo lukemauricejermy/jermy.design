@@ -13,7 +13,7 @@ seconds, 50+ portfolios a sitting). So every case answers, in this order:
 1. **What changed because of this work?** (outcome)
 2. **What did Luke own?** (role, team, scope)
 3. **How did he get there?** (the few decisions that mattered, with proof)
-4. **What did it teach him?** (judgement, skills, what he'd do differently)
+4. **What did it prove?** (the principles it put to work, what he'd do differently)
 
 Copy follows the `voice-and-tone` skill. This skill sets the shape and the
 interview that gathers the raw material.
@@ -30,6 +30,15 @@ interview that gathers the raw material.
 - **Role, explicitly.** Title, team shape, what Luke did himself versus led
   or influenced. Credit the team by name or role; claiming everything reads as
   ego (Tom Scott).
+- **"We", not "I".** Write the story in the first person plural; the work was
+  a team's. Luke's part is carried by the facts (role) and the "My role"
+  section, written without "I" ("Product design lead and owner of…",
+  "Day to day: walking the group through…"). Never claim a process, method
+  or idea that came from the agency, client or team: credit it ("Neverbland's
+  two-week sprint").
+- **Proof, not lessons.** Luke has 20 years in the field; a case rarely
+  *taught* him the basics. Frame the closing section as what the project put
+  to work or proved again, plus one honest thing he'd do differently.
 - **The work before the work.** At lead level, framing, alignment and
   reframing the ask are most of the job. Show them, not just screens.
 - **Decisions, not process.** No double-diamond tour, personas or journey maps
@@ -50,17 +59,26 @@ Each section maps to a field in Dato (see "Dato model" below).
    not "Vemi mobile app". Six to 14 words. Also feeds the work tile's short line.
 2. **Facts** — client, what it is (one line), Luke's role, team, duration, year,
    platform. Scannable, sidebar or strip.
-3. **Impact** — two to four results. Each: a value ("500+", "15 min", "MVP in
-   3 months") and a plain label. Optional client or colleague quote.
+3. **Impact** — two to four results. Each is exactly two parts: a value and a
+   plain label of a few words ("500+" / "change-makers using it",
+   "Build-ready" / "every journey documented for engineering"). Where there
+   are no honest numbers, a one-word outcome works better than a weak number.
+   No quotes or extra lines here; the page's one pull quote sits further down.
 4. **The starting point** — two or three sentences: the situation, what was
    at stake, the real problem (and how it was reframed, if it was).
 5. **My role** — what Luke owned, who he worked with, the balance of
    strategy, hands-on craft and leadership. One short paragraph.
-6. **Key decisions** (2–4) — each a titled section: the decision, why, the
-   trade-off, then the visual proof (screens, flows, system, artefacts).
-   Replaces the current "callouts". The crunchy UX lives here.
-7. **What it taught me** — two or three lessons or skills sharpened, and what
-   he'd do differently. Honest, specific, not a skills cloud.
+6. **The work** (3–4 highlights) — each a titled section giving a flavour
+   of the hardest, most interesting work: what made it complex, how we
+   handled it, then the visual proof (annotated Figma frames, flows, system,
+   artefacts). Show the brain-scratching, not just finished screens.
+   Replaces the current "callouts". Include the design system where it was a
+   big part of the project.
+6b. **How we worked** (optional) — process and team culture, each point
+   beside the picture that shows it.
+7. **What held true** — two or three principles the project proved again
+   (not lessons learned), each tied to something that happened, plus one
+   honest "next time". Specific, not a skills cloud.
 8. **Related cases.**
 
 ## The interview
@@ -98,7 +116,7 @@ after, a moment. Note what's confidential. Record answers verbatim in
   without owning?
 - Who were the key stakeholders, and how did you work with them?
 
-**4. Key decisions** (repeat for 2–4)
+**4. The work** (repeat for 3–4 highlights)
 - What was the decision or turning point?
 - What were the options, and why this one? What did you give up?
 - How did you get alignment? Who disagreed?
@@ -110,8 +128,8 @@ after, a moment. Note what's confidential. Record answers verbatim in
 - What didn't work, or what would you undo?
 - Biggest surprise along the way?
 
-**6. Lessons and skills**
-- What did this project teach you that you still use?
+**6. Principles and skills**
+- Which of your principles did this project prove or put to the test?
 - Which skills did it stretch (craft, systems, research, facilitation,
   leadership, commercial)?
 - What would you do differently with hindsight?
@@ -143,12 +161,21 @@ The case study model (`case_study`) has today: `title`, `slug`, `excerpt`,
 `scores`, `methodologies`, `technologies`, `hero_*` images, `cover_image`,
 `client_logo`, `hero_background_colour`, `featured`, related links.
 
-Additions for this structure (agree with Luke before changing the schema):
-`outcome_headline` (string), `impact` (blocks of `impact_stat`: value, label),
-`quote` (block: text, name, role), `team` (string), `platform` (string),
-`starting_point` (structured text), `my_role` (structured text),
-`lessons` (structured text). `callouts` stays as the key decisions (title,
-then image + text blocks). `overview_text` is retired once its content moves.
+In place since Nov 2026, in the "Outcome-first case" fieldset (setting
+`outcome_headline` switches a case to the new template):
+`outcome_headline`, `summary`, `facts` (blocks of `case_fact`: label, value),
+`impact` (`case_impact`: value, label), `quote_text` + `quote_role`,
+`starting_point`, `my_role` (text; paragraphs split on blank lines),
+`highlights_heading` + `highlights` (`case_highlight`: title, body, images
+gallery, captions from asset titles), `ways_of_working`
+(`case_way_of_working`: title, body, image or `visual: "sprint"`, quote and
+role), `principles_heading` + `principles` (`case_principle`: title, body),
+`next_time`. The old `overview_text`, `scores` and `callouts` stay for cases
+not yet rewritten.
+
+Workflow for a new case: draft in `notes/cases/<slug>.draft.json` and review
+at `/work/<slug>/draft` (local only), then write it into Dato, check
+`/work/<slug>?preview=1` locally, and Luke publishes.
 
 ## Sources
 

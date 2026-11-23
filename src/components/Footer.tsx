@@ -44,7 +44,7 @@ export default async function Footer() {
             easing={animationEasings.smooth}
             className="flex flex-col items-center gap-8 lg:items-start"
           >
-            <Lead className="max-w-xl text-balance text-foreground lg:text-pretty">
+            <Lead className="max-w-xl text-balance lg:text-pretty">
               Whether it&apos;s a role, a project or a sounding board, I&apos;m
               always up for a chat.
             </Lead>

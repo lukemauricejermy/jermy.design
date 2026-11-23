@@ -1,62 +1,15 @@
-import Link from "next/link";
-import Image from "next/image";
 import { H2 } from "@/components/ui/typography";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { StaggerChildren } from "@/components/animations";
-import {
-  animationDurations,
-  animationEasings,
-  animationDistances,
-} from "@/lib/animation-config";
+import { DealIn } from "@/components/animations";
+import { PublishedCaseStudyCard } from "@/components/FeaturedCases";
 import type { RelatedCaseStudy } from "@/lib/queries/case-study";
 
 interface CaseStudyRelatedProps {
   related: (RelatedCaseStudy | null)[];
 }
 
-function RelatedCard({ study }: { study: RelatedCaseStudy }) {
-  return (
-    <Link
-      href={`/work/${study.slug}`}
-      className="group block h-full select-none"
-    >
-      <Card className="h-full flex flex-col overflow-hidden rounded-[var(--radius-card)] py-3 md:py-6 transition-shadow group-hover:shadow-md">
-        <CardContent className="pt-0 px-3 md:px-6">
-          <div className="aspect-video bg-muted relative rounded-[calc(var(--radius-card)-0.75rem)] md:rounded-lg overflow-hidden">
-            {study.coverImage ? (
-              <Image
-                src={study.coverImage.url}
-                alt={study.coverImage.alt || study.title}
-                width={600}
-                height={338}
-                className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.02]"
-              />
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center bg-muted" />
-            )}
-          </div>
-        </CardContent>
-        <CardHeader className="gap-1.5 px-3 md:px-6 pb-5 md:pb-7">
-          <CardTitle className="type-title-sm">
-            {study.title}
-          </CardTitle>
-          {study.excerpt && (
-            <CardDescription className="type-body text-foreground">
-              {study.excerpt}
-            </CardDescription>
-          )}
-        </CardHeader>
-      </Card>
-    </Link>
-  );
-}
-
+// Related cases use the same tile as the homepage's featured cases (brand
+// colour field, logo or tile art, title, year and short line), dealt in the
+// same way.
 export function CaseStudyRelated({ related }: CaseStudyRelatedProps) {
   const studies = related.filter((study): study is RelatedCaseStudy =>
     Boolean(study)
@@ -65,25 +18,18 @@ export function CaseStudyRelated({ related }: CaseStudyRelatedProps) {
   if (studies.length === 0) return null;
 
   return (
-    <section className="bg-background px-6 py-56">
-      <div className="mx-auto flex w-full max-w-[90rem] flex-col items-center gap-16">
-        {/* Full-width section title */}
-        <H2 className="w-full">
+    <section className="overflow-x-clip bg-background px-6 py-56">
+      <div className="mx-auto flex w-full max-w-[90rem] flex-col">
+        {/* Same rhythm as the case sections: heading, a rule, then the content. */}
+        <H2 className="w-full pb-8 text-center md:pb-12 md:text-left">
           Carry on through the archives
         </H2>
 
-        <StaggerChildren
-          triggerOnScroll
-          delayBetween={80}
-          duration={animationDurations.default}
-          distance={animationDistances.default}
-          easing={animationEasings.smooth}
-          className="grid w-full grid-cols-1 gap-8 lg:grid-cols-2"
-        >
+        <DealIn className="featured-cases grid w-full grid-cols-1 gap-x-8 gap-y-16 border-t border-border pt-16 sm:grid-cols-2 md:pt-20">
           {studies.map((study) => (
-            <RelatedCard key={study.id} study={study} />
+            <PublishedCaseStudyCard key={study.id} study={study} />
           ))}
-        </StaggerChildren>
+        </DealIn>
       </div>
     </section>
   );

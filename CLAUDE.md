@@ -46,12 +46,13 @@ src/
     layout.tsx            Root layout: PreLoader + ThemeProvider
     page.tsx              Homepage (force-dynamic): Header, Hero, SocialProof, FeaturedCases, Values, Footer
     work/page.tsx         Case study index
-    work/[slug]/page.tsx  Case study template
+    work/[slug]/page.tsx  Case study template (outcome-first when the case has an outcome headline, else the original layout)
+    work/[slug]/draft/    Local-only review of a case being written, from notes/cases/<slug>.draft.json
     globals.css           Tailwind import, design tokens, light/dark variables
     fonts.css             Matter (sans) + DM Mono (mono)
   components/
     ui/                   shadcn primitives
-    case-study/           Case study sections (hero, overview, callouts, related, rich-text)
+    case-study/           Case study sections: hero, related, case-study-outcome (the outcome-first sections), and the original overview/callouts
     animations/           FadeUp, TextReveal, StaggerChildren, DealIn
   lib/
     datocms.ts            performRequest() — the single entry point for Dato queries
@@ -71,6 +72,7 @@ src/
 - Dato images are served from `www.datocms-assets.com` (allowed in `next.config.ts` for `next/image`).
 - Drafts: `FeaturedCases` uses the preview token with `includeDrafts: true` and shows unpublished featured cases as "coming soon" (detected via a null `_publishedAt`). Keep other pages on published content only.
 - Missing records → `notFound()`.
+- Case studies: the outcome-first template reads the "Outcome-first case" fieldset on `case_study` (blocks `case_fact`, `case_impact`, `case_highlight`, `case_way_of_working`, `case_principle`; text fields split into paragraphs on blank lines; image captions come from the asset title). `outcomeCaseFromDato` in `lib/outcome-case.ts` maps it for the components. In development, `/work/<slug>?preview=1` reads unpublished changes. Luke publishes in Dato.
 
 ### Components & styling
 
@@ -79,7 +81,7 @@ src/
 
 ### Copy
 
-- Any words on the site (headings, intros, case lines, buttons, microcopy) follow the `voice-and-tone` skill in `.claude/skills/voice-and-tone/`: Luke's voice (plain, confident, a bit wry), UX writing fundamentals from NN/g and GOV.UK, house style (British English, sentence case, spaced em dashes) and a review checklist.
+- Any words on the site (headings, intros, case lines, buttons, microcopy) follow the `voice-and-tone` skill in `.claude/skills/voice-and-tone/`: Luke's voice (plain, confident, a bit wry), UX writing fundamentals from NN/g and GOV.UK, house style (British English, sentence case, no em dashes in copy) and a review checklist.
 - Case studies follow the `case-study-writing` skill in `.claude/skills/case-study-writing/`: outcome-first structure, the interview used to gather each case, and planned Dato fields. Interview notes and drafts live in `notes/cases/` (gitignored, because the repo is public).
 
 ### Typography

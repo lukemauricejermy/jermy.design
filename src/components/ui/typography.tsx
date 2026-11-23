@@ -27,7 +27,7 @@ const typographyVariants = cva("", {
       "title-lg": "type-title-lg",
       title: "type-title",
       "title-sm": "type-title-sm",
-      lead: "type-lead text-muted-foreground",
+      lead: "type-lead text-foreground",
       body: "type-body",
       "body-long": "type-body-long",
       label: "type-label",

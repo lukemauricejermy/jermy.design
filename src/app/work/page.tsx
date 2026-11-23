@@ -63,7 +63,7 @@ export default async function WorkPage() {
                   {study.title}
                 </h2>
                 {study.excerpt && (
-                  <p className="text-muted-foreground">{study.excerpt}</p>
+                  <p className="text-foreground">{study.excerpt}</p>
                 )}
               </article>
             </Link>
