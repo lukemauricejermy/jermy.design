@@ -298,15 +298,41 @@ function ElsewhereArt() {
   );
 }
 
-/** Plocka: the hero in miniature, the lemon wordmark over the Grow screen. */
+/**
+ * Plocka: the Grow screen with real components from the app in straight
+ * columns either side, like the hero without the wordmark. The phone runs off
+ * the bottom of the tile.
+ */
+const PLOCKA_TILE_LEFT = [
+  { src: "tile-soil-v3", w: 496, h: 298, r: 70 },
+  { src: "tile-frost-v3", w: 496, h: 298, r: 70 },
+];
+const PLOCKA_TILE_RIGHT = [
+  { src: "tile-daylight-v3", w: 496, h: 298, r: 70 },
+  { src: "card-tomato-v3", w: 536, h: 778, r: 64 },
+];
+
 function PlockaArt() {
   const dir = "/images/cases/plocka-v1";
+  const column = (items: typeof PLOCKA_TILE_LEFT, side: "left" | "right") => (
+    <div
+      className="absolute top-[22%] flex w-[22cqw] flex-col gap-[1.6cqw]"
+      style={{ [side === "left" ? "right" : "left"]: "calc(50% + 16cqw)" }}
+    >
+      {items.map((f) => (
+        <div
+          key={f.src}
+          className="overflow-hidden shadow-[0_1.6cqw_3.2cqw_-1.2cqw_rgb(0_20_9/0.45)]"
+          style={{ borderRadius: `calc(22cqw * ${(f.r / f.w).toFixed(4)})` }}
+        >
+          <Image src={`${dir}/components/${f.src}.webp`} alt="" width={f.w} height={f.h} sizes="15vw" className="block h-auto w-full" />
+        </div>
+      ))}
+    </div>
+  );
   return (
     <div className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-[1.04]">
-      <div className="absolute inset-x-0 top-[11%] flex justify-center">
-        <Image src={`${dir}/logo-lemon.svg`} alt="Plocka" width={535} height={133} unoptimized className="h-auto w-[26%]" />
-      </div>
-      <div className="absolute top-[30%] left-1/2 w-[34%] -translate-x-1/2 rounded-[3.4cqw] bg-neutral-950 p-[0.6cqw] shadow-[0_2cqw_5cqw_-1.5cqw_rgb(0_20_9/0.5)]">
+      <div className="absolute top-[10%] left-1/2 w-[30cqw] -translate-x-1/2 rounded-[3.4cqw] bg-neutral-950 p-[0.6cqw] shadow-[0_2cqw_5cqw_-1.5cqw_rgb(0_20_9/0.5)]">
         <Image
           src={`${dir}/screens/grow-cloudy-v3.webp`}
           alt=""
@@ -316,6 +342,8 @@ function PlockaArt() {
           className="block h-auto w-full rounded-[2.8cqw]"
         />
       </div>
+      {column(PLOCKA_TILE_LEFT, "left")}
+      {column(PLOCKA_TILE_RIGHT, "right")}
     </div>
   );
 }
