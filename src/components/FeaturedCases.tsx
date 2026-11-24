@@ -93,7 +93,7 @@ const SHORT_LINES: Record<string, string> = {
   foundgood: "Measuring impact for philanthropy",
   sourcewhere: "Finding the unfindable in luxury fashion",
   techsoup: "A tech marketplace for nonprofits",
-  elsewhere: "A people-first product studio",
+  elsewhere: "A people-first digital product studio",
 };
 
 type AllCaseStudiesQueryResult = {
@@ -270,9 +270,36 @@ function FoundgoodArt() {
   );
 }
 
+function ElsewhereArt() {
+  const dir = "/images/cases/elsewhere-v1";
+  // The case hero in miniature: the burst covering the tile, a smaller
+  // wordmark in the middle.
+  return (
+    <div className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-[1.04]">
+      <div
+        aria-hidden
+        className="absolute top-1/2 left-1/2 aspect-square w-[112cqw] -translate-x-1/2 -translate-y-1/2"
+      >
+        <Image src={`${dir}/burst-hero-v2.png`} alt="" fill sizes="(min-width: 640px) 60vw, 110vw" className="object-contain" />
+      </div>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <Image
+          src={`${dir}/wordmark-white.svg`}
+          alt="elsewhere"
+          width={948}
+          height={158}
+          unoptimized
+          className="h-auto w-[38%]"
+        />
+      </div>
+    </div>
+  );
+}
+
 const TILE_ART: Record<string, () => React.ReactNode> = {
   vemi: VemiArt,
   foundgood: FoundgoodArt,
+  elsewhere: ElsewhereArt,
 };
 
 function BrandTile({ study, overlay }: { study: CaseStudy; overlay?: string }) {
