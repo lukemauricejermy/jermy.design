@@ -14,7 +14,7 @@ import {
 // many words as fit), e.g. "Still doing the / doing." when "the" fits.
 const HEADLINE = "Head\u00a0of design.\nStill\u00a0doing the doing.";
 // What Luke is doing now, under the headline. Update when it changes.
-const STATUS = "Currently head of design at VISIT";
+const STATUS = { text: "Currently head of design at", company: "VISIT", href: "https://visit.com" };
 // The headline's reveal, and the moment it finishes: the status line fades in
 // only after the last letter has landed. TextReveal staggers every character
 // of every word (non-breaking spaces included), not the spaces between words.
@@ -213,7 +213,17 @@ export default function Hero() {
           <span className="absolute inset-0 animate-ping rounded-full bg-status-live opacity-60 motion-reduce:hidden" />
           <span className="relative size-2.5 rounded-full bg-status-live" />
         </span>
-        {STATUS}
+        <span>
+          {STATUS.text}{" "}
+          <a
+            href={STATUS.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline decoration-foreground/30 decoration-1 underline-offset-4 transition-colors hover:decoration-foreground"
+          >
+            {STATUS.company}
+          </a>
+        </span>
       </p>
 
       {/* Portrait: stacked under the headline on phones (centred, like the

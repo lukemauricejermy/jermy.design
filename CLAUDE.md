@@ -110,7 +110,7 @@ src/
 
 ### Hero status and greeting flag
 
-- The hero's current status (`STATUS` in `Hero.tsx`, e.g. "Currently head of design at VISIT") sits under the headline on phones and pinned bottom left on desktop, level with the bottom of the portrait. The headline fit reserves its room. Update the string when the role changes.
+- The hero's current status (`STATUS` in `Hero.tsx`: text, company and its link, e.g. "Currently head of design at VISIT" linking to visit.com) sits under the headline on phones and pinned bottom left on desktop, level with the bottom of the portrait. The headline fit reserves its room. Update the string when the role changes.
 - The preloader greeting badge shows the visitor's flag on the left: circle-flags (MIT, HatScripts), self-hosted in `public/flags/<iso>.svg`. The pill wraps it with an even 0.25rem inset (plus the border) so the flag sits concentric in the rounded end. No country (local dev), no flag.
 
 ### Hero and footer video
