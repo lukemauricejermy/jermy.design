@@ -4,6 +4,7 @@ import { performRequest } from "@/lib/datocms";
 import { Header } from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CaseStudyHero } from "@/components/case-study/case-study-hero";
+import { HERO_ART } from "@/components/case-study/hero-art";
 import { CaseStudyRelated } from "@/components/case-study/case-study-related";
 import {
   CaseStudyOutcome,
@@ -43,29 +44,36 @@ export default async function CaseStudyDraftPage({
     query: CASE_STUDY_QUERY,
     variables: { slug },
   });
-  if (!caseStudy) notFound();
+  // A case that isn't in Dato yet takes its hero from the draft file.
+  if (!caseStudy && !draft.hero) notFound();
+  const heroImage = draft.hero?.imagery
+    ? { url: draft.hero.imagery.url, alt: draft.hero.imagery.caption, width: draft.hero.imagery.width, height: draft.hero.imagery.height }
+    : null;
+  const hero = {
+    title: caseStudy?.title ?? draft.title ?? slug,
+    backgroundColour: caseStudy?.heroBackgroundColour?.hex ?? draft.hero?.colour ?? null,
+    logo: caseStudy?.clientLogo ?? null,
+    imagery: caseStudy?.heroImagery ?? heroImage,
+    imageryMobile: caseStudy?.heroImageryMobile ?? heroImage,
+  };
 
   return (
     <main className="case-study-page">
       <div className="relative z-10 pointer-events-none">
         <div className="pointer-events-auto bg-background">
           <Header />
-          <CaseStudyHero
-            title={caseStudy.title}
-            backgroundColour={caseStudy.heroBackgroundColour?.hex ?? null}
-            logo={caseStudy.clientLogo}
-            imagery={caseStudy.heroImagery}
-            imageryMobile={caseStudy.heroImageryMobile}
-          />
+          <CaseStudyHero {...hero} art={HERO_ART[slug]?.()} />
           <CaseStudyOutcome draft={draft} />
           <CaseStudyStory draft={draft} />
           <CaseStudyQuote draft={draft} />
           <CaseStudyDecisions draft={draft} />
           <CaseStudyHowWeWorked draft={draft} />
           <CaseStudyHeldTrue draft={draft} />
-          <CaseStudyRelated
-            related={[caseStudy.relatedCaseStudy1, caseStudy.relatedCaseStudy2]}
-          />
+          {caseStudy && (
+            <CaseStudyRelated
+              related={[caseStudy.relatedCaseStudy1, caseStudy.relatedCaseStudy2]}
+            />
+          )}
         </div>
         {/* Spacer: matches footer height so fixed footer is revealed as content scrolls away */}
         <div

@@ -12,6 +12,7 @@ import {
 } from "@/lib/animation-config";
 import { cn } from "@/lib/utils";
 import { SURFACE_CLASS } from "@/components/case-study/surface";
+import { CaseStudyShowcase } from "@/components/case-study/case-study-showcase";
 import type { OutcomeCase, DraftImage } from "@/lib/outcome-case";
 
 const fade = {
@@ -54,6 +55,16 @@ function Figure({ image, className, style }: { image: DraftImage; className?: st
 // the row is its aspect ratio. Stacks on phones.
 function ImageRow({ images }: { images: DraftImage[] }) {
   if (images.length === 0) return null;
+  // Four or more read as a gallery: a grid of equal tiles instead of one row.
+  if (images.length > 3) {
+    return (
+      <StaggerChildren {...fade} delayBetween={60} className={cn("grid w-full grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2", images.length !== 4 && "lg:grid-cols-3")}>
+        {images.map((image) => (
+          <Figure key={image.url} image={image} />
+        ))}
+      </StaggerChildren>
+    );
+  }
   return (
     <StaggerChildren {...fade} delayBetween={80} className="flex w-full flex-col gap-8 md:flex-row md:items-start md:gap-6">
       {images.map((image) => (
@@ -201,8 +212,9 @@ export function CaseStudyDecisions({ draft }: { draft: OutcomeCase }) {
                 <Paragraphs items={decision.body} />
               </FadeUp>
             </div>
+            {decision.showcase && <CaseStudyShowcase items={decision.showcase} />}
             <ImageRow images={decision.images} />
-            {decision.images.length === 0 && decision.placeholder && (
+            {decision.images.length === 0 && !decision.showcase && decision.placeholder && (
               <div className="flex aspect-video w-full items-center justify-center rounded-[var(--radius-card)] border border-dashed border-border p-6 text-center">
                 <P className="max-w-md text-muted-foreground">{decision.placeholder}</P>
               </div>

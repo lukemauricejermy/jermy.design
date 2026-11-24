@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import type { CaseAsset, CaseStudy } from "@/lib/queries/case-study";
+import { CASE_SHOWCASES } from "@/lib/case-showcases";
 
 // Case studies in the outcome-first structure (see the case-study-writing
 // skill). Live cases come from Dato (outcomeCaseFromDato); drafts being
@@ -14,7 +15,30 @@ export interface DraftImage {
   height: number;
 }
 
+// Real screens shown in device or browser frames on a brand-colour canvas.
+export interface ShowcaseImage {
+  url: string;
+  alt: string;
+  width: number;
+  height: number;
+}
+
+export type Showcase = {
+  label: string;
+  caption?: string;
+  // Spans both columns on desktop.
+  wide?: boolean;
+  bg: string;
+  fg?: string;
+} & (
+  | { kind: "phones"; screens: ShowcaseImage[] }
+  | { kind: "browser"; screen: ShowcaseImage; float?: ShowcaseImage }
+);
+
 export interface OutcomeCase {
+  /** Draft files only: hero for a case that isn't in Dato yet. */
+  title?: string;
+  hero?: { colour: string; imagery?: DraftImage };
   outcomeHeadline: string;
   summary: string;
   facts: { label: string; value: string }[];
@@ -29,6 +53,7 @@ export interface OutcomeCase {
     title: string;
     body: string[];
     images: DraftImage[];
+    showcase?: Showcase[];
     placeholder?: string;
   }[];
   heldTrueHeading?: string;
@@ -84,6 +109,7 @@ export function outcomeCaseFromDato(cs: CaseStudy): OutcomeCase | null {
       title: h.title,
       body: paragraphs(h.body),
       images: h.images.map(toImage).filter((i): i is DraftImage => i !== null),
+      showcase: CASE_SHOWCASES[cs.slug]?.[h.title],
     })),
     heldTrueHeading: cs.principlesHeading ?? undefined,
     heldTrue: cs.principles.map((p) => ({ title: p.title, body: p.body ?? "" })),

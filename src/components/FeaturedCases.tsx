@@ -93,6 +93,7 @@ const SHORT_LINES: Record<string, string> = {
   foundgood: "Measuring impact for philanthropy",
   sourcewhere: "Finding the unfindable in luxury fashion",
   techsoup: "A tech marketplace for nonprofits",
+  elsewhere: "A people-first product studio",
 };
 
 type AllCaseStudiesQueryResult = {

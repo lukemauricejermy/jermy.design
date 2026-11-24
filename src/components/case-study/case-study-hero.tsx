@@ -1,5 +1,6 @@
 import { FadeUp } from "@/components/animations";
 import { animationDurations, animationEasings } from "@/lib/animation-config";
+import type { ReactNode } from "react";
 import type { DatoImage } from "@/lib/queries/case-study";
 
 interface CaseStudyHeroProps {
@@ -8,6 +9,8 @@ interface CaseStudyHeroProps {
   logo: DatoImage | null;
   imagery: DatoImage | null;
   imageryMobile: DatoImage | null;
+  /** A bespoke composition (see hero-art.tsx) that replaces logo and imagery. */
+  art?: ReactNode;
 }
 
 export function CaseStudyHero({
@@ -16,6 +19,7 @@ export function CaseStudyHero({
   logo,
   imagery,
   imageryMobile,
+  art,
 }: CaseStudyHeroProps) {
   const desktopImagery = imagery;
   const mobileImagery = imageryMobile ?? imagery;
@@ -26,9 +30,17 @@ export function CaseStudyHero({
     // radius plus the gap between the pill and the hero's edge.
     <section className="flex flex-col items-center p-[var(--hero-section-inset)]">
       <div
-        className="relative flex w-full flex-col items-center gap-[var(--hero-content-gap)] self-stretch overflow-hidden rounded-[calc(var(--header-bar-height)/2+var(--header-padding-y)-var(--hero-section-inset))] px-[var(--spacing-3)] pb-[var(--spacing-3)] pt-[calc(var(--header-content-bottom)+var(--hero-content-gap)-var(--hero-section-inset))] md:grid md:h-[var(--hero-tablet-height)] md:max-h-[var(--hero-tablet-height)] md:min-h-0 md:grid-cols-3 md:grid-rows-[minmax(0,1fr)] md:items-stretch md:gap-0 md:p-0 md:pt-0 lg:h-[var(--hero-desktop-height)] lg:max-h-[var(--hero-desktop-height)]"
+        className={`relative flex w-full flex-col items-center gap-[var(--hero-content-gap)] self-stretch overflow-hidden rounded-[calc(var(--header-bar-height)/2+var(--header-padding-y)-var(--hero-section-inset))] px-[var(--spacing-3)] pb-[var(--spacing-3)] pt-[calc(var(--header-content-bottom)+var(--hero-content-gap)-var(--hero-section-inset))] md:grid md:h-[var(--hero-tablet-height)] md:max-h-[var(--hero-tablet-height)] md:min-h-0 md:grid-cols-3 md:grid-rows-[minmax(0,1fr)] md:items-stretch md:gap-0 md:p-0 md:pt-0 lg:h-[var(--hero-desktop-height)] lg:max-h-[var(--hero-desktop-height)]`}
         style={{ backgroundColor: backgroundColour ?? "var(--muted)" }}
       >
+        {art ? (
+          <>
+            {/* Full-bleed art; the spacer sets the hero's height on phones. */}
+            <div aria-hidden className="h-[min(60svh,28rem)] w-full md:hidden" />
+            <div className="absolute inset-0">{art}</div>
+          </>
+        ) : (
+          <>
         {/* Logo — stacked above imagery on mobile; left third on desktop */}
         {logo && (
           <div className="relative z-10 shrink-0 md:col-span-1 md:flex md:h-full md:min-h-0 md:items-center md:justify-center md:px-12 lg:px-24">
@@ -76,6 +88,8 @@ export function CaseStudyHero({
               className="h-full w-full object-contain object-right-bottom lg:object-cover lg:object-right"
             />
           </FadeUp>
+        )}
+          </>
         )}
       </div>
     </section>

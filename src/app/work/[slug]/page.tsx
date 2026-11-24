@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Header } from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CaseStudyHero } from "@/components/case-study/case-study-hero";
+import { HERO_ART } from "@/components/case-study/hero-art";
 import { CaseStudyOverview } from "@/components/case-study/case-study-overview";
 import { CaseStudyCallouts } from "@/components/case-study/case-study-callouts";
 import { CaseStudyRelated } from "@/components/case-study/case-study-related";
@@ -61,6 +62,7 @@ export default async function CaseStudyPage({
             logo={caseStudy.clientLogo}
             imagery={caseStudy.heroImagery}
             imageryMobile={caseStudy.heroImageryMobile}
+            art={HERO_ART[slug]?.()}
           />
           {outcome ? (
             <>
