@@ -55,7 +55,7 @@ function ElsewhereHeroArt() {
 }
 
 /**
- * Plocka: the lemon wordmark, on dark green, then the Grow screen in a phone frame on Plocka
+ * Plocka: the dark green wordmark on green 600, then the Grow screen in a phone frame on Plocka
  * green, lit by a soft glow, with real components from the app in two straight
  * columns either side (soil, ground and frost tiles on the left; the soil read,
  * daylight and a crop card on the right), cut from light-theme captures.
@@ -148,7 +148,7 @@ function PlockaHeroArt() {
           easing={animationEasings.smooth}
           className="w-[min(30cqw,34cqh,16rem)]"
         >
-          <Image src={`${dir}/logo-heavy-lemon.svg`} alt="Plocka" width={539} height={137} priority unoptimized className="h-auto w-full" />
+          <Image src={`${dir}/logo-heavy-dark.svg`} alt="Plocka" width={539} height={137} priority unoptimized className="h-auto w-full" />
         </FadeUp>
       </div>
       <div
