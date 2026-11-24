@@ -38,6 +38,19 @@ function visitorCity() {
 }
 
 /**
+ * The visitor's country as a lower-case ISO code, from the cookie set by
+ * src/proxy.ts. Flags are circle-flags (MIT), self-hosted in public/flags.
+ */
+let cachedCountry: string | null | undefined;
+function getCountry() {
+  if (cachedCountry === undefined) {
+    const match = document.cookie.match(/(?:^|;\s*)visitor-country=([a-z]{2})(?:;|$)/);
+    cachedCountry = match ? match[1] : null;
+  }
+  return cachedCountry;
+}
+
+/**
  * "Good evening, Copenhagen." in the visitor's own local time, or just
  * "Good evening." when we don't know where they are. Read on the client
  * only (the server knows neither), so it renders empty on the server.
@@ -60,6 +73,9 @@ declare global {
 
 export function PreLoader() {
   const greeting = useSyncExternalStore(noSubscribe, getGreeting, () => "");
+  const country = useSyncExternalStore(noSubscribe, getCountry, () => null);
+  const [flagFailed, setFlagFailed] = useState(false);
+  const showFlag = country !== null && !flagFailed;
   const [isVisible, setIsVisible] = useState(true);
   const overlayRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
@@ -159,7 +175,25 @@ export function PreLoader() {
     >
       <div ref={textRef} className="opacity-0">
         {greeting && (
-          <Badge variant="secondary" size="lg">
+          <Badge
+            variant="secondary"
+            size="lg"
+            // With a flag, the pill wraps it evenly: the same 0.25rem inset
+            // above, below and to its left, so the flag sits concentric in
+            // the rounded end. The pill keeps its height (text 1em + 1rem).
+            className={showFlag ? "gap-2 py-1 pl-1" : undefined}
+          >
+            {showFlag && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={`/flags/${country}.svg`}
+                alt=""
+                width={24}
+                height={24}
+                onError={() => setFlagFailed(true)}
+                className="size-[calc(1em+0.5rem)] shrink-0 rounded-full"
+              />
+            )}
             {greeting}
           </Badge>
         )}

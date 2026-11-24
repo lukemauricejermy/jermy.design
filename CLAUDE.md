@@ -41,7 +41,7 @@ Dev CSS quirk: Turbopack serves `globals.css` one save behind, and a `touch` doe
 
 ```
 src/
-  proxy.ts                Edge proxy: puts the visitor's city (Vercel geo IP) in a cookie for the preloader greeting
+  proxy.ts                Edge proxy: puts the visitor's city and country (Vercel geo IP) in cookies for the preloader greeting and its flag
   app/
     layout.tsx            Root layout: PreLoader + ThemeProvider
     page.tsx              Homepage (force-dynamic): Header, Hero, SocialProof, FeaturedCases, Values, Footer
@@ -107,6 +107,11 @@ src/
 - Value illustrations live in `public/images/values/<version>/<key>.png` plus `<key>-dark.png`, cut with `--keep-frame` (full 2048 square) so the character is the same size on every card. Every value needs a night version; pictures with a screen (arcade, laptop) light the face with it. Bump `ILLUSTRATION_VERSION` in `Values.tsx` when replacing images. The old hand-drawn SVGs are in `art/reference/values-hand-drawn/`.
 - Gemini won't reliably mirror a pose: flip the image yourself (`sips -f horizontal`), then ask it to re-light only.
 - When replacing an image in `public/`, use a new filename. Next's image optimiser caches by URL.
+
+### Hero status and greeting flag
+
+- The hero's current status (`STATUS` in `Hero.tsx`, e.g. "Currently head of design at VISIT") sits under the headline on phones and pinned bottom left on desktop, level with the bottom of the portrait. The headline fit reserves its room. Update the string when the role changes.
+- The preloader greeting badge shows the visitor's flag on the left: circle-flags (MIT, HatScripts), self-hosted in `public/flags/<iso>.svg`. The pill wraps it with an even 0.25rem inset (plus the border) so the flag sits concentric in the rounded end. No country (local dev), no flag.
 
 ### Hero and footer video
 

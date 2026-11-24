@@ -13,6 +13,18 @@ import {
 // word can be stranded; everything else wraps greedily (each line takes as
 // many words as fit), e.g. "Still doing the / doing." when "the" fits.
 const HEADLINE = "Head\u00a0of design.\nStill\u00a0doing the doing.";
+// What Luke is doing now, under the headline. Update when it changes.
+const STATUS = "Currently head of design at VISIT";
+// The headline's reveal, and the moment it finishes: the status line fades in
+// only after the last letter has landed. TextReveal staggers every character
+// of every word (non-breaking spaces included), not the spaces between words.
+const REVEAL_DELAY_MS = 120;
+const REVEAL_STAGGER_S = 0.025;
+const REVEAL_CHARS = HEADLINE.replace(/[ \n]/g, "").length;
+const STATUS_DELAY_MS =
+  REVEAL_DELAY_MS + animationDurations.verySlow + REVEAL_STAGGER_S * 1000 * (REVEAL_CHARS - 1);
+// Desktop: clear space between the headline and the pinned status line.
+const STATUS_CLEARANCE_REM = 2;
 
 // How far the top of the portrait reaches up into the last line (em of the
 // headline): enough to overlap the bottoms of the letters, not more.
@@ -91,6 +103,7 @@ export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const portraitRef = useRef<HTMLSpanElement>(null);
+  const statusRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
     if (window.__preloaderDone) {
@@ -109,12 +122,20 @@ export default function Hero() {
     const section = sectionRef.current;
     const heading = headingRef.current;
     const portrait = portraitRef.current;
-    if (!section || !heading || !portrait) return;
+    const status = statusRef.current;
+    if (!section || !heading || !portrait || !status) return;
 
     const fit = () => {
       const s = getComputedStyle(section);
+      // The status line takes its own room first: under the headline on
+      // phones; on desktop pinned bottom left (level with the bottom of the
+      // portrait), where the headline keeps a clear band above it.
+      const statusPinned = getComputedStyle(status).position === "absolute";
+      const statusSpace =
+        status.offsetHeight +
+        (statusPinned ? STATUS_CLEARANCE_REM * parseFloat(getComputedStyle(document.documentElement).fontSize) : parseFloat(getComputedStyle(status).marginTop));
       const available =
-        section.clientHeight - parseFloat(s.paddingTop) - parseFloat(s.paddingBottom);
+        section.clientHeight - parseFloat(s.paddingTop) - parseFloat(s.paddingBottom) - statusSpace;
       const p = getComputedStyle(portrait);
       const stacked = p.position !== "absolute";
       const portraitHeight = (fontSize: number) =>
@@ -169,9 +190,9 @@ export default function Hero() {
       >
         {isPreloaderDone ? (
           <TextReveal
-            delay={120}
+            delay={REVEAL_DELAY_MS}
             duration={animationDurations.verySlow}
-            stagger={0.025}
+            stagger={REVEAL_STAGGER_S}
             easing={animationEasings.robust}
           >
             {HEADLINE}
@@ -180,6 +201,20 @@ export default function Hero() {
           <span className="block whitespace-pre-line opacity-0">{HEADLINE}</span>
         )}
       </Typography>
+
+      <p
+        ref={statusRef}
+        className={`relative z-0 mt-6 flex items-center justify-center gap-3 type-lead text-foreground transition-[opacity,translate] duration-700 ease-out md:absolute md:bottom-[7.5svh] md:left-[7.5vw] md:mt-0 md:justify-start ${
+          isPreloaderDone ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
+        }`}
+        style={{ transitionDelay: isPreloaderDone ? `${STATUS_DELAY_MS}ms` : "0ms" }}
+      >
+        <span aria-hidden className="relative flex size-2.5 shrink-0">
+          <span className="absolute inset-0 animate-ping rounded-full bg-status-live opacity-60 motion-reduce:hidden" />
+          <span className="relative size-2.5 rounded-full bg-status-live" />
+        </span>
+        {STATUS}
+      </p>
 
       {/* Portrait: stacked under the headline on phones (centred, like the
           headline above it); from md, a floating
