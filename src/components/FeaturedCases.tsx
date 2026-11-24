@@ -309,7 +309,7 @@ const PLOCKA_TILE_LEFT = [
 ];
 const PLOCKA_TILE_RIGHT = [
   { src: "tile-daylight-v3", w: 496, h: 298, r: 70 },
-  { src: "card-tomato-v3", w: 536, h: 778, r: 64 },
+  { src: "card-tomato-v4", w: 540, h: 780, r: 70 },
 ];
 
 function PlockaArt() {

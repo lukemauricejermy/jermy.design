@@ -102,7 +102,7 @@ export const CASE_SHOWCASES: Record<string, Record<string, Showcase[]>> = {
         "kind": "phones",
         "label": "Plocka setup",
         "wide": true,
-        "bg": "#03A14A",
+        "bg": "#51AE76",
         "screens": [
           {
             "url": "/images/cases/plocka-v1/screens/soil-v3.webp",
@@ -155,7 +155,7 @@ export const CASE_SHOWCASES: Record<string, Record<string, Showcase[]>> = {
       {
         "kind": "browser",
         "label": "Plocka task review",
-        "bg": "#03A14A",
+        "bg": "#51AE76",
         "screen": {
           "url": "/images/cases/plocka-v1/screens/debug-steps-v3.webp",
           "alt": "The task review page: every step picture, marked good or redo",
@@ -233,7 +233,7 @@ export const CASE_SHOWCASES: Record<string, Record<string, Showcase[]>> = {
         "kind": "phones",
         "label": "Plocka Grow weeks",
         "wide": true,
-        "bg": "#03A14A",
+        "bg": "#51AE76",
         "screens": [
           {
             "url": "/images/cases/plocka-v1/screens/grow-quiet-v3.webp",

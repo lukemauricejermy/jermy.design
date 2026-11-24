@@ -79,7 +79,7 @@ const PLOCKA_RIGHT: PlockaFloat[][] = [
     { src: "chip-acidic-v3", w: 329, h: 96, r: 999, alt: "Acidic, pH 5.2" },
   ],
   [{ src: "tile-daylight-v3", w: 496, h: 298, r: 70, alt: "Daylight: 6h 5m, losing 5 minutes a day" }],
-  [{ src: "card-tomato-v3", w: 536, h: 778, r: 64, alt: "Crop card: tomato, a little trickier" }],
+  [{ src: "card-tomato-v4", w: 540, h: 780, r: 70, alt: "Crop card: tomato, a little trickier" }],
 ];
 
 function PlockaColumn({ rows, side, dir }: { rows: PlockaFloat[][]; side: "left" | "right"; dir: string }) {
