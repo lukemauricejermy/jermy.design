@@ -303,13 +303,14 @@ function ElsewhereArt() {
  * columns either side, like the hero without the wordmark. The phone runs off
  * the bottom of the tile.
  */
-const PLOCKA_TILE_LEFT = [
+type PlockaTileFloat = { src: string; w: number; h: number; r: number; ring?: { colour: string; px: number } };
+const PLOCKA_TILE_LEFT: PlockaTileFloat[] = [
   { src: "tile-soil-v3", w: 496, h: 298, r: 70 },
   { src: "tile-frost-v3", w: 496, h: 298, r: 70 },
 ];
-const PLOCKA_TILE_RIGHT = [
+const PLOCKA_TILE_RIGHT: PlockaTileFloat[] = [
   { src: "tile-daylight-v3", w: 496, h: 298, r: 70 },
-  { src: "card-tomato-v4", w: 540, h: 780, r: 70 },
+  { src: "card-tomato-v5", w: 522, h: 762, r: 61, ring: { colour: "#03A14A", px: 9 } },
 ];
 
 function PlockaArt() {
@@ -323,7 +324,10 @@ function PlockaArt() {
         <div
           key={f.src}
           className="overflow-hidden shadow-[0_1.6cqw_3.2cqw_-1.2cqw_rgb(0_20_9/0.45)]"
-          style={{ borderRadius: `calc(22cqw * ${(f.r / f.w).toFixed(4)})` }}
+          style={{
+            borderRadius: `calc(22cqw * ${((f.r + (f.ring?.px ?? 0)) / f.w).toFixed(4)})`,
+            border: f.ring ? `calc(22cqw * ${(f.ring.px / f.w).toFixed(4)}) solid ${f.ring.colour}` : undefined,
+          }}
         >
           <Image src={`${dir}/components/${f.src}.webp`} alt="" width={f.w} height={f.h} sizes="15vw" className="block h-auto w-full" />
         </div>

@@ -55,7 +55,7 @@ function ElsewhereHeroArt() {
 }
 
 /**
- * Plocka: the dark green wordmark, then the Grow screen in a phone frame on Plocka
+ * Plocka: the lemon wordmark, on dark green, then the Grow screen in a phone frame on Plocka
  * green, lit by a soft glow, with real components from the app in two straight
  * columns either side (soil, ground and frost tiles on the left; the soil read,
  * daylight and a crop card on the right), cut from light-theme captures.
@@ -66,7 +66,9 @@ function ElsewhereHeroArt() {
 const PLOCKA_COLUMN = "28cqh"; // column width
 const PLOCKA_GAP = "4cqh"; // gap between phone and columns, and between items
 // r is the corner radius in source pixels; 999 makes a pill.
-type PlockaFloat = { src: string; w: number; h: number; r: number; alt: string };
+// ring draws an even outline in CSS (as a share of the width) instead of
+// keeping the app's own, which thickens at the corners in captures.
+type PlockaFloat = { src: string; w: number; h: number; r: number; alt: string; ring?: { colour: string; px: number } };
 // Each entry is a row; most rows hold one component, the soil read holds its two chips.
 const PLOCKA_LEFT: PlockaFloat[][] = [
   [{ src: "tile-soil-v3", w: 496, h: 298, r: 70, alt: "Soil: 0 °C, too cold to sow" }],
@@ -79,7 +81,7 @@ const PLOCKA_RIGHT: PlockaFloat[][] = [
     { src: "chip-acidic-v3", w: 329, h: 96, r: 999, alt: "Acidic, pH 5.2" },
   ],
   [{ src: "tile-daylight-v3", w: 496, h: 298, r: 70, alt: "Daylight: 6h 5m, losing 5 minutes a day" }],
-  [{ src: "card-tomato-v4", w: 540, h: 780, r: 70, alt: "Crop card: tomato, a little trickier" }],
+  [{ src: "card-tomato-v5", w: 522, h: 762, r: 61, alt: "Crop card: tomato, a little trickier", ring: { colour: "#03A14A", px: 9 } }],
 ];
 
 function PlockaColumn({ rows, side, dir }: { rows: PlockaFloat[][]; side: "left" | "right"; dir: string }) {
@@ -110,7 +112,8 @@ function PlockaColumn({ rows, side, dir }: { rows: PlockaFloat[][]; side: "left"
                 className="min-w-0 overflow-hidden shadow-[0_3cqh_6cqh_-2.5cqh_rgb(0_20_9/0.5)]"
                 style={{
                   flex: `${f.w} 1 0`,
-                  borderRadius: f.r >= 999 ? "999px" : `calc(${PLOCKA_COLUMN} * ${(f.r / total).toFixed(4)})`,
+                  borderRadius: f.r >= 999 ? "999px" : `calc(${PLOCKA_COLUMN} * ${((f.r + (f.ring?.px ?? 0)) / total).toFixed(4)})`,
+                  border: f.ring ? `calc(${PLOCKA_COLUMN} * ${(f.ring.px / total).toFixed(4)}) solid ${f.ring.colour}` : undefined,
                 }}
               >
                 <Image src={`${dir}/components/${f.src}.webp`} alt={f.alt} width={f.w} height={f.h} sizes="20vw" className="block h-auto w-full" />
@@ -145,7 +148,7 @@ function PlockaHeroArt() {
           easing={animationEasings.smooth}
           className="w-[min(30cqw,34cqh,16rem)]"
         >
-          <Image src={`${dir}/logo-green.svg`} alt="Plocka" width={539} height={137} priority unoptimized className="h-auto w-full" />
+          <Image src={`${dir}/logo-heavy-lemon.svg`} alt="Plocka" width={539} height={137} priority unoptimized className="h-auto w-full" />
         </FadeUp>
       </div>
       <div
