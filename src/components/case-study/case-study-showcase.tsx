@@ -1,6 +1,7 @@
 // Real screens presented the way product studios show work: a few screens in
 // device or browser frames on one flat brand-colour canvas per project. Sizes
-// use container units, so each canvas scales as one picture.
+// use container units, so each canvas scales as one picture. Screens are never
+// tilted or staggered: they sit straight, centred on one line.
 import { StaggerChildren } from "@/components/animations";
 import { animationDurations, animationEasings, animationDistances } from "@/lib/animation-config";
 import { cn } from "@/lib/utils";
@@ -58,7 +59,14 @@ function Canvas({ item }: { item: Showcase }) {
       style={{ backgroundColor: item.bg, color: item.fg ?? "#fff" }}
     >
       {item.kind === "phones" ? (
-        <div className={cn("flex items-center justify-center gap-[3cqw]", item.wide ? "aspect-[16/10]" : "aspect-[4/3]")}>
+        <div
+          className={cn(
+            "flex justify-center gap-[3cqw]",
+            // A pair is too tall to fit: both phones share a top line and run off the bottom.
+            item.screens.length === 2 ? "items-start pt-[6cqw]" : "items-center",
+            item.wide ? "aspect-[16/10]" : "aspect-[4/3]",
+          )}
+        >
           {item.screens.map((screen, i) => {
             const middle = item.screens.length % 2 === 1 && i === Math.floor(item.screens.length / 2);
             const pair = item.screens.length === 2;
@@ -66,7 +74,7 @@ function Canvas({ item }: { item: Showcase }) {
               <Phone
                 key={screen.url}
                 image={screen}
-                className={pair ? cn("w-[30cqw]", i === 0 ? "translate-y-[6cqw] -rotate-3" : "-translate-y-[2cqw] rotate-3") : middle ? "w-[25cqw] -translate-y-[1cqw]" : "w-[21cqw] translate-y-[4cqw]"}
+                className={pair ? "w-[30cqw]" : middle ? "w-[25cqw]" : "w-[21cqw]"}
               />
             );
           })}

@@ -95,6 +95,7 @@ const SHORT_LINES: Record<string, string> = {
   sourcewhere: "Finding the unfindable in luxury fashion",
   techsoup: "A tech marketplace for nonprofits",
   elsewhere: "A people-first digital product studio",
+  plocka: "Growing advice for your own ground",
 };
 
 type AllCaseStudiesQueryResult = {
@@ -297,10 +298,33 @@ function ElsewhereArt() {
   );
 }
 
+/** Plocka: the hero in miniature, the lemon wordmark over the Grow screen. */
+function PlockaArt() {
+  const dir = "/images/cases/plocka-v1";
+  return (
+    <div className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-[1.04]">
+      <div className="absolute inset-x-0 top-[11%] flex justify-center">
+        <Image src={`${dir}/logo-lemon.svg`} alt="Plocka" width={535} height={133} unoptimized className="h-auto w-[26%]" />
+      </div>
+      <div className="absolute top-[30%] left-1/2 w-[34%] -translate-x-1/2 rounded-[3.4cqw] bg-neutral-950 p-[0.6cqw] shadow-[0_2cqw_5cqw_-1.5cqw_rgb(0_20_9/0.5)]">
+        <Image
+          src={`${dir}/screens/grow-cloudy-v3.webp`}
+          alt=""
+          width={750}
+          height={1624}
+          sizes="(min-width: 640px) 20vw, 40vw"
+          className="block h-auto w-full rounded-[2.8cqw]"
+        />
+      </div>
+    </div>
+  );
+}
+
 const TILE_ART: Record<string, () => React.ReactNode> = {
   vemi: VemiArt,
   foundgood: FoundgoodArt,
   elsewhere: ElsewhereArt,
+  plocka: PlockaArt,
 };
 
 function BrandTile({ study, overlay }: { study: CaseStudy; overlay?: string }) {
