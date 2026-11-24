@@ -72,6 +72,7 @@ src/
 - Dato images are served from `www.datocms-assets.com` (allowed in `next.config.ts` for `next/image`).
 - Drafts: `FeaturedCases` uses the preview token with `includeDrafts: true` and shows unpublished featured cases as "coming soon" (detected via a null `_publishedAt`). Keep other pages on published content only.
 - Missing records → `notFound()`.
+- Case lists (homepage, `/work`) are newest first by the `year` field, via `byNewest` in `lib/case-order.ts`; published cases come before "coming soon" drafts.
 - Case studies: the outcome-first template reads the "Outcome-first case" fieldset on `case_study` (blocks `case_fact`, `case_impact`, `case_highlight`, `case_way_of_working`, `case_principle`; text fields split into paragraphs on blank lines; image captions come from the asset title). `outcomeCaseFromDato` in `lib/outcome-case.ts` maps it for the components. In development, `/work/<slug>?preview=1` reads unpublished changes. Luke publishes in Dato. Art direction that isn't content lives in code, keyed by slug: `HERO_ART` (`case-study/hero-art.tsx`) for a bespoke hero, and `CASE_SHOWCASES` (`lib/case-showcases.ts`) for framed screens under a highlight, matched by its title. The showcase presents real screens in phone or browser frames on a flat colour, no labels.
 
 ### Components & styling

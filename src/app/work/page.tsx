@@ -1,6 +1,7 @@
 import { performRequest } from "@/lib/datocms";
 import Link from "next/link";
 import Image from "next/image";
+import { byNewest } from "@/lib/case-order";
 
 const CASE_STUDIES_QUERY = `
   query CaseStudies {
@@ -9,6 +10,7 @@ const CASE_STUDIES_QUERY = `
       title
       slug
       excerpt
+      year
       coverImage {
         url
         alt
@@ -22,6 +24,7 @@ type CaseStudy = {
   title: string;
   slug: string;
   excerpt: string | null;
+  year: string | null;
   coverImage: {
     url: string;
     alt: string | null;
@@ -43,7 +46,7 @@ export default async function WorkPage() {
         <h1 className="text-4xl font-semibold tracking-tight">Work</h1>
         
         <div className="grid gap-8">
-          {allCaseStudies.map((study) => (
+          {byNewest(allCaseStudies).map((study) => (
             <Link
               key={study.id}
               href={`/work/${study.slug}`}

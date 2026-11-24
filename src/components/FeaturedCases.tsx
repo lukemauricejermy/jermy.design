@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { performRequest } from "@/lib/datocms";
+import { byNewest } from "@/lib/case-order";
 import Image from "next/image";
 import { H2, Lead } from "@/components/ui/typography";
 import { Badge } from "@/components/ui/badge";
@@ -39,7 +40,7 @@ const ALL_CASE_STUDIES_QUERY = `
 
 const FEATURED_CASE_STUDIES_PUBLISHED_QUERY = `
   query FeaturedCaseStudies {
-    allCaseStudies(filter: { featured: { eq: true } }, first: 4) {
+    allCaseStudies(filter: { featured: { eq: true } }, first: 100) {
       id
       title
       slug
@@ -160,7 +161,7 @@ async function fetchFeaturedCaseStudies(): Promise<CaseStudy[]> {
   const allWithDrafts = await fetchAllCaseStudiesWithDrafts();
 
   if (!allWithDrafts) {
-    return publishedFeatured;
+    return byNewest(publishedFeatured).slice(0, FEATURED_SLOTS);
   }
 
   const publishedIds = new Set(publishedFeatured.map((study) => study.id));
@@ -168,7 +169,7 @@ async function fetchFeaturedCaseStudies(): Promise<CaseStudy[]> {
     (study) => study.featured && !publishedIds.has(study.id),
   );
 
-  return [...publishedFeatured, ...draftFeatured]
+  return [...byNewest(publishedFeatured), ...byNewest(draftFeatured)]
     .slice(0, FEATURED_SLOTS)
     .map((study) => ({
       ...study,
