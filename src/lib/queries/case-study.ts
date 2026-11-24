@@ -167,6 +167,7 @@ export const CASE_STUDY_QUERY = `
         }
       }
       nextTime
+      nextTimeHeading
 
       # Related projects (same tile as the homepage's featured cases)
       relatedCaseStudy1 {
@@ -342,6 +343,7 @@ export interface CaseStudy {
   principlesHeading: string | null;
   principles: { title: string; body: string | null }[];
   nextTime: string | null;
+  nextTimeHeading: string | null;
 }
 
 /** An image with its caption in the asset title. */

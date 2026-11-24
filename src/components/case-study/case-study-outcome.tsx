@@ -245,7 +245,7 @@ export function CaseStudyHeldTrue({ draft }: { draft: OutcomeCase }) {
           {draft.nextTime && (
             <div className="flex flex-col justify-between gap-6 rounded-[var(--radius-card)] border border-border p-6 md:p-8">
               <Typography variant="title-sm" as="h3">
-                One for next time
+                {draft.nextTimeHeading ?? "One for next time"}
               </Typography>
               <P>{draft.nextTime}</P>
             </div>

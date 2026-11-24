@@ -59,6 +59,8 @@ export interface OutcomeCase {
   heldTrueHeading?: string;
   heldTrue: { title: string; body: string }[];
   nextTime: string | null;
+  /** Replaces "One for next time", e.g. "What's next" for a project still going. */
+  nextTimeHeading?: string;
   heldTrueImages: DraftImage[];
 }
 
@@ -114,6 +116,7 @@ export function outcomeCaseFromDato(cs: CaseStudy): OutcomeCase | null {
     heldTrueHeading: cs.principlesHeading ?? undefined,
     heldTrue: cs.principles.map((p) => ({ title: p.title, body: p.body ?? "" })),
     nextTime: cs.nextTime,
+    nextTimeHeading: cs.nextTimeHeading ?? undefined,
     heldTrueImages: [],
   };
 }
